@@ -41,7 +41,7 @@ public sealed class ServerListBox : BoxContainer
 
     private void AddServers(BoxContainer container)
     {
-        AddServerInfo(container, "МИНИ-СТАНЦИЯ:ОАЗИС", "ss14://ministation.qeqk.ru:1215", "Вайтлист с высоким уровнем отыгрыша", null);
+        AddServerInfo(container, "МИНИ-СТАНЦИЯ", "ss14://msk.veroid.net:30110", "Сервер со средним уровнем отыгрыша", null);
     }
 
     private void AddServerInfo(BoxContainer container, string serverName, string serverUrl, string description, string? discord)
