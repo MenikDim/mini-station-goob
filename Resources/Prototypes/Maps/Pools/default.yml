@@ -2,31 +2,32 @@
 - type: gameMapPool
   id: DefaultMapPool
   maps:
-  # Highpop 55+
-  - CorvaxAstra
-  #- CorvaxAvrite
-  - CorvaxBox
-  - CorvaxChloris
-  #- CorvaxDelta
-  - CorvaxGlacier
-  - CorvaxPilgrim
-
-  # Midpop 25–55
-  # - CorvaxAmber
-  - CorvaxAwesome
-  - CorvaxBagel
-  #- CorvaxMarathon
-  - CorvaxMascara
-  - CorvaxOutpost
-  - CorvaxPaper
-  #- CorvaxPearl
-  - CorvaxVoid
-
-  # Lowpop 0–25
-  - CorvaxMaus
-  - CorvaxOmega
-  - CorvaxPacked
-  # - CorvaxSilly
+  # - Atlas
+  - Amber
+  - Bagel
+  - Box
   - MiniSilly
-  - CorvaxTushkan
-  - CorvaxCluster
+  - MiniCluster
+  #- Core
+  - Fland
+ # - Gate Goobstation - My name is Walter Hartwell White, I live at 2308 Negra alloya line albequrque new mexico.
+  #- Loop Goobstation - I love maintenance!!!
+  - Marathon
+  - Meta
+  - Oasis
+  - MiniOmega
+  - Origin
+  # - Saltern
+  - MiniPacked
+  #- Reach # Goobstation, removed from map pool
+  #- Train # Goobstation - all my friends hate train
+  - FlandHighPop
+  - OasisHighPop
+  - Barratry # Goobstation - Re-add barratry
+  - Kettle # Goobstation - Re-add kettle (before it was gemini!)
+  - Submarine # goobstation - kill yourse
+  - Leonid # Goobstation - for goob by goob
+  - Delta # Goobstation - ported from Corvax
+  - Chloris # Goobstation - also Corvax because we love goidamaps
+  - Cog # those who forget to clear their multitool
+  - Serpentcrest # Goobstation when contra

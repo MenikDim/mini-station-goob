@@ -58,6 +58,9 @@
             "name": "rock_copper"
         },
         {
+            "name": "gibtonite_inactive"
+        },
+        {
             "name": "rock_diamond",
             "delays": [
               [

@@ -322,3 +322,23 @@
     securityLevel: medSecurity
   - type: Wires
     layoutId: AirlockCommand
+
+- type: entity
+  parent: Airlock
+  id: AirlockShaftMiner
+  suffix: Шахтёр
+  components:
+  - type: Sprite
+    sprite: Structures/Doors/Airlocks/Standard/salvage.rsi
+  - type: Wires
+    layoutId: AirlockCargo
+
+- type: entity
+  parent: AirlockGlass
+  id: AirlockShaftMinerGlass
+  suffix: Шахтёр
+  components:
+  - type: Sprite
+    sprite: Structures/Doors/Airlocks/Glass/salvage.rsi
+  - type: Wires
+    layoutId: AirlockCargo

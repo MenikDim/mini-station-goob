@@ -5,8 +5,8 @@
     xmlns:lobby="clr-namespace:Content.Client.Lobby.UI"
     xmlns:style="clr-namespace:Content.Client.Stylesheets"
     xmlns:ui="clr-namespace:Content.Client._Mini.Roadmap.UI"
-    MinSize="400, 500"
-    SetSize="400, 500"
+    MinSize="400, 200"
+    SetSize="400, 200"
     Title="{Loc 'character-blocked-gui'}">
 
     <BoxContainer Orientation="Vertical" VerticalExpand="true" HorizontalExpand="true">

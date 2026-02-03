@@ -118,5 +118,11 @@ namespace Content.Server.Communications
         [DataField]
         public bool AnnounceSentBy = true;
         public SoundSpecifier AnnouncementSound = new SoundPathSpecifier("/Audio/_Mini/Announcements/announce.ogg");
+
+        /// <summary>
+        /// Goobstation
+        /// What alert level to set it to if the console is emagged.
+        /// </summary>
+        [DataField] public string AlertLevelOnEmag = "honk";
     }
 }

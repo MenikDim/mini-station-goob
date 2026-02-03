@@ -64,7 +64,8 @@ namespace Content.Server.Voting.Managers
         private VotingSystem? _votingSystem;
         private RoleSystem? _roleSystem;
         private GameTicker? _gameTicker;
-        public string _lastPickedPreset = "";//режим с последнего голосования
+        private string _lastPickedPreset1 = ""; //режимы, которые уже были выбраны в прошлых голосованиях
+        private string _lastPickedPreset2 = "";
 
         private static readonly Dictionary<StandardVoteType, CVarDef<bool>> VoteTypesToEnableCVars = new()
         {
@@ -288,7 +289,8 @@ namespace Content.Server.Voting.Managers
                     _chatManager.DispatchServerAnnouncement(
                         Loc.GetString("ui-vote-gamemode-win", ("winner", Loc.GetString(presets[picked]))));
                 }
-                _lastPickedPreset = picked;
+                _lastPickedPreset2 = _lastPickedPreset1;
+                _lastPickedPreset1 = picked;
                 _adminLogger.Add(LogType.Vote, LogImpact.Medium, $"Preset vote finished: {picked}");
                 var ticker = _entityManager.EntitySysManager.GetEntitySystem<GameTicker>();
                 ticker.SetGamePreset(picked);
@@ -633,13 +635,13 @@ namespace Content.Server.Voting.Managers
 
                 if(_playerManager.PlayerCount > (preset.MaxPlayers ?? int.MaxValue))
                     continue;
-                if(preset.ModeTitle == "traitor-title" && _playerManager.PlayerCount<5)
+                if(preset.ModeTitle == "traitor-title" && _playerManager.PlayerCount<10 || _playerManager.PlayerCount > 35)
                     continue;
-                if(preset.ModeTitle == "nukeops-title" && _playerManager.PlayerCount<40)
+                if(preset.ModeTitle == "nukeops-title" && _playerManager.PlayerCount<25)
                     continue;
-                if(preset.ModeTitle == "cosmiccult-title" && _playerManager.PlayerCount<30)
+                if(preset.ModeTitle == "cosmiccult-title" && _playerManager.PlayerCount<25)
                     continue;
-                if(preset.ModeTitle == "survivalplus-title" && _playerManager.PlayerCount<40)
+                if(preset.ModeTitle == "survivalplus-title" && _playerManager.PlayerCount<25)
                     continue;
                 if(preset.ModeTitle == "secretplus-mid-title" && _playerManager.PlayerCount<25)
                     continue;
@@ -651,11 +653,17 @@ namespace Content.Server.Voting.Managers
                     continue;
                 if(preset.ModeTitle == "blob-title" && _playerManager.PlayerCount<30)
                     continue;
-                if(preset.ModeTitle == "xenomorph-title" && _playerManager.PlayerCount<30)
+                if(preset.ModeTitle == "xenomorph-title" && _playerManager.PlayerCount<35)
                     continue;
-                if(preset.ModeTitle == "guide-title" && _playerManager.PlayerCount<25)
+                if(preset.ModeTitle == "guide-title" && _playerManager.PlayerCount<25 || _playerManager.PlayerCount>40)
                     continue;
-                if(preset.ID == _lastPickedPreset)
+                if(preset.ModeTitle == "sleeper-title" && _playerManager.PlayerCount<25 || _playerManager.PlayerCount>30)
+                    continue;
+                if(preset.ModeTitle == "changeling-gamemode-title" && _playerManager.PlayerCount<30)
+                    continue;
+                if(preset.ModeTitle == "extended-title" && _playerManager.PlayerCount<0 || _playerManager.PlayerCount>20)
+                    continue;
+                if(preset.ID == _lastPickedPreset1 || preset.ID == _lastPickedPreset2)
                     continue;
                 presets[preset.ID] = preset.ModeTitle;
             }

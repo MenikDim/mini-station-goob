@@ -1,0 +1,8 @@
+- type: entity
+  parent: ClothingBackpackDuffel
+  id: ClothingBackpackDuffelNanotrasen
+  name: nanotrasen duffel bag
+  description: A large duffel bag for holding extra tools and supplies.
+  components:
+  - type: Sprite
+    sprite: _Mini/Clothing/Back/Duffels/nanotrasen.rsi

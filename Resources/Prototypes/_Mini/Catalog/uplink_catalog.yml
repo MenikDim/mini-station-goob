@@ -156,3 +156,22 @@
     Productunit: 1
   categories:
   - UplinkERTBomb
+
+
+# Morph1ne edits
+
+- type: listing
+  id: UplinkAmmoDuffel
+  name: вещмешок боеприпасов
+  description: Большой вещмешок для хранения дополнительных предательских предметов. Наполнен боеприпасами.
+  icon: { sprite: Clothing/Back/Duffels/syndicate.rsi, state: icon-ammo }
+  productEntity: ClothingBackpackDuffelSyndicateAmmoFilled
+  cost:
+    Telecrystal: 15
+  categories:
+  - UplinkAmmo
+  conditions:
+  - !type:StoreWhitelistCondition
+    whitelist:
+      tags:
+      - NukeOpsUplink

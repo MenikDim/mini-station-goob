@@ -3,9 +3,9 @@
   name: М-90
   description: boobr-m90-desc
   icon: { sprite: /Textures/Objects/Weapons/Guns/Rifles/carbine.rsi, state: base }
-  productEntity: WeaponRifleM90GrenadeLauncher
+  productEntity: ClothingBackpackDuffelNanotrasenМ-90Bundle
   cost:
-    Productunit: 12
+    Productunit: 6
   categories:
   - ADTUplinkERTWeapon
 
@@ -26,9 +26,20 @@
   name: Лектер
   description: boobr-lecter-desc
   icon: { sprite: /Textures/Objects/Weapons/Guns/Rifles/lecter.rsi, state: icon }
-  productEntity: WeaponRifleLecter
+  productEntity: ClothingBackpackDuffelNanotrasenLecterBundle
   cost:
-    Productunit: 10
+    Productunit: 8
+  categories:
+  - ADTUplinkERTWeapon
+
+- type: listing
+  id: ADTBoberAnnie
+  name: boobr-annie-name
+  description: boobr-annie-desc
+  icon: { sprite: _Goobstation/Objects/Weapons/Guns/Rifles/annie.rsi, state: icon }
+  productEntity: ClothingBackpackDuffelNanotrasenAnnieBundle
+  cost:
+    Productunit: 12
   categories:
   - ADTUplinkERTWeapon
 
@@ -50,7 +61,7 @@
   icon: { sprite: /Textures/ADT/Objects/Weapons/Guns/Revolvers/mateba.rsi, state: icon }
   productEntity: WeaponRevolverMateba
   cost:
-    Productunit: 6
+    Productunit: 4
   categories:
   - ADTUplinkERTWeapon
 
@@ -116,7 +127,7 @@
   icon: { sprite: _Mini/Objects/Weapons/Guns/Turrets/turrets.rsi, state: full }
   productEntity: ToolboxElectricalTurretNanotrasen
   cost:
-    Productunit: 10
+    Productunit: 8
   categories:
   - ADTUplinkERTMisc
 

@@ -863,7 +863,7 @@
   description: uplink-stimpack-desc
   productEntity: Stimpack
   cost:
-    Telecrystal: 1 # goob - 1 TC per 3 seconds.
+    Telecrystal: 2 # goob - 1 TC per 3 seconds.
   categories:
   - UplinkChemicals
 
@@ -1200,7 +1200,7 @@
   description: uplink-antimov-law-desc
   productEntity: AntimovCircuitBoard
   cost:
-    Telecrystal: 24 # goob
+    Telecrystal: 15 # goob
   categories:
   - UplinkDisruption
 # Goob - Antimov was given the same price for traitors and nukies
@@ -2010,7 +2010,7 @@
   description: uplink-carp-suit-bundle-desc
   productEntity: ClothingBackpackDuffelSyndicateCarpSuit
   cost:
-    Telecrystal: 8 # goob
+    Telecrystal: 4 # goob
   categories:
   - UplinkPointless
 

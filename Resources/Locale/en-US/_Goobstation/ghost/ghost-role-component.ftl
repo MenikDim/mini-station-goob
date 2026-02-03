@@ -20,11 +20,13 @@ ghost-role-information-lootbug-description = Постарайся не быть 
 ghost-role-information-homunculus-name = Гомункул
 ghost-role-information-homunculus-description = Повинуйся тому, кто тебя создал; если же его нет, поступай как пожелаешь.
 
-ghost-role-information-huborg-name = Урист МакБорг
-ghost-role-information-huborg-description = Вы отвратительный уродливый киборг.
-
 ghost-role-information-c4-name = Композиция C-4
 ghost-role-information-c4-description = Помогайте своему пользователю взрывать вещи.
+ghost-role-information-fillbot-name = fillbot
+ghost-role-information-fillbot-description = Serve the one who has created you, if there are nowhere to be found, do as you will.
+
+ghost-role-information-huborg-name = Urist McBorg
+ghost-role-information-huborg-description = You are a disgusting abomination of a cyborg.
 
 ghost-role-information-derelict-cyborg-syndicate-name = Заброшенный киборг Синдиката
 ghost-role-information-derelict-cyborg-syndicate-description = Вы были потеряны во время штурма станции. После долгих лет воздействия ионных бурь вы оказались возле космической станции.
@@ -177,4 +179,17 @@ vox-raider-role-greeting = Ты [color=#7851A9]Налётчик Воксов[/co
 ghost-role-information-clown-goblin-name = Клоун-гоблин
 ghost-role-information-clown-goblin-description = Ужасное существо, рождённое из ада.
 
-ghost-role-information-slasher-token = Потрошитель
+ghost-role-information-santa-name = Santa Claus
+ghost-role-information-santa-description = Spread christmas cheer around the station!
+
+ghost-role-information-slasher-token = The Slasher (Token)
+
+ghost-role-information-sentientanimal-rules = You are a [color={role-type-sentient-animal-color}][bold]{role-type-sentient-animal-name}[/bold][/color]. You are a neutral animal who may act in self defense but otherwise not seek to harm crew.
+                                              You don't remember any of your previous life, and you don't remember anything you learned as a ghost.
+                                              You are allowed to remember knowledge about the game in general, such as how to cook, how to use objects, etc, however you are not knowledgeable in advanced roles.
+                                              You are absolutely [color=red]NOT[/color] allowed to remember, say, the name, appearance, etc. of your previous character.
+
+ghost-role-information-contractor-name = Syndicate Contractor
+ghost-role-information-contractor-token = Syndicate Contractor (Token)
+ghost-role-information-contractor-description = GET DA... tider..?
+contractor-role-greeting = You are a [color=#611b2b]Syndicate Contractor[/color], a bounty hunter, you are tasked with retreving targets from the station, dead or alive.

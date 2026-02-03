@@ -66,6 +66,7 @@ using Content.Shared.Communications;
 using Content.Shared.Database;
 using Content.Shared.DeviceNetwork;
 using Content.Shared.DeviceNetwork.Components;
+using Content.Shared.Emag.Systems;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Popups;
 using Robust.Server.GameObjects;
@@ -83,6 +84,7 @@ namespace Content.Server.Communications
         [Dependency] private readonly AlertLevelSystem _alertLevelSystem = default!;
         [Dependency] private readonly ChatSystem _chatSystem = default!;
         [Dependency] private readonly DeviceNetworkSystem _deviceNetworkSystem = default!;
+        [Dependency] private readonly EmagSystem _emag = default!;
         [Dependency] private readonly EmergencyShuttleSystem _emergency = default!;
         [Dependency] private readonly PopupSystem _popupSystem = default!;
         [Dependency] private readonly RoundEndSystem _roundEndSystem = default!;
@@ -97,8 +99,6 @@ namespace Content.Server.Communications
 
         public override void Initialize()
         {
-            SubscribeLocalEvent<CommunicationsConsoleComponent, MapInitEvent>(OnMapInit);
-
             // All events that refresh the BUI
             SubscribeLocalEvent<AlertLevelChangedEvent>(OnAlertLevelChanged);
             SubscribeLocalEvent<RoundEndSystemChangedEvent>(_ => OnGenericBroadcastEvent());
@@ -112,14 +112,10 @@ namespace Content.Server.Communications
             SubscribeLocalEvent<CommunicationsConsoleComponent, CommunicationsConsoleCallEmergencyShuttleMessage>(OnCallShuttleMessage);
             SubscribeLocalEvent<CommunicationsConsoleComponent, CommunicationsConsoleRecallEmergencyShuttleMessage>(OnRecallShuttleMessage);
 
-            SubscribeLocalEvent<CommunicationsConsoleComponent, EntInsertedIntoContainerMessage>((uid, comp, _) => UpdateCommsConsoleInterface(uid, comp));
-            SubscribeLocalEvent<CommunicationsConsoleComponent, EntRemovedFromContainerMessage>((uid, comp, _) => UpdateCommsConsoleInterface(uid, comp));
+            // On console init, set cooldown
+            SubscribeLocalEvent<CommunicationsConsoleComponent, MapInitEvent>(OnCommunicationsConsoleMapInit);
 
-        }
-
-        public void OnMapInit(EntityUid uid, CommunicationsConsoleComponent comp, MapInitEvent args)
-        {
-            comp.AnnouncementCooldownRemaining = comp.InitialDelay;
+            SubscribeLocalEvent<CommunicationsConsoleComponent, GotEmaggedEvent>(OnEmagged); // Goobstation
         }
 
         public override void Update(float frameTime)
@@ -413,6 +409,25 @@ namespace Content.Server.Communications
             _adminLogger.Add(LogType.Action, LogImpact.High, $"{ToPrettyString(message.Actor):player} has recalled the shuttle.");
         }
 
+        // Goobstation start
+        private void OnEmagged(Entity<CommunicationsConsoleComponent> ent, ref GotEmaggedEvent args)
+        {
+            if (args.Handled)
+                return;
+
+            var (uid, comp) = ent;
+            args.Repeatable = true;
+
+            if (!_emag.CompareFlag(args.Type, EmagType.Interaction))
+                return;
+
+            var stationUid = _stationSystem.GetOwningStation(uid);
+            if (stationUid != null)
+                _alertLevelSystem.SetLevel(stationUid.Value, comp.AlertLevelOnEmag, true, true);
+
+            args.Handled = true;
+        }
+        // Goobstation end
     }
 
     /// <summary>
@@ -439,4 +454,5 @@ namespace Content.Server.Communications
         public EntityUid? Sender = Sender;
         public string? Reason;
     }
+
 }
