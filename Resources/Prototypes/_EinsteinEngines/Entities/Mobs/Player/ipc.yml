@@ -66,8 +66,6 @@
         requireInputValidation: false
       enum.SurgeryUIKey.Key: # Shitmed
         type: SurgeryBui
-      enum.RadarConsoleUiKey.Key: #goob - contractor
-        type: RadarConsoleBoundUserInterface
   # Goobstation Start - Energycrit
   # - type: PowerCellSlot
   #   cellSlotId: cell_slot

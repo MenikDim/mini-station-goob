@@ -440,7 +440,6 @@
     - GrenadeTriggersStatic
     - TapeRecorderStatic
     - MiscSignallersStatic
-    - HydroponicsStatic # CorvaxGoob
   - type: EmagLatheRecipes
     emagStaticPacks:
     - SecurityWeaponsStatic
@@ -547,7 +546,6 @@
     - RestraintTechnology
     - MiningWeapons
     # CorvaxGoob Packs
-    emagStaticPacks:
     - SyndicateBodyBagsStatic # AdvancedBodyBag
 
 - type: entity

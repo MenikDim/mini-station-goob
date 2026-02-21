@@ -46,7 +46,5 @@ ent-ChairFoldingSpawnFolded = { ent-ChairFolding }
     .desc = { ent-ChairFolding.desc }
 ent-SteelBench = steel bench
     .desc = A long chair made for a metro. Really standard design.
-ent-CardStool = cardboard stool
-    .desc = Make sure you sit *really* gently.
 ent-WoodenBench = wooden bench
     .desc = Did you get a splinter? Well, at least it’s eco friendly.

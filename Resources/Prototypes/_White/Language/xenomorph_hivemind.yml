@@ -7,6 +7,6 @@
     !type:SyllableObfuscation
     minSyllables: 1
     maxSyllables: 8 # I was crazy once
-    replacement: # CorvaxGoob-Localization
-    - с
-    - с
+    replacement:
+    - s
+    - S

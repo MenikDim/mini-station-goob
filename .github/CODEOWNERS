@@ -5,10 +5,9 @@
 
 # Locale
 /Resources/Locale @Ko4ergaPunk
-/Resources/ServerInfo @Ko4ergaPunk
 
 # Textures
-/Resources/Textures @RedTerrorDark
+/Resources/Textures/_CorvaxGoob @SonicHDC
 
 # Map files
 /Resources/Prototypes/_CorvaxGoob/Entities/Stations @kvant8

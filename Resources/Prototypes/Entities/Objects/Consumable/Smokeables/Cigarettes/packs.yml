@@ -154,7 +154,7 @@
       tags:
       - Cigarette
       - Lighter
-      # - MedicalPatch CorvaxGoob
+      - MedicalPatch
   - type: StorageFill
     contents:
     - id: Cigarette
@@ -228,7 +228,7 @@
       tags:
       - Cigarette
       - Lighter
-      # - MedicalPatch CorvaxGoob
+      - MedicalPatch
   - type: ItemCounter
     count:
       tags: [Cigarette]

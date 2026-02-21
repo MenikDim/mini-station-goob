@@ -32,5 +32,3 @@ ent-BulletFlock = stun bolt
     .desc = { ent-BaseBullet.desc }
 ent-ProjectileMonkeyDart = monkey-thrown dart
     .desc = { ent-BaseBullet.desc }
-ent-BulletMime = bullet (silent)
-    .desc = { ent-BaseBullet.desc }

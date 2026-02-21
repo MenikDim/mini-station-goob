@@ -10,7 +10,3 @@ ent-MindRoleBrainwashed = Brainwashed Role
     .desc = { ent-BaseMindRoleAntag.desc }
 ent-MindRoleSlasher = Slasher Role
     .desc = { ent-BaseMindRoleAntag.desc }
-ent-MindRoleGhostRoleSentientAnimal = Ghost Role (SentientAnimal)
-    .desc = { ent-BaseMindRoleAntag.desc }
-ent-MindRoleContractor = Contractor Role
-    .desc = { ent-BaseMindRoleAntag.desc }

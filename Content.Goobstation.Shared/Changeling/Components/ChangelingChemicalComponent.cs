@@ -18,7 +18,7 @@ public sealed partial class ChangelingChemicalComponent : Component
     /// <summary>
     /// The InternalResourcesData of the prototype.
     /// </summary>
-    [DataField, AutoNetworkedField]
+    [DataField]
     public InternalResourcesData? ResourceData;
 
     /// <summary>

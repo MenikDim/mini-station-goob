@@ -116,10 +116,13 @@ using Content.Server.Antag;
 using Content.Server.GameTicking.Rules.Components;
 using Content.Server.Mind;
 using Content.Server.Objectives;
+using Content.Server.PDA.Ringer;
 using Content.Server.Roles;
 using Content.Server.Traitor.Uplink;
 using Content.Shared.Mind;
 using Content.Shared.NPC.Systems;
+using Content.Shared.PDA;
+using Content.Shared.PDA.Ringer;
 using Content.Shared.Random.Helpers;
 using Content.Shared.Roles;
 using Content.Shared.Roles.Jobs;
@@ -177,8 +180,8 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
 
         var issuer = _random.Pick(_prototypeManager.Index(component.ObjectiveIssuers));
 
-        string? uplinkBriefing = null;
-        string? uplinkBriefingShort = null;
+        Note[]? code = null;
+        int[]? spinCode = null;
 
         if (component.GiveUplink)
         {
@@ -189,18 +192,33 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
 
             var uplinkPreference = _goobUplink.GetUplinkPreference(mindId);
 
-            if (!_uplink.TryAddUplink(traitor, startingBalance, uplinkPreference, out _, out var setupEvent))
+            // creadth: we need to create uplink for the antag.
+            EntityUid? uplinkTarget = uplinkPreference switch
+            {
+                UplinkPreference.Pda => _uplink.FindPdaUplinkTarget(traitor),
+                UplinkPreference.Pen => _goobUplink.FindPenUplinkTarget(traitor),
+                _ => null // Implant doesn't need a target entity
+            };
+
+            if (!_uplink.AddUplink(traitor, startingBalance, uplinkPreference))
                 return false;
 
-            if (setupEvent != null)
+            if (uplinkTarget != null)
             {
-                uplinkBriefing = setupEvent.Value.BriefingEntry;
-                uplinkBriefingShort = setupEvent.Value.BriefingEntryShort;
-            }
-            else // Fallback ooplink
-            {
-                uplinkBriefing = Loc.GetString("traitor-role-uplink-implant");
-                uplinkBriefingShort = Loc.GetString("traitor-role-uplink-implant-short");
+                switch (uplinkPreference)
+                {
+                    case UplinkPreference.Pda:
+                        EnsureComp<RingerUplinkComponent>(uplinkTarget.Value);
+                        var ringerEv = new GenerateUplinkCodeEvent();
+                        RaiseLocalEvent(uplinkTarget.Value, ref ringerEv);
+                        code = Comp<RingerUplinkComponent>(uplinkTarget.Value).Code;
+                        break;
+                    case UplinkPreference.Pen:
+                        var spinEv = new GeneratePenSpinCodeEvent();
+                        RaiseLocalEvent(uplinkTarget.Value, ref spinEv);
+                        spinCode = spinEv.Code;
+                        break;
+                }
             }
         }
 
@@ -215,7 +233,7 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
 
         if (component.GiveBriefing)
         {
-            _antag.SendBriefing(traitor, GenerateBriefing(codewords, uplinkBriefing, issuer), null, component.GreetSoundNotification);
+            _antag.SendBriefing(traitor, GenerateBriefing(codewords, code, spinCode, issuer), null, component.GreetSoundNotification);
             Log.Debug($"MakeTraitor {ToPrettyString(traitor)} - Sent the Briefing");
         }
 
@@ -228,10 +246,9 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
         _roleSystem.MindHasRole<TraitorRoleComponent>(mindId, out var traitorRole);
         if (traitorRole is not null)
         {
-            Log.Debug($"MakeTraitor {ToPrettyString(traitor)} - Add traitor briefing components");
             EnsureComp<RoleBriefingComponent>(traitorRole.Value.Owner, out var briefingComp);
             // Goobstation Change - If you remove this, we lose ringtones and flavor in char menu. Upstream's version sucks.
-            briefingComp.Briefing = GenerateBriefingCharacter(codewords, uplinkBriefingShort, issuer);
+            briefingComp.Briefing = GenerateBriefingCharacter(codewords, code, spinCode, issuer);
         }
 
         var color = TraitorCodewordColor; // Fall back to a dark red Syndicate color if a prototype is not found
@@ -255,28 +272,33 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
     }
 
     // TODO: figure out how to handle this? add priority to briefing event?
-    private string GenerateBriefing(string[]? codewords, string? uplinkBriefing, string objectiveIssuer)
+    private string GenerateBriefing(string[]? codewords, Note[]? uplinkCode, int[]? penSpinCode, string objectiveIssuer)
     {
         var sb = new StringBuilder();
         sb.AppendLine(Loc.GetString("traitor-role-greeting", ("corporation", objectiveIssuer ?? Loc.GetString("objective-issuer-unknown"))));
         if (codewords != null)
             sb.AppendLine(Loc.GetString("traitor-role-codewords", ("codewords", string.Join(", ", codewords))));
-        if (uplinkBriefing != null)
-            sb.AppendLine(uplinkBriefing);
+        if (uplinkCode != null)
+            sb.AppendLine(Loc.GetString("traitor-role-uplink-code", ("code", string.Join("-", uplinkCode).Replace("sharp", "#"))));
+        else if (penSpinCode != null)
+            sb.AppendLine(Loc.GetString("traitor-role-uplink-pen-code", ("code", string.Join("-", penSpinCode))));
         else
             sb.AppendLine(Loc.GetString("traitor-role-uplink-implant"));
+
 
         return sb.ToString();
     }
 
     // Goobstation Change - Readd the character briefing text.
-    private string GenerateBriefingCharacter(string[]? codewords, string? uplinkBriefingShort, string objectiveIssuer)
+    private string GenerateBriefingCharacter(string[]? codewords, Note[]? uplinkCode, int[]? penSpinCode, string objectiveIssuer)
     {
         var sb = new StringBuilder();
         sb.AppendLine("\n" + Loc.GetString($"traitor-{objectiveIssuer.Replace(" ", "").ToLower()}-intro"));
 
-        if (uplinkBriefingShort != null)
-            sb.AppendLine(uplinkBriefingShort);
+        if (uplinkCode != null)
+            sb.AppendLine(Loc.GetString($"traitor-role-uplink-code-short", ("code", string.Join("-", uplinkCode).Replace("sharp", "#"))));
+        else if (penSpinCode != null)
+            sb.AppendLine(Loc.GetString($"traitor-role-uplink-pen-code-short", ("code", string.Join("-", penSpinCode))));
         else sb.AppendLine("\n" + Loc.GetString($"traitor-role-nouplink"));
 
         if (codewords != null)

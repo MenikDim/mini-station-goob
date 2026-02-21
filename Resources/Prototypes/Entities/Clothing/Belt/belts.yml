@@ -394,7 +394,6 @@
         - HolosignProjector
         - Plunger
         - Keyring # Goobstation
-        - GoldenPlunger
         - WireBrush
       components:
         - LightReplacer
@@ -676,7 +675,6 @@
         - BolaEnergy # Goobstation
         - EnergySpeedloader # Goobstation
         - MilitaryPowerCell # Goobstation
-        - EnergyMagAmmo # Goobstation
         - HandGrenade
         - TelescopicBaton # CorvaxGoob
         - TelescopicShield # CorvaxGoob

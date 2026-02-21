@@ -11,7 +11,7 @@ public sealed partial class RingerUplinkComponent : Component
 {
     /// <summary>
     /// Notes to set ringtone to in order to lock or unlock the uplink.
-    /// Set via GenerateUplinkCodeEvent{Note[]}.
+    /// Set via GenerateUplinkCodeEvent.
     /// </summary>
     [DataField]
     public Note[]? Code;

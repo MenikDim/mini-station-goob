@@ -6,5 +6,4 @@
     - !type:DoSparksTargetEvent
       playSound: false
   - type: TriggerOnSpawn
-  - type: TimedDespawn
-    lifetime: 5
+  - type: DeleteOnTrigger

@@ -30,8 +30,6 @@
     anchored: true
   - type: Physics
     bodyType: Static
-  - type: WarpPoint
-    location: bingle pit
   - type: Fixtures
     fixtures:
       fix1:

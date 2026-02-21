@@ -14,7 +14,3 @@ ent-SpawnArmamentsMonk = monk's habit
     .desc = { ent-SpawnSupplyEmpty.desc }
 ent-SpawnArmamentsBishop = bishop's robes
     .desc = { ent-SpawnSupplyEmpty.desc }
-ent-SpawnArmamentsDraconic = dragon suit
-    .desc = { ent-SpawnSupplyEmpty.desc }
-ent-SpawnArmamentsInquisitor = inquisitor armour
-    .desc = { ent-SpawnSupplyEmpty.desc }

@@ -22,13 +22,3 @@
     Telecrystal: 27
   categories:
   - UplinkPointless
-
-- type: listing
-  id: UplinkClothingHandsAppearanceConverter
-  name: uplink-appearance-converter-name
-  description: uplink-appearance-converter-desc
-  productEntity: ClothingHandsAppearanceConverter
-  cost:
-    Telecrystal: 40
-  categories:
-  - UplinkWearables

@@ -36,8 +36,6 @@ public abstract partial class SharedChangelingChemicalSystem : EntitySystem
 
         if (data != null)
             ent.Comp.ResourceData = data;
-
-        Dirty(ent);
     }
 
     private void OnShutdown(Entity<ChangelingChemicalComponent> ent, ref ComponentShutdown args)

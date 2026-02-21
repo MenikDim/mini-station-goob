@@ -5,11 +5,6 @@
   placement:
     mode: SnapgridCenter
   components:
-  - type: DeviceLinkSink
-    ports:
-    - On
-    - Off
-    - Toggle
   - type: MeleeSound
     soundGroups:
       Brute:

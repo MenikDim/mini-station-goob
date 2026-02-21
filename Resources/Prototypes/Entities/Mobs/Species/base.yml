@@ -337,7 +337,6 @@
     horizontalRotation: 90
   - type: HumanoidAppearance
     species: Human
-  - type: TypingIndicator
   - type: SlowOnDamage
     speedModifierThresholds:
       60: 0.7
@@ -377,6 +376,9 @@
       - !type:WashCurseOfGreentextReaction # CorvaxGoob-Lavaland-Stuff
   - type: StatusEffects
     allowed:
+    - Stun
+    - KnockedDown
+    - SlowedDown
     - Stutter
     - Electrocution
     - Drunk
@@ -424,7 +426,6 @@
   - type: SleepEmitSound
   - type: SSDIndicator
   - type: StandingState
-  - type: Crawler
   - type: Dna
   - type: Scent # Einstein Engines
   - type: MindContainer
@@ -459,8 +460,6 @@
       enum.WizardTeleportUiKey.Key: # Goobstation - wizard
         type: WizardTeleportBoundUserInterface
         requireInputValidation: false
-      enum.RadarConsoleUiKey.Key: #goob - contractor
-        type: RadarConsoleBoundUserInterface
   - type: Puller
   - type: Speech
     speechSounds: Alto
@@ -490,6 +489,7 @@
     - FootstepSound
     - DoorBumpOpener
     - AnomalyHost
+  - type: LayingDown # WD EDIT
   - type: EmoteOnDamage # CorvaxGoob-AutoEmote
     emotes:
       50: ["Scream"] # >50 of alive HP. Scream only
@@ -511,7 +511,6 @@
   - type: Sprinter # Goobstation
   - type: MindControllable # Goobstation
   - type: VisibleContraband # Goobstation
-  - type: MomentumSteering # Goobstation - No steer
 
 - type: entity
   save: false
@@ -558,9 +557,9 @@
         Heat: 1.0 # Goob edit #per second, scales with temperature & other constants
   - type: TemperatureSpeed
     thresholds:
-      293: 0.9
-      280: 0.8
-      260: 0.7
+      293: 0.8
+      280: 0.6
+      260: 0.4
   - type: ThermalRegulator
     metabolismHeat: 800
     radiatedHeat: 100

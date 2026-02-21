@@ -39,13 +39,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Linq;
 using Content.Client.LateJoin;
-using Content.Goobstation.Client.Polls.UI;
 using Robust.Client.UserInterface.CustomControls;
 using Robust.Shared.ContentPack;
 using Robust.Shared.IoC;
 using Robust.Shared.Reflection;
-using System.Linq;
 
 namespace Content.IntegrationTests.Tests.UserInterface;
 
@@ -56,7 +55,6 @@ public sealed class UiControlTest
     private Type[] _ignored = new Type[]
     {
         typeof(LateJoinGui),
-        typeof(PollVotingWindow),// CorvaxGoob
     };
 
     /// <summary>

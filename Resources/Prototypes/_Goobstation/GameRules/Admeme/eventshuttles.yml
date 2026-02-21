@@ -104,20 +104,22 @@
 
 #Contractor
 - type: entity
-  parent: BaseGameRule
+  parent: BaseUnknownShuttleRule
   id: ContractorSpawn
   components:
   - type: StationEvent
-    earliestStart: 15
-    reoccurrenceDelay: 45
-    weight: 3
-    minimumPlayers: 10
+    startAnnouncement: null
+    weight: 1
     duration: null
+    earliestStart: 30
+    minimumPlayers: 30
     chaos:
-      Hostile: 75
+      Hostile: 40
+      Combat: 40
+      Death: 40
     eventType: HostilesSpawn
   - type: GameRule
-    chaosScore: 100
+    chaosScore: 400
   - type: RuleGrids
   - type: LoadMapRule
     gridPath: /Maps/_Goobstation/Shuttles/ShuttleEvent/Legionnaire.yml

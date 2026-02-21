@@ -1,6 +1,6 @@
-ent-SpawnerRandomMobLavaland = lavaland heavy mob spawner
+ent-SpawnerRandomMobLavaland = lavaland mob spawner
     .suffix = Lavaland
     .desc = { ent-MarkerBase.desc }
-ent-SpawnerRandomLightMobLavaland = lavaland light mob spawner
-    .suffix = Lavaland
+ent-MobGoliathRandom = Goliath
+    .suffix = Random
     .desc = { ent-MarkerBase.desc }

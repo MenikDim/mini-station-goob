@@ -60,8 +60,6 @@ public abstract class SharedChangelingBiomassSystem : EntitySystem
 
         if (data != null)
             ent.Comp.ResourceData = data;
-
-        Dirty(ent);
     }
 
     private void OnShutdown(Entity<ChangelingBiomassComponent> ent, ref ComponentShutdown args)
@@ -88,19 +86,19 @@ public abstract class SharedChangelingBiomassSystem : EntitySystem
 
             case "Second":
 
-            _stun.TryUpdateStunDuration(ent, ent.Comp.SecondWarnStun);
-            DoPopup(ent, ent.Comp.SecondWarnPopup, PopupType.MediumCaution);
+                _stun.TryStun(ent, ent.Comp.SecondWarnStun, false);
+                DoPopup(ent, ent.Comp.SecondWarnPopup, PopupType.MediumCaution);
 
                 break;
 
             case "Third":
 
-            _stun.TryUpdateStunDuration(ent, ent.Comp.ThirdWarnStun);
+                _stun.TryStun(ent, ent.Comp.ThirdWarnStun, false);
 
                 if (!_blood.TryModifyBloodLevel(ent.Owner, -ent.Comp.BloodCoughAmount)
                     || !_bloodQuery.TryComp(ent, out var bloodComp))
                 {
-                    _stun.TryKnockdown(ent.Owner, ent.Comp.ThirdWarnStun, false); // knockdown if there isnt any blood to cough up
+                    _stun.TryKnockdown(ent, ent.Comp.ThirdWarnStun, false); // knockdown if there isnt any blood to cough up
                     return;
                 }
 

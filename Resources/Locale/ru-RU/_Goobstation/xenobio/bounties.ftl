@@ -14,7 +14,7 @@ bounty-item-dark-blue-extract = Экстракт [color=#1e8cfa]ТЁМНО-СИ�
 bounty-item-silver-extract = Экстракт [color=#c4c4c4]СЕРЕБРЯННОГО[/color] слайма
 bounty-item-bluespace-extract = Экстракт [color=#f0f8ff]БЛЮСПЕЙС[/color] слайма
 bounty-item-sepia-extract = Экстракт [color=#704214]СЕПИЯ[/color] слайма
-bounty-item-cerulean-extract = Экстракт [color=#2a52be]ЛАЗУРНОГО[/color] слайма
+bounty-item-cerulean-extract = Экстракт [color=#2a52be]ЛАЗУРНОГО[/color] слайма 
 bounty-item-pyrite-extract = Экстракт [color=#dcaa4f]ПИРИТОВОГО[/color] слайма
 bounty-item-red-extract = Экстракт [color=#ff3333]КРАСНОГО[/color] слайма
 bounty-item-green-extract = Экстракт [color=#4dff4d]ЗЕЛЁНОГО[/color] слайма

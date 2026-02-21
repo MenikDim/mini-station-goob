@@ -12,5 +12,3 @@ ent-SpawnERTJanitorial = { ent-BaseUnknownShuttleRule }
     .desc = { ent-BaseUnknownShuttleRule.desc }
 ent-SpawnERTChaplain = { ent-BaseUnknownShuttleRule }
     .desc = { ent-BaseUnknownShuttleRule.desc }
-ent-ContractorSpawn = { ent-BaseUnknownShuttleRule }
-    .desc = { ent-BaseUnknownShuttleRule.desc }

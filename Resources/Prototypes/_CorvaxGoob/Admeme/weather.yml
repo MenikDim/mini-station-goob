@@ -9,7 +9,6 @@
   - type: Clickable
   - type: Physics
     bodyType: Static
-    canCollide: false
   - type: Sprite
     noRot: true
     sprite: /Textures/Effects/weather.rsi

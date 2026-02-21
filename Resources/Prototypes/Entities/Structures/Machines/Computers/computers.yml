@@ -930,7 +930,6 @@
     title: comms-console-announcement-title-station
     global: false # Mini edit
   - type: DeviceNetwork
-    deviceNetId: Wireless    
     transmitFrequencyId: ShuttleTimer
   - type: ActivatableUI
     key: enum.CommunicationsConsoleUiKey.Key

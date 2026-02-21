@@ -495,12 +495,6 @@
   id: RatvarianSpear
 
 - type: Tag
-  id: DragonsTail
-
-- type: Tag
-  id: InquisitorChainSword
-
-- type: Tag
   id: ReptilianEmotes
 
 - type: Tag
@@ -799,10 +793,19 @@
   id: Crate
 
 - type: Tag
-  id: VinylSleeveFit
+  id: GreenGloves
+
+- type: Tag
+  id: WaterBottle
+
+- type: Tag
+  id: IceBucket
+
+- type: Tag
+  id: HereticCostume
+  
+- type: Tag
+  id: VinylSleeveFit  
 
 - type: Tag
   id: CD
-
-- type: Tag
-  id: ContractorUplink

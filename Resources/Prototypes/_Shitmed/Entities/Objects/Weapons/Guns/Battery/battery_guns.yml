@@ -64,8 +64,3 @@
   - type: Battery
     maxCharge: 2000
     startingCharge: 2000
-  - type: Appearance
-  - type: MagazineVisuals
-    magState: mag
-    steps: 5
-    zeroVisible: true

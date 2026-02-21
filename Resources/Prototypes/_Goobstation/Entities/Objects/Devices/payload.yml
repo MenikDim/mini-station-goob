@@ -8,23 +8,16 @@
     state: icon
   - type: Explosive
     explosionType: Default
-    maxIntensity: 100
+    maxIntensity: 5
     intensitySlope: 3
-    totalIntensity: 25
-    canCreateVacuum: true
+    totalIntensity: 85
+    canCreateVacuum: false
   - type: ExplodeOnTrigger
   - type: Destructible
     thresholds:
-    - trigger:
-        !type:DamageTypeTrigger
-        damageType: Heat
-        damage: 12
-      behaviors:
-      - !type:ExplodeBehavior
     - trigger:
         !type:DamageTrigger
         damage: 50
       behaviors:
       - !type:DoActsBehavior
         acts: [ "Destruction" ]
-

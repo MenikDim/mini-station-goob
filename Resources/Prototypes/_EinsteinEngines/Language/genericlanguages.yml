@@ -316,11 +316,11 @@
     - chat-speech-verb-sign-3
   obfuscation:
     !type:ReplacementObfuscation
-    replacement: # CorvaxGoob - Localization
-    - что-то
-    - непонятное сообщение
-    - сигнал
-    - сообщение
+    replacement:
+    - something
+    - a cryptic message
+    - a signal
+    - a message
 
     #Used for Xenoglossy, and anything else with the UniversalLanguageSpeaker component
 - type: language

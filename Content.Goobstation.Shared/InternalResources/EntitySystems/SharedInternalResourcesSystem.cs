@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Content.Goobstation.Shared.InternalResources.EntitySystems;
-public abstract class SharedInternalResourcesSystem : EntitySystem
+public sealed class SharedInternalResourcesSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _gameTiming = default!;
     [Dependency] private readonly IPrototypeManager _protoMan = default!;
@@ -278,8 +278,6 @@ public abstract class SharedInternalResourcesSystem : EntitySystem
     /// </summary>
     public override void Update(float frameTime)
     {
-        base.Update(frameTime);
-
         if (_systemNextUpdate > _gameTiming.CurTime)
             return;
 
@@ -321,8 +319,6 @@ public abstract class SharedInternalResourcesSystem : EntitySystem
 
                     resourceData.Thresholds[key] = threshold;
                 }
-
-                Dirty(uid, resourcesComp);
             }
         }
     }
