@@ -39,7 +39,8 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Content.Goobstation.Common.NTR.Scan; // Goobstation
+using Content.Goobstation.Common.NTR.Scan;
+using Content.Server.EntityEffects; // Goobstation
 using Content.Shared.Administration.Logs;
 using Content.Shared.Database;
 using Content.Shared.EntityEffects;
@@ -59,7 +60,7 @@ public sealed partial class BotanySystem : EntitySystem
     [Dependency] private readonly FixtureSystem _fixtureSystem = default!;
     [Dependency] private readonly RandomHelperSystem _randomHelper = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly EntityEffectSystem _effect = default!; // goob edit
+    [Dependency] private readonly SharedEntityEffectSystem _effect = default!; // goob edit
 
     public override void Initialize()
     {
@@ -180,6 +181,20 @@ public sealed partial class BotanySystem : EntitySystem
     public IEnumerable<EntityUid> GenerateProduct(SeedData proto, EntityCoordinates position, int yieldMod = 1)
     {
         var totalYield = CalculateTotalYield(proto.Yield, yieldMod);
+    // CorvaxGoob-Plant-Analyzer-Start
+    /*
+        var totalYield = 0;
+        if (proto.Yield > -1)
+        {
+            if (yieldMod < 0)
+                totalYield = proto.Yield;
+            else
+                totalYield = proto.Yield * yieldMod;
+
+            totalYield = Math.Max(1, totalYield);
+        }
+    */
+    // CorvaxGoob-Plant-Analyzer-End
         var products = new List<EntityUid>();
 
         if (totalYield > 1 || proto.HarvestRepeat != HarvestType.NoRepeat)
@@ -218,6 +233,7 @@ public sealed partial class BotanySystem : EntitySystem
         return !proto.Ligneous || proto.Ligneous && held != null && HasComp<SharpComponent>(held);
     }
 
+    // CorvaxGoob-Plant-Analyzer-Start
     public static int CalculateTotalYield(int yield, int yieldMod)
     {
         var totalYield = 0;
@@ -232,6 +248,7 @@ public sealed partial class BotanySystem : EntitySystem
         }
         return totalYield;
     }
+    // CorvaxGoob-Plant-Analyzer-End
 
     #endregion
 }
