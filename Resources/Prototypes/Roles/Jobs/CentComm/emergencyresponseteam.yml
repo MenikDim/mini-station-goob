@@ -37,11 +37,9 @@
     ears: ClothingHeadsetAltCentCom
     belt: ClothingBeltAssaultFilled # Goobstation
     pocket1: WeaponPulsePistol # Literally described as "Favored sidearm of NT ERT operatives". Is never used anywhere else.
-    pocket2: FlashlightSeclite
   storage:
     back:
     - MedkitCombatFilled # Goobstation - No reason not to.
-    - BoxZiptie
     - CrowbarRed
     - ADTBaseUplinkBOBERT
     - PinpointerNuclear
@@ -60,16 +58,13 @@
     ears: ClothingHeadsetAltCentCom
     belt: ClothingBeltAssaultFilled # Goobstation
     pocket1: WeaponPulsePistol # Literally described as "Favored sidearm of NT ERT operatives". Is never used anywhere else.
-    pocket2: FlashlightSeclite
   storage:
     back:
     # - WeaponDisabler - Redundant. It spawns in secbelts now.
     - MedkitCombatFilled # Goobstation - No reason not to.
-    - BoxZiptie
     - CrowbarRed
     # Goobstation - MagazineMagnum
     - PinpointerNuclear
-    - MagazineMagnum
     - ADTBaseUplinkBOBERT
     #- WeaponLauncherMGL
     #- ADTertMechUplink
@@ -289,11 +284,9 @@
     ears: ClothingHeadsetAltCentCom
     belt: ClothingBeltAssaultFilled # Goobstation
     pocket1: WeaponPulsePistol # Literally described as "Favored sidearm of NT ERT operatives".
-    pocket2: FlashlightSeclite
   storage:
     back:
     - MedkitCombatFilled # Goobstation - No reason not to.
-    - BoxZiptie
     - CrowbarRed
     - ADTBaseUplinkBOBERT
     - PinpointerNuclear
@@ -313,12 +306,10 @@
     ears: ClothingHeadsetAltCentCom
     belt: ClothingBeltAssaultFilled # Goobstation
     pocket1: WeaponPulsePistol # Death to Crew aligned Ballistics
-    pocket2: FlashlightSeclite
   storage:
     back:
     # - WeaponDisabler - Redundant. It spawns in secbelts now.
     - MedkitCombatFilled # Goobstation - No reason not to.
-    - BoxZiptie
     - CrowbarRed
     - ADTBaseUplinkBOBERT
     - PinpointerNuclear

@@ -246,6 +246,17 @@
   - ADTUplinkERTAmmo
 
 - type: listing
+  id: ADTBoberAnnieAmmo
+  name: Магазин 30.винтовочный
+  description: Магазин для "Энни"
+  icon: { sprite: Objects/Weapons/Guns/Ammunition/Magazine/LightRifle/light_rifle_mag.rsi, state: base }
+  productEntity: MagazineLightRifle
+  cost:
+    Productunit: 1
+  categories:
+  - ADTUplinkERTAmmo
+
+- type: listing
   id: ADTBoberMatebaAmmo
   name: Спидлоадер 45.магнум
   description: Спидлоадер 45.магнум для револьвера Матеба
