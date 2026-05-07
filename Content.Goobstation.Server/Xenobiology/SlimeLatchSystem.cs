@@ -73,6 +73,10 @@ public sealed partial class SlimeLatchSystem : EntitySystem
         var sodQuery = EntityQueryEnumerator<SlimeDamageOvertimeComponent>();
         while (sodQuery.MoveNext(out var uid, out var dotComp))
             UpdateHunger((uid, dotComp));
+
+        var slimeQuery = EntityQueryEnumerator<SlimeComponent>();
+        while (slimeQuery.MoveNext(out var uid, out var slime))
+            EnsureLatchedSlimeAnchored((uid, slime));
     }
 
     private void UpdateHunger(Entity<SlimeDamageOvertimeComponent> ent)
@@ -158,6 +162,9 @@ public sealed partial class SlimeLatchSystem : EntitySystem
 
     private bool StartSlimeLatchDoAfter(Entity<SlimeComponent> ent, EntityUid target)
     {
+        if (HasComp<BeingLatchedComponent>(target) || HasComp<SlimeDamageOvertimeComponent>(target))
+            return false;
+
         if (_mobState.IsDead(target))
         {
             var targetDeadPopup = Loc.GetString("slime-latch-fail-target-dead", ("ent", target));
@@ -199,6 +206,12 @@ public sealed partial class SlimeLatchSystem : EntitySystem
             return;
         }
 
+        if (!CanLatch(ent, target, ignoreBeingLatched: true))
+        {
+            RemCompDeferred<BeingLatchedComponent>(target);
+            return;
+        }
+
         Latch(ent, target);
         args.Handled = true;
     }
@@ -221,11 +234,13 @@ public sealed partial class SlimeLatchSystem : EntitySystem
     public bool IsLatched(Entity<SlimeComponent> ent, EntityUid target)
         => IsLatched(ent) && ent.Comp.LatchedTarget!.Value == target;
 
-    public bool CanLatch(Entity<SlimeComponent> ent, EntityUid target)
+    public bool CanLatch(Entity<SlimeComponent> ent, EntityUid target, bool ignoreBeingLatched = false)
     {
         return !(IsLatched(ent) // already latched
             || _mobState.IsDead(target) // target dead
             || !_actionBlocker.CanInteract(ent, target) // can't reach
+            || (!ignoreBeingLatched && HasComp<BeingLatchedComponent>(target)) // target already being latched
+            || HasComp<SlimeDamageOvertimeComponent>(target) // target already latched
             || !HasComp<MobStateComponent>(target)); // make any mob work
     }
 
@@ -284,6 +299,28 @@ public sealed partial class SlimeLatchSystem : EntitySystem
             inpm.CanMove = true;
 
         ent.Comp.LatchedTarget = null;
+    }
+
+    private void EnsureLatchedSlimeAnchored(Entity<SlimeComponent> ent)
+    {
+        if (!IsLatched(ent))
+            return;
+
+        var target = ent.Comp.LatchedTarget!.Value;
+        if (TerminatingOrDeleted(target))
+        {
+            Unlatch(ent);
+            return;
+        }
+
+        var xform = Transform(ent);
+        if (xform.ParentUid != target)
+            _xform.SetParent(ent, target);
+
+        _xform.SetCoordinates(ent, Transform(target).Coordinates);
+
+        if (TryComp<InputMoverComponent>(ent, out var inpm))
+            inpm.CanMove = false;
     }
 
     #endregion

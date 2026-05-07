@@ -40,7 +40,10 @@ public sealed partial class SlimeLatchOperator : HTNOperator
             return HTNOperatorStatus.Finished;
 
         if (_entManager.HasComponent<BeingLatchedComponent>(target))
-            return HTNOperatorStatus.Continuing;
+            return HTNOperatorStatus.Failed;
+
+        if (_entManager.HasComponent<SlimeDamageOvertimeComponent>(target))
+            return HTNOperatorStatus.Failed;
 
         return _slimeLatch.NpcTryLatch((owner, slime), target)
             ? HTNOperatorStatus.Continuing
