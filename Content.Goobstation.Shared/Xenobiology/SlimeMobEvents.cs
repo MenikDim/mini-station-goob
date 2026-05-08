@@ -23,6 +23,16 @@ public sealed partial class XenoVacClearEvent : InstantActionEvent;
 [Serializable, NetSerializable]
 public sealed partial class SlimeLatchDoAfterEvent : SimpleDoAfterEvent;
 
+public sealed partial class SlimeTamedEvent : EntityEventArgs
+{
+    public EntityUid Tamer;
+
+    public SlimeTamedEvent(EntityUid tamer)
+    {
+        Tamer = tamer;
+    }
+}
+
 /// <summary>
 /// rised after mitosis completed, but before parent slime deletion, directed to parent slime
 /// </summary>
