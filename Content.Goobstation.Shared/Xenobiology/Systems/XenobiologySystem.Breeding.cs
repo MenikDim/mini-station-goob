@@ -123,6 +123,8 @@ public partial class XenobiologySystem
         if (!TryComp<SlimeComponent>(newEntityUid, out var newSlime))
             return null;
 
+        _physics.WakeBody(newEntityUid);
+
         if (newSlime.ShouldHaveShader && newSlime.Shader != null)
             _appearance.SetData(newEntityUid, XenoSlimeVisuals.Shader, newSlime.Shader);
 
