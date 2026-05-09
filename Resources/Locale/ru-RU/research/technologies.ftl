@@ -42,6 +42,7 @@ research-technology-experimental-battery-ammo = Экспериментальны
 research-technology-basic-shuttle-armament = Базовое корабельное вооружение
 research-technology-advanced-shuttle-weapon = Продвинутое корабельное оружие
 research-technology-basic-robotics = Основы робототехники
+research-technology-typan-basic-robotics = Основы робототехники (Тайпан)
 research-technology-basic-anomalous-research = Основы исследования аномалий
 research-technology-basic-xenoarcheology = Основы ксеноархеологии
 research-technology-alternative-research = Альтернативные исследования
