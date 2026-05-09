@@ -20,6 +20,9 @@ public sealed partial class DailyRewardComponent : Component
     public TimeSpan ExpirationWindow = TimeSpan.FromHours(36);
 
     [DataField]
+    public int StreakMissGraceDays = 1;
+
+    [DataField]
     public int MaxStreak = 30;
 
     [DataField]

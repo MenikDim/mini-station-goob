@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using Content.Server.Administration;
 using Content.Server.Commands;
+using Content.Server.Database;
 using Content.Server._Mini.DailyRewards;
 using Content.Shared.Administration;
 using Robust.Server.Player;
@@ -54,12 +55,13 @@ public sealed class DailyRewardSetStreakCommand : IConsoleCommand
 {
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IEntityManager _entities = default!;
+    [Dependency] private readonly IServerDbManager _db = default!;
 
     public string Command => "dailyrewardsetstreak";
-    public string Description => "Sets streak value for an online player.";
+    public string Description => "Sets streak in DB for a player (offline ok).";
     public string Help => "Usage: dailyrewardsetstreak [username] <streak>";
 
-    public void Execute(IConsoleShell shell, string argStr, string[] args)
+    public async void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         if (args.Length is < 1 or > 2)
         {
@@ -67,23 +69,60 @@ public sealed class DailyRewardSetStreakCommand : IConsoleCommand
             return;
         }
 
-        if (!DailyRewardCommandHelpers.TryResolveSession(shell, args, _playerManager, out var session, out var consumedArgs))
-            return;
-
-        if (!int.TryParse(args[consumedArgs], out var streak) || streak < 0)
+        if (!int.TryParse(args[^1], out var streak) || streak < 0)
         {
             shell.WriteError("Streak must be a non-negative integer.");
             return;
         }
 
         var system = _entities.System<DailyRewardSystem>();
-        if (!system.SetStreak(session.UserId, streak))
+
+        if (args.Length == 2)
         {
-            shell.WriteError("Failed to update streak.");
+            if (DailyRewardCommandHelpers.TryResolveOnlineSession(new[] { args[0] }, _playerManager, shell,
+                    out var session, out _))
+            {
+                if (!system.SetStreak(session.UserId, streak))
+                    shell.WriteError("Failed to update streak.");
+                else
+                    shell.WriteLine($"Set streak for {session.Name} to {streak}.");
+                return;
+            }
+
+            var record = await _db.GetPlayerRecordByUserName(args[0]);
+            if (record == null)
+            {
+                var normalized = DailyRewardCommandHelpers.NormalizeTarget(args[0]);
+                if (normalized != args[0])
+                    record = await _db.GetPlayerRecordByUserName(normalized);
+            }
+
+            if (record == null)
+            {
+                shell.WriteError($"No player record for '{args[0]}'.");
+                return;
+            }
+
+            if (!await system.SetStreakForPlayerAsync(record.UserId, streak))
+            {
+                shell.WriteError("Failed to update streak.");
+                return;
+            }
+
+            shell.WriteLine($"Set streak for {record.LastSeenUserName} to {streak}.");
             return;
         }
 
-        shell.WriteLine($"Set streak for {session.Name} to {streak}.");
+        if (shell.Player is null)
+        {
+            shell.WriteError("From server console use: dailyrewardsetstreak <username> <streak>");
+            return;
+        }
+
+        if (!system.SetStreak(shell.Player.UserId, streak))
+            shell.WriteError("Failed to update streak.");
+        else
+            shell.WriteLine($"Set streak for {shell.Player.Name} to {streak}.");
     }
 }
 
@@ -336,7 +375,52 @@ internal static class DailyRewardCommandHelpers
         return false;
     }
 
-    private static string NormalizeTarget(string rawTarget)
+    public static bool TryResolveOnlineSession(
+        string[] args,
+        IPlayerManager playerManager,
+        IConsoleShell shell,
+        [NotNullWhen(true)] out ICommonSession? session,
+        out int consumedArgs)
+    {
+        consumedArgs = 0;
+        session = null;
+
+        if (args.Length == 0)
+            return false;
+
+        var rawTarget = args[0];
+        var normalizedTarget = NormalizeTarget(rawTarget);
+
+        if (shell.Player is { } self &&
+            (string.Equals(rawTarget, self.Name, StringComparison.OrdinalIgnoreCase) ||
+             string.Equals(normalizedTarget, self.Name, StringComparison.OrdinalIgnoreCase)))
+        {
+            session = self;
+            consumedArgs = 1;
+            return true;
+        }
+
+        if (shell.Player is { } performer &&
+            (CommandUtils.TryGetSessionByUsernameOrId(shell, rawTarget, performer, out session) ||
+             (normalizedTarget != rawTarget &&
+              CommandUtils.TryGetSessionByUsernameOrId(shell, normalizedTarget, performer, out session))))
+        {
+            consumedArgs = 1;
+            return true;
+        }
+
+        if (playerManager.TryGetSessionByUsername(rawTarget, out session) ||
+            (normalizedTarget != rawTarget &&
+             playerManager.TryGetSessionByUsername(normalizedTarget, out session)))
+        {
+            consumedArgs = 1;
+            return true;
+        }
+
+        return false;
+    }
+
+    internal static string NormalizeTarget(string rawTarget)
     {
         var atIndex = rawTarget.LastIndexOf('@');
         if (atIndex >= 0 && atIndex < rawTarget.Length - 1)

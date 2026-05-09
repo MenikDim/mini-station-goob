@@ -100,6 +100,41 @@ public sealed class DailyRewardSystem : EntitySystem
         return true;
     }
 
+    public async Task<bool> SetStreakForPlayerAsync(Guid playerId, int streak, CancellationToken cancel = default)
+    {
+        var maxStreak = _defaultComponent.MaxStreak;
+        streak = Math.Clamp(streak, 0, maxStreak);
+
+        var progress = await _db.GetDailyRewardProgress(playerId, cancel);
+        if (progress == null)
+        {
+            progress = new DailyRewardProgress
+            {
+                PlayerId = playerId,
+                CurrentStreak = streak,
+                PendingActiveDate = DateTime.UtcNow.Date,
+                PendingActiveTime = TimeSpan.Zero,
+            };
+        }
+        else
+        {
+            progress.CurrentStreak = streak;
+        }
+
+        await _db.UpsertDailyRewardProgress(progress);
+
+        var netUserId = new NetUserId(playerId);
+        if (_states.TryGetValue(netUserId, out var state))
+        {
+            state.Progress.CurrentStreak = streak;
+            state.MarkMutated();
+            if (_playerManager.TryGetSessionById(netUserId, out var session))
+                SendState(session);
+        }
+
+        return true;
+    }
+
     public bool SetLastClaimTime(NetUserId userId, DateTime? lastClaimTimeUtc)
     {
         var state = EnsureStateExists(userId);
@@ -497,7 +532,7 @@ public sealed class DailyRewardSystem : EntitySystem
         if (nowUtc - lastClaim <= component.ExpirationWindow)
             return false;
 
-        return nowUtc.Date > lastClaim.Date.AddDays(1);
+        return nowUtc.Date > lastClaim.Date.AddDays(1 + component.StreakMissGraceDays);
     }
 
     private DailyRewardComponent? TryGetComponentFor(NetUserId userId)
