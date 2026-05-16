@@ -70,6 +70,7 @@ using Content.Shared.Preferences;
 using Content.Client.Guidebook;
 using Content.Client.Lobby.UI;
 using Content.Client.Players.PlayTimeTracking;
+using Content.Corvax.Interfaces.Shared;
 
 namespace Content.Client.UserInterface.Systems.EscapeMenu;
 
@@ -100,18 +101,15 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
     private DefaultWindow? _characterWindow;
     private CharacterSetupGui? _characterSetup;
     private HumanoidProfileEditor? _profileEditor;
+    private ISharedSponsorsManager? _sponsors; // Sponsor think
 
     /* CorvaxGoob-Coins-start
     private MenuButton? EscapeButton => UIManager.GetActiveUIWidgetOrNull<GameTopMenuBar>()?.EscapeButton; // RMC - Patreon
-
-    public override void Initialize()  // RMC - Patreon
+    */
+    public override void Initialize()
     {
-        _linkAccount.Updated += () =>
-        {
-            if (_escapeWindow != null)
-                _escapeWindow.PatronPerksButton.Visible = _linkAccount.CanViewPatronPerks();
-        };
-    } */
+    IoCManager.Instance!.TryResolveType(out _sponsors);
+    }
     private MenuButton? EscapeButton => UIManager.GetActiveUIWidgetOrNull<MenuBar.Widgets.GameTopMenuBar>()?.EscapeButton;
     // CorvaxGoob-Coins-end
 
@@ -275,7 +273,8 @@ public sealed class EscapeUIController : UIController, IOnStateEntered<GameplayS
             _prototypeManager,
             _resourceCache,
             _requirements,
-            _markings);
+            _markings,
+            _sponsors); //Sponsor think
 
         if (_guide != null)
             _profileEditor.OnOpenGuidebook += _guide.OpenHelp;

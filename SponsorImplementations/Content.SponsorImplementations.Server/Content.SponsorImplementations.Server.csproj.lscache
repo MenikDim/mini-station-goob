@@ -241,9 +241,6 @@ ServerSponsorManager.cs
  System.Xml.XPath.XDocument.dll
  WindowsBase.dll
 <NUGET>/
- jetbrains.formatripper/2.2.2/lib/netstandard2.0/JetBrains.FormatRipper.dll
- jetbrains.habitatdetector/1.4.3/lib/netstandard2.0/JetBrains.HabitatDetector.dll
- jetbrains.profiler.api/1.4.8/lib/netstandard2.0/JetBrains.Profiler.Api.dll
  linguini.bundle/0.8.1/lib/net8.0/Linguini.Bundle.dll
  linguini.shared/0.8.0/lib/net8.0/Linguini.Shared.dll
  linguini.syntax/0.8.0/lib/net8.0/Linguini.Syntax.dll

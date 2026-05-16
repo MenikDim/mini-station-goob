@@ -3759,9 +3759,6 @@ _White/
  asmresolver.pe/6.0.0-beta.3/lib/net8.0/AsmResolver.PE.dll
  asmresolver/6.0.0-beta.3/lib/net8.0/AsmResolver.dll
  jetbrains.annotations/2024.3.0/lib/netstandard2.0/JetBrains.Annotations.dll
- jetbrains.formatripper/2.2.2/lib/netstandard2.0/JetBrains.FormatRipper.dll
- jetbrains.habitatdetector/1.4.3/lib/netstandard2.0/JetBrains.HabitatDetector.dll
- jetbrains.profiler.api/1.4.8/lib/netstandard2.0/JetBrains.Profiler.Api.dll
  linguini.bundle/0.8.1/lib/net8.0/Linguini.Bundle.dll
  linguini.shared/0.8.0/lib/net8.0/Linguini.Shared.dll
  linguini.syntax/0.8.0/lib/net8.0/Linguini.Syntax.dll
@@ -3803,9 +3800,7 @@ _White/
  robust.shared.authlib/0.1.2/lib/netstandard2.1/Robust.Shared.AuthLib.dll
  serilog/4.2.0/lib/net9.0/Serilog.dll
  sixlabors.imagesharp/3.1.11/lib/net6.0/SixLabors.ImageSharp.dll
- sqlitepclraw.bundle_e_sqlite3/2.1.10/lib/netstandard2.0/SQLitePCLRaw.batteries_v2.dll
  sqlitepclraw.core/2.1.10/lib/netstandard2.0/SQLitePCLRaw.core.dll
- sqlitepclraw.provider.e_sqlite3/2.1.10/lib/net6.0/SQLitePCLRaw.provider.e_sqlite3.dll
  system.composition.attributedmodel/8.0.0/lib/net8.0/System.Composition.AttributedModel.dll
  system.composition.convention/8.0.0/lib/net8.0/System.Composition.Convention.dll
  system.composition.hosting/8.0.0/lib/net8.0/System.Composition.Hosting.dll

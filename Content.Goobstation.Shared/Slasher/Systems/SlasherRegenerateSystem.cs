@@ -29,7 +29,7 @@ public sealed class SlasherRegenerateSystem : EntitySystem
 
         SubscribeLocalEvent<SlasherRegenerateComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<SlasherRegenerateComponent, ComponentShutdown>(OnShutdown);
-        SubscribeLocalEvent<SlasherRegenerateComponent, ActionAttemptEvent>(OnActionAttempt);
+        // SubscribeLocalEvent<SlasherRegenerateComponent, ActionAttemptEvent>(OnActionAttempt);
         SubscribeLocalEvent<SlasherRegenerateComponent, SlasherRegenerateEvent>(OnRegenerate);
     }
 
@@ -43,14 +43,14 @@ public sealed class SlasherRegenerateSystem : EntitySystem
         _actions.RemoveAction(ent.Comp.ActionEnt);
     }
 
-    private void OnActionAttempt(EntityUid uid, SlasherRegenerateComponent comp, ref ActionAttemptEvent args)
-    {
-        if (!comp.HasSoulAvailable)
-        {
-            _popup.PopupPredicted(Loc.GetString("slasher-regenerate-no-soul"), uid, uid);
-            args.Cancelled = true;
-        }
-    }
+    // private void OnActionAttempt(EntityUid uid, SlasherRegenerateComponent comp, ref ActionAttemptEvent args)
+    // {
+    //     if (!comp.HasSoulAvailable)
+    //     {
+    //         _popup.PopupPredicted(Loc.GetString("slasher-regenerate-no-soul"), uid, uid);
+    //         args.Cancelled = true;
+    //     }
+    // }
 
     /// <summary>
     /// Handles the regeneration of the entity/slasher (self) & uncuffing
