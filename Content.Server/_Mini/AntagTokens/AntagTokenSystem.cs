@@ -75,7 +75,7 @@ public sealed class AntagTokenSystem : EntitySystem
     private const float DatabaseSyncInterval = 15f;
     private const int SharedTokenSlotsPlayersPerSlot = 10;
     private bool _enforcingSharedTokenSlotCapacity;
-    private int _ghostMinimumTimeBonusSeconds;
+    private readonly Dictionary<string, int> _ghostMinimumTimeRandomBonusByRole = new();
     private static readonly HashSet<string> BlockedRoundstartRolePresets = new(StringComparer.OrdinalIgnoreCase)
     {
         "Extended",
@@ -84,19 +84,6 @@ public sealed class AntagTokenSystem : EntitySystem
         "SecretGreenshift",
         "TheGhost",
     };
-
-    private int GetDonorBonusByLevel(int sponsorLevel)
-    {
-        return sponsorLevel switch
-        {
-            1 => 20,
-            2 => 30,
-            3 => 40,
-            4 => 60,
-            5 => 100,
-            _ => 0
-        };
-    }
 
     private static int EncodeUtcDayNumber(DateTime utc)
     {
@@ -150,7 +137,6 @@ public sealed class AntagTokenSystem : EntitySystem
         SubscribeLocalEvent<GhostRoleComponent, TakeGhostRoleEvent>(OnGhostRoleTakenForToken, after: new[] { typeof(GhostRoleSystem) });
 
         _userDb.AddOnLoadPlayer(LoadPlayerData);
-        _userDb.AddOnFinishLoad(OnPlayerDatabaseLoadFinished);
         _userDb.AddOnPlayerDisconnect(OnPlayerDisconnect);
     }
 
@@ -209,31 +195,6 @@ public sealed class AntagTokenSystem : EntitySystem
             _lobbyDepositCapacityEnforceAccumulator = 2f;
             EnforceSharedTokenSlotCapacity();
         }
-    }
-
-    private void TryGrantSponsorRenewal(ICommonSession session, PlayerTokenState state, DateTime nowUtc)
-    {
-        var sponsorLevel = GetEffectiveSponsorLevel(session.UserId);
-        if (sponsorLevel <= 0)
-            return;
-
-        var bonusAmount = GetDonorBonusByLevel(sponsorLevel);
-        if (bonusAmount <= 0)
-            return;
-
-        if (state.LastDonorBonusClaimUtc is { } lastClaim &&
-            nowUtc - lastClaim < TimeSpan.FromDays(30))
-        {
-            return;
-        }
-
-        AddBalance(session.UserId, bonusAmount, out var granted, out _);
-        if (granted <= 0)
-            return;
-
-        state.LastDonorBonusClaimUtc = nowUtc;
-        PersistState(session.UserId, state);
-        ShowPopup(session, Loc.GetString("antag-tokens-sponsor-bonus-popup", ("amount", granted), ("tier", sponsorLevel)));
     }
 
     public bool AddBalance(NetUserId userId, int amount, out int grantedAmount, out string? note)
@@ -918,19 +879,6 @@ public sealed class AntagTokenSystem : EntitySystem
         _onlineRewards[ev.PlayerSession.UserId].Resume(now);
     }
 
-    private void OnPlayerDatabaseLoadFinished(ICommonSession session)
-    {
-        TryGrantSponsorRenewalAfterStateLoaded(session);
-    }
-
-    internal void TryGrantSponsorRenewalAfterStateLoaded(ICommonSession session)
-    {
-        if (!_states.TryGetValue(session.UserId, out var state))
-            return;
-
-        TryGrantSponsorRenewal(session, state, DateTime.UtcNow);
-    }
-
     internal void TestSetLastDonorBonusClaimUtc(NetUserId userId, DateTime? utc)
     {
         if (!_states.TryGetValue(userId, out var state))
@@ -941,11 +889,19 @@ public sealed class AntagTokenSystem : EntitySystem
 
     private void OnRoundStarting(RoundStartingEvent _)
     {
-        _ghostMinimumTimeBonusSeconds = _random.Next(0, 4) * 300;
+        _ghostMinimumTimeRandomBonusByRole.Clear();
+        foreach (var role in _listings.ListingsOrdered)
+        {
+            if (role.Mode != AntagPurchaseMode.GhostRule || role.MinimumTimeFromRoundStart <= 0)
+                continue;
+
+            _ghostMinimumTimeRandomBonusByRole[role.Id] = _random.Next(-300, 901);
+        }
     }
 
     private void OnRoundRestartCleanup(RoundRestartCleanupEvent _)
     {
+        _ghostMinimumTimeRandomBonusByRole.Clear();
         _globallyClaimedGhostRoles.Clear();
 
         var grantedGhost = new HashSet<NetUserId>(_roundGrantedGhostRule);
@@ -1577,8 +1533,9 @@ public sealed class AntagTokenSystem : EntitySystem
             return 0;
 
         var minimum = role.MinimumTimeFromRoundStart;
-        if (role.Mode == AntagPurchaseMode.GhostRule)
-            minimum += _ghostMinimumTimeBonusSeconds;
+        if (role.Mode == AntagPurchaseMode.GhostRule &&
+            _ghostMinimumTimeRandomBonusByRole.TryGetValue(role.Id, out var bonus))
+            minimum += bonus;
 
         return Math.Max(0, minimum - cache.RoundElapsedSeconds);
     }
@@ -1809,24 +1766,7 @@ private void NormalizeMonthlyState(PlayerTokenState state, DateTime nowUtc, NetU
     state.MonthlyYear = nowUtc.Year;
     state.MonthlyMonth = nowUtc.Month;
     state.MonthlyEarned = 0;
-
-        if (userId != null)
-        {
-            var sponsorLevel = GetEffectiveSponsorLevel(userId.Value);
-            if (sponsorLevel > 0)
-            {
-                var bonusAmount = GetDonorBonusByLevel(sponsorLevel);
-                if (bonusAmount > 0)
-                {
-                    state.Balance += bonusAmount;
-                    state.LastDonorBonusClaimUtc = nowUtc;
-
-                    if (_playerManager.TryGetSessionById(userId.Value, out var session))
-                        ShowPopup(session, Loc.GetString("antag-tokens-popup-monthly-donor-bonus", ("amount", bonusAmount)));
-                }
-            }
-        }
-    }
+}
 
     private int? GetMonthlyCap(NetUserId userId)
     {

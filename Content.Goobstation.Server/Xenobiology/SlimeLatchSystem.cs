@@ -24,12 +24,14 @@ using Content.Shared.Nutrition.EntitySystems;
 using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
+using Robust.Shared.Map;
 using Robust.Shared.Timing;
 using Content.Shared.Body.Systems;
 using Content.Shared.Body.Components;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Chemistry.Components;
+using System.Numerics;
 
 namespace Content.Goobstation.Server.Xenobiology;
 
@@ -63,6 +65,7 @@ public sealed partial class SlimeLatchSystem : EntitySystem
         SubscribeLocalEvent<SlimeComponent, EntGotRemovedFromContainerMessage>(OnEntGotRemovedFromContainer);
         SubscribeLocalEvent<SlimeComponent, EntGotInsertedIntoContainerMessage>(OnEntGotInsertedIntoContainer);
         SubscribeLocalEvent<SlimeComponent, SlimeMitosisEvent>(OnSlimeMitosis);
+        SubscribeLocalEvent<SlimeComponent, SlimeTamedEvent>(OnSlimeTamed);
     }
 
     private void OnSlimeContained(Entity<SlimeComponent> ent, ref EntInsertedIntoContainerMessage args)
@@ -81,6 +84,10 @@ public sealed partial class SlimeLatchSystem : EntitySystem
         var sodQuery = EntityQueryEnumerator<SlimeDamageOvertimeComponent>();
         while (sodQuery.MoveNext(out var uid, out var dotComp))
             UpdateHunger((uid, dotComp));
+
+        var slimeQuery = EntityQueryEnumerator<SlimeComponent>();
+        while (slimeQuery.MoveNext(out var uid, out var slime))
+            EnsureLatchedSlimeAnchored((uid, slime));
     }
 
     private void UpdateHunger(Entity<SlimeDamageOvertimeComponent> ent)
@@ -173,6 +180,18 @@ public sealed partial class SlimeLatchSystem : EntitySystem
     {
         Unlatch(ent);
     }
+
+    private void OnSlimeTamed(Entity<SlimeComponent> ent, ref SlimeTamedEvent args)
+    {
+        if (IsLatched(ent, args.Tamer))
+        {
+            Unlatch(ent);
+            return;
+        }
+
+        if (ent.Comp.PendingLatchTarget == args.Tamer)
+            CancelLatchAttempt(ent);
+    }
     private void OnLatchAttempt(SlimeLatchEvent args)
     {
         if (TerminatingOrDeleted(args.Target)
@@ -199,6 +218,12 @@ public sealed partial class SlimeLatchSystem : EntitySystem
 
     private bool StartSlimeLatchDoAfter(Entity<SlimeComponent> ent, EntityUid target)
     {
+        if (IsLatchAttemptInProgress(ent))
+            return false;
+
+        if (HasComp<BeingLatchedComponent>(target) || HasComp<SlimeDamageOvertimeComponent>(target))
+            return false;
+
         if (_mobState.IsDead(target))
         {
             var targetDeadPopup = Loc.GetString("slime-latch-fail-target-dead", ("ent", target));
@@ -230,11 +255,9 @@ public sealed partial class SlimeLatchSystem : EntitySystem
             AttemptFrequency = AttemptFrequency.StartAndEnd,
         };
 
-        if (!_doAfter.TryStartDoAfter(doAfterArgs))
-            return false;
-
-        var attemptPopup = Loc.GetString("slime-latch-attempt", ("slime", ent), ("ent", target));
-        _popup.PopupEntity(attemptPopup, ent, PopupType.MediumCaution);
+        BeginLatchAttempt(ent, target);
+        EnsureComp<BeingLatchedComponent>(target);
+        _doAfter.TryStartDoAfter(doAfterArgs);
         return true;
     }
 
@@ -250,8 +273,19 @@ public sealed partial class SlimeLatchSystem : EntitySystem
             return;
 
         if (args.Handled || args.Cancelled)
+        {
+            ClearLatchAttempt(ent);
+            RemCompDeferred<BeingLatchedComponent>(target);
+            return;
+        }
+
+        if (!CanLatch(ent, target, ignoreBeingLatched: true))
+        {
+            ClearLatchAttempt(ent);
+            RemCompDeferred<BeingLatchedComponent>(target);
             return;
 
+        ClearLatchAttempt(ent);
         Latch(ent, target);
         args.Handled = true;
     }
@@ -274,11 +308,30 @@ public sealed partial class SlimeLatchSystem : EntitySystem
     public bool IsLatched(Entity<SlimeComponent> ent, EntityUid target)
         => IsLatched(ent) && ent.Comp.LatchedTarget!.Value == target;
 
-    public bool CanLatch(Entity<SlimeComponent> ent, EntityUid target)
+    public bool IsLatchAttemptInProgress(Entity<SlimeComponent> ent)
+    {
+        if (ent.Comp.PendingLatchTarget is not { } target)
+            return false;
+
+        if (_gameTiming.CurTime >= ent.Comp.PendingLatchUntil || TerminatingOrDeleted(target))
+        {
+            ClearLatchAttempt(ent);
+            return false;
+        }
+
+        return true;
+    }
+
+    public bool IsLatchAttemptInProgress(Entity<SlimeComponent> ent, EntityUid target)
+        => IsLatchAttemptInProgress(ent) && ent.Comp.PendingLatchTarget == target;
+
+    public bool CanLatch(Entity<SlimeComponent> ent, EntityUid target, bool ignoreBeingLatched = false)
     {
         return !(IsLatched(ent) // already latched
             || _mobState.IsDead(target) // target dead
             || !_actionBlocker.CanInteract(ent, target) // can't reach
+            || (!ignoreBeingLatched && HasComp<BeingLatchedComponent>(target)) // target already being latched
+            || HasComp<SlimeDamageOvertimeComponent>(target) // target already latched
             || !HasComp<MobStateComponent>(target)); // make any mob work
     }
 
@@ -288,6 +341,14 @@ public sealed partial class SlimeLatchSystem : EntitySystem
             return false;
 
         return StartSlimeLatchDoAfter(ent, target);
+    }
+
+    public void CancelLatchAttempt(Entity<SlimeComponent> ent)
+    {
+        if (ent.Comp.PendingLatchTarget is { } pendingTarget)
+            RemCompDeferred<BeingLatchedComponent>(pendingTarget);
+
+        ClearLatchAttempt(ent);
     }
 
     public void Latch(Entity<SlimeComponent> ent, EntityUid target)
@@ -320,6 +381,8 @@ public sealed partial class SlimeLatchSystem : EntitySystem
 
     public void Unlatch(Entity<SlimeComponent> ent)
     {
+        CancelLatchAttempt(ent);
+
         if (!IsLatched(ent))
             return;
 
@@ -338,6 +401,36 @@ public sealed partial class SlimeLatchSystem : EntitySystem
             inpm.CanMove = true;
 
         ent.Comp.LatchedTarget = null;
+    }
+
+    private void EnsureLatchedSlimeAnchored(Entity<SlimeComponent> ent)
+    {
+        if (!IsLatched(ent))
+            return;
+
+        var target = ent.Comp.LatchedTarget!.Value;
+        if (TerminatingOrDeleted(target))
+        {
+            Unlatch(ent);
+            return;
+        }
+
+        _xform.SetCoordinates(ent, new EntityCoordinates(target, Vector2.Zero));
+
+        if (TryComp<InputMoverComponent>(ent, out var inpm))
+            inpm.CanMove = false;
+    }
+
+    private void BeginLatchAttempt(Entity<SlimeComponent> ent, EntityUid target)
+    {
+        ent.Comp.PendingLatchTarget = target;
+        ent.Comp.PendingLatchUntil = _gameTiming.CurTime + ent.Comp.LatchDoAfterDuration + TimeSpan.FromSeconds(0.25);
+    }
+
+    private static void ClearLatchAttempt(Entity<SlimeComponent> ent)
+    {
+        ent.Comp.PendingLatchTarget = null;
+        ent.Comp.PendingLatchUntil = TimeSpan.Zero;
     }
 
     #endregion

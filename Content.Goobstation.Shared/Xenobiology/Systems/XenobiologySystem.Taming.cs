@@ -35,6 +35,7 @@ public partial class XenobiologySystem
         // Hearts VFX - Slime taming is seperate to core Pettable Component/System
         Spawn(ent.Comp.TameEffect, coords);
         comp.Tamer = args.User;
+        RaiseLocalEvent(ent, new SlimeTamedEvent(args.User));
 
         _popup.PopupEntity(Loc.GetString("slime-interaction-tame"), args.User, args.User);
 

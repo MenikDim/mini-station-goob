@@ -67,7 +67,7 @@ public sealed partial class PickSlimeLatchTargetOperator : HTNOperator
         if (!blackboard.TryGetValue<float>(RangeKey, out var range, _ent)
         || !_ent.TryGetComponent<SlimeComponent>(owner, out var slimeComp)
         || !_ent.TryGetComponent<MobGrowthComponent>(owner, out var growthComp)
-        || (growthComp.IsFirstStage && _hunger.IsHungerAboveState(owner, HungerThreshold.Peckish)) // babies only latch when very hungry
+        || _latch.IsLatchAttemptInProgress((owner, slimeComp))
         || _latch.IsLatched((owner, slimeComp)))
             return (false, null);
 

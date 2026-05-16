@@ -23,16 +23,6 @@
       - BoxShotgunSlug
 
 - type: startingGear
-  id: ThunderdomeHristov
-  equipment:
-    suitstorage: WeaponSniperHristov
-  storage:
-    back:
-      - MagazineAntiMateriel
-      - MagazineAntiMateriel
-
-
-- type: startingGear
   id: ThunderdomeDoubleBarreled
   equipment:
     suitstorage: WeaponShotgunDoubleBarreled

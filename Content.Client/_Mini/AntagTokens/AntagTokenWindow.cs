@@ -503,17 +503,6 @@ public sealed class AntagTokenWindow : DefaultWindow
             });
         }
 
-        if (entry.FreeUnlocks > 0)
-        {
-            root.AddChild(new Label
-            {
-                Text = Loc.GetString("antag-token-window-free-unlocks", ("amount", entry.FreeUnlocks)),
-                Modulate = AccentColor,
-                HorizontalAlignment = HAlignment.Center,
-                MaxWidth = 268
-            });
-        }
-
         root.AddChild(new Control { VerticalExpand = true });
 
         var buyButton = new Button

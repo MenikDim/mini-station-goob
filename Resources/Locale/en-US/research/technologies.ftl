@@ -65,6 +65,7 @@ research-technology-thermal-weaponry = Thermal Weaponry
 research-technology-dual-wielding-technology = Dual Wielding Technology
 
 research-technology-basic-robotics = Basic Robotics
+research-technology-typan-basic-robotics = Basic Robotics (Typan)
 research-technology-basic-anomalous-research = Basic Anomalous Research
 research-technology-basic-xenoarcheology = Basic XenoArcheology
 research-technology-alternative-research = Alternative Research

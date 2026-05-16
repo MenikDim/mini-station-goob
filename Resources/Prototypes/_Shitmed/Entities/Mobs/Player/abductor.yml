@@ -131,7 +131,7 @@
     shoes: ClothingShoesBootsCombat
     gloves: ClothingHandsGlovesCombat
     head: ClothingHeadHelmetAbductor
-    outerClothing: ClothingOuterCoatAbductor
+    outerClothing: ClothingOuterArmorAbductor
     back: ClothingBackpackAbductor
     pocket1: AbductorGizmo
     pocket2: WeaponAlien

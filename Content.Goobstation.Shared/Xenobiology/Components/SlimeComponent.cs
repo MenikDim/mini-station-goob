@@ -88,6 +88,18 @@ public sealed partial class SlimeComponent : Component
     public EntityUid? LatchedTarget;
 
     /// <summary>
+    /// The entity, if any, currently being latched by an active do-after.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadOnly)]
+    public EntityUid? PendingLatchTarget;
+
+    /// <summary>
+    /// The time at which the active latch attempt should be considered expired.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadOnly)]
+    public TimeSpan PendingLatchUntil = TimeSpan.Zero;
+
+    /// <summary>
     /// The maximum amount of offspring produced by mitosis.
     /// </summary>
     [DataField, AutoNetworkedField]

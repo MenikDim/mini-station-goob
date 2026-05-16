@@ -114,6 +114,7 @@ public sealed partial class FancyResearchConsoleMenu : FancyWindow
 
             var control = new FancyResearchConsoleItem(proto, _sprite, tech.Value);
             DragContainer.AddChild(control);
+            control.SetScale(_zoom);
 
             // Set position for all tech, relating to _position
             LayoutContainer.SetPosition(control, _position + proto.Position * 150 * _zoom);
@@ -257,7 +258,26 @@ public sealed partial class FancyResearchConsoleMenu : FancyWindow
     /// </summary>
     public void Recenter()
     {
-        _position = new(45, 250);
+        if (List.Count == 0)
+        {
+            _position = new(45, 250);
+            return;
+        }
+
+        var min = new Vector2(float.MaxValue, float.MaxValue);
+        var max = new Vector2(float.MinValue, float.MinValue);
+
+        foreach (var techId in List.Keys)
+        {
+            var pos = _prototype.Index<TechnologyPrototype>(techId).Position;
+            min = Vector2.Min(min, pos);
+            max = Vector2.Max(max, pos);
+        }
+
+        var graphCenter = (min + max) * 0.5f * 150f * _zoom;
+        var viewportCenter = DragContainer.Size * 0.5f;
+        _position = viewportCenter - graphCenter;
+
         foreach (var item in DragContainer.Children)
         {
             if (item is not FancyResearchConsoleItem research)

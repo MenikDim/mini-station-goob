@@ -113,13 +113,17 @@ public sealed partial class ResearchSystem
             return;
 
         // R&D Console Rework Start
-        var allTechs = PrototypeManager.EnumeratePrototypes<TechnologyPrototype>().ToList();
+        var allTechs = new List<TechnologyPrototype>();
         Dictionary<string, ResearchAvailability> techList;
         var points = 0;
 
         if (TryGetClientServer(uid, out var serverUid, out var server, clientComponent) &&
             TryComp<TechnologyDatabaseComponent>(serverUid, out var db))
         {
+            allTechs = PrototypeManager.EnumeratePrototypes<TechnologyPrototype>()
+                .Where(proto => db.SupportedDisciplines.Contains(proto.Discipline))
+                .ToList();
+
             var unlockedTechs = new HashSet<ProtoId<TechnologyPrototype>>(db.UnlockedTechnologies);
             techList = allTechs.ToDictionary(
                 proto => proto.ID,
@@ -141,6 +145,13 @@ public sealed partial class ResearchSystem
         }
         else
         {
+            if (TryComp<TechnologyDatabaseComponent>(uid, out var localDb))
+            {
+                allTechs = PrototypeManager.EnumeratePrototypes<TechnologyPrototype>()
+                    .Where(proto => localDb.SupportedDisciplines.Contains(proto.Discipline))
+                    .ToList();
+            }
+
             techList = allTechs.ToDictionary(proto => proto.ID, _ => ResearchAvailability.Unavailable);
         }
 
