@@ -1,5 +1,8 @@
-xenobio-reagent-jelly-purple-name = Слизестероид
-xenobio-reagent-jelly-purple-desc = Это мощная химическая смесь, которая заставит слизня произвести на один экстракт больше при обработке, максимум до четырёх дополнительных. Стероид действует только на живых слизней.
+xenobio-reagent-slime-toxin-name = Slime toxin
+xenobio-reagent-slime-toxin-desc = The toxin that slime introduces into victim’s blood during the hunt, maintains the victim in a critical state even with zero blood volume. It also has hallucinogenic and sedative effects.
+
+xenobio-reagent-jelly-purple-name = Slime steroid
+xenobio-reagent-jelly-purple-desc = This is a potent chemical mix that will cause a slime to produce one more extract when processed, for a maximum of four extra. The steroid only works on live slimes.
 
 xenobio-reagent-jelly-blue-name = Стабилизатор слизней
 xenobio-reagent-jelly-blue-desc = Уменьшает шанс мутации слизня на 25%, и этот эффект передаётся через поколения.

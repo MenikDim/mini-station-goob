@@ -132,6 +132,7 @@
     - id: MagazineMagnumAntimaterial # Mini
     - id: MagazineMagnumAntimaterial # Mini
     - id: SecurityMegaphone # goob - loudspeakers
+    - id: SecApartmentTablet # CorvaxGoob-SecApartment
 
 - type: entityTable
   id: FillLockerWardenHarduit

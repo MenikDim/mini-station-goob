@@ -181,13 +181,14 @@
         - Multitool
         - AppraisalTool
         - JawsOfLife
-        - GPS
-        - WeldingMask
         - RemoteSignaller
         - Hammer # Goobstation
         - Nailgun # Goobstation
         - MagazineNailgun # Goobstation
         - HandHeldMassScanner # CorvaxGoob
+        - WeldingMask # Goobstation
+        - GPS # Goobstation
+        - MesonGoggles # Goobstation
       components:
         - SprayPainter
         - SprayPainterAmmo
@@ -200,6 +201,7 @@
         - TrayScanner
         - GasAnalyzer
         - HandLabeler
+        - RadarConsole # Goobstation
   - type: ItemMapper
     mapLayers:
       drill:
@@ -234,6 +236,18 @@
         whitelist:
           tags:
             - Multitool
+      weldmask:
+        whitelist:
+          tags:
+            - WeldingMask
+      mass_scanner:
+        whitelist:
+          tags:
+           - GPS
+      meson:
+        whitelist:
+          tags:
+           - MesonGoggles
     sprite: Clothing/Belt/belt_overlay.rsi
   - type: Appearance
   - type: Tag
@@ -276,6 +290,9 @@
         - Nailgun # Goobstation
         - MagazineNailgun # Goobstation
         - HandHeldMassScanner # CorvaxGoob
+        - WeldingMask # Goobstation
+        - GPS # Goobstation
+        - MesonGoggles #Goobstation
       components:
         - SprayPainter
         - SprayPainterAmmo
@@ -289,6 +306,7 @@
         - Geiger
         - TrayScanner
         - GasAnalyzer
+        - RadarConsole # Goobstation
   - type: ItemMapper
     mapLayers:
       drill:
@@ -323,6 +341,20 @@
         whitelist:
           tags:
           - Wrench
+      weldmask:
+        whitelist:
+          tags:
+          - WeldingMask
+      mass_scanner:
+        whitelist:
+          tags:
+          - GPS
+          components:
+          - RadarConsole
+      meson:
+        whitelist:
+          tags:
+          - MesonGoggles
     sprite: Clothing/Belt/belt_overlay.rsi
   - type: Appearance
 
@@ -548,7 +580,7 @@
       hydro:
         whitelist:
           tags:
-          - PlantAnalyzer
+          - PlantAnalyzer # Dunno what to put here, should be aight.
       hoe:
         whitelist:
           tags:
@@ -761,7 +793,7 @@
     - neck # CorvaxGoob start
   - type: Storage
     grid:
-    - 0,0,5,1 #corvaxgoob 
+    - 0,0,5,1 #corvaxgoob
   # Goobstation
 #    whitelist:
 #      components:

@@ -811,9 +811,10 @@
   categories:
     - UplinkJob
   conditions:
-    - !type:BuyerJobCondition
-      whitelist:
-        - SalvageSpecialist
+  - !type:BuyerJobCondition
+    whitelist:
+    - SalvageSpecialist
+    - ShaftMiner
 
 - type: listing
   id: UplinkGreyTide
@@ -1271,7 +1272,7 @@
   icon: { sprite: _Goobstation/Objects/Weapons/Guns/Ammunition/Magazine/heavy_shotgun.rsi, state: icon2 }
   productEntity: MagazineShotgunHeavySlug
   cost:
-    Telecrystal: 6
+    Telecrystal: 5
   categories:
     - UplinkAmmo
   conditions:

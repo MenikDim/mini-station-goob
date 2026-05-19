@@ -813,6 +813,12 @@
         acts: [ "Destruction" ]
 
 - type: entity
+  name: evil Xeve plush
+  parent: PlushieXeve
+  id: EvilPlushieXeve
+  suffix: Evil
+
+- type: entity
   parent: BasePlushie
   id: PlushieTheHolyCrusader
   name: Holy Crusader plush

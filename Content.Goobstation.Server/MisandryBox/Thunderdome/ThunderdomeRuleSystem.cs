@@ -1,4 +1,5 @@
 using Content.Goobstation.Common.Mind;
+using Content.Goobstation.Common.Mobs;
 using Content.Goobstation.Server.MisandryBox.Mind;
 using Content.Goobstation.Shared.MisandryBox.Mind;
 using Content.Goobstation.Shared.MisandryBox.Thunderdome;
@@ -334,7 +335,8 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
     {
         if (!TryComp<ThunderdomeRuleComponent>(ruleEntity, out var rule)
             || !rule.Active
-            || session.AttachedEntity is not { Valid: true } ghostEntity)
+            || session.AttachedEntity is not { Valid: true } ghostEntity
+            || !HasComp<GhostComponent>(ghostEntity))
             return;
 
         var spawnCoords = GetRandomSpawnPoint(rule);
@@ -707,6 +709,12 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
     private static void OnAntagSelectionBlocker(Entity<ThunderdomePlayerComponent> ent, ref GetAntagSelectionBlockerEvent args)
     {
         args.Blocked = true;
+    }
+
+    private void OnShouldLogStateChange(ref ShouldLogMobStateChangeEvent args)
+    {
+        if (HasComp<ThunderdomePlayerComponent>(args.Target))
+            args.Cancelled = true;
     }
 
     private void OnOriginalBodyExamined(Entity<ThunderdomeOriginalBodyComponent> ent, ref ExaminedEvent args)

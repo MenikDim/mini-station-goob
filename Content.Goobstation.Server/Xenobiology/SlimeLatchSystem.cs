@@ -26,6 +26,11 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Timing;
+using Content.Shared.Body.Systems;
+using Content.Shared.Body.Components;
+using Content.Shared.Chemistry.EntitySystems;
+using Content.Goobstation.Maths.FixedPoint;
+using Content.Shared.Chemistry.Components;
 using System.Numerics;
 
 namespace Content.Goobstation.Server.Xenobiology;
@@ -42,6 +47,9 @@ public sealed partial class SlimeLatchSystem : EntitySystem
     [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
     [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
+    [Dependency] private readonly StomachSystem _stomach = default!;
 
     public override void Initialize()
     {
@@ -49,8 +57,8 @@ public sealed partial class SlimeLatchSystem : EntitySystem
 
         SubscribeLocalEvent<SlimeLatchEvent>(OnLatchAttempt);
         SubscribeLocalEvent<SlimeComponent, SlimeLatchDoAfterEvent>(OnSlimeLatchDoAfter);
-        SubscribeLocalEvent<SlimeComponent, EntRemovedFromContainerMessage>(OnEntityEscape);
-        SubscribeLocalEvent<SlimeComponent, EntInsertedIntoContainerMessage>(OnSlimeContained);
+        SubscribeLocalEvent<SlimeComponent, DoAfterAttemptEvent<SlimeLatchDoAfterEvent>>(OnDoAfterAttempt);
+
         SubscribeLocalEvent<SlimeDamageOvertimeComponent, MobStateChangedEvent>(OnMobStateChangedSOD);
         SubscribeLocalEvent<SlimeComponent, MobStateChangedEvent>(OnMobStateChangedSlime);
         SubscribeLocalEvent<SlimeComponent, PullAttemptEvent>(OnPullAttempt);
@@ -87,14 +95,47 @@ public sealed partial class SlimeLatchSystem : EntitySystem
         if (_gameTiming.CurTime < ent.Comp.NextTickTime || _mobState.IsDead(ent))
             return;
 
-        var addedHunger = (float) ent.Comp.Damage.GetTotal();
         ent.Comp.NextTickTime = _gameTiming.CurTime + ent.Comp.Interval;
         _damageable.TryChangeDamage(ent, ent.Comp.Damage, ignoreResistances: true, targetPart: TargetBodyPart.All);
 
-        if (ent.Comp.SourceEntityUid is { } source && TryComp<HungerComponent>(ent.Comp.SourceEntityUid, out var hunger))
+        if (ent.Comp.SourceEntityUid is not { } source)
+            return;
+
+        var addedHunger = (float) ent.Comp.Damage.GetTotal();
+        if (TryComp<HungerComponent>(source, out var hunger))
         {
             _hunger.ModifyHunger(source, addedHunger, hunger);
             Dirty(source, hunger);
+        }
+
+        var stomachList = _body.GetBodyOrganEntityComps<StomachComponent>(source);
+
+        if (stomachList.Count == 0)
+            return;
+
+        FixedPoint2 availabaleVolume = 0;
+        foreach (var stomach in stomachList)
+        {
+            if (_solutionContainer.ResolveSolution(stomach.Owner, StomachSystem.DefaultSolutionName, ref stomach.Comp1.Solution, out var sol))
+                availabaleVolume += sol.AvailableVolume;
+        }
+
+        if (TryComp<BloodstreamComponent>(ent, out var bloodstream)
+            && _solutionContainer.ResolveSolution(ent.Owner, bloodstream.BloodSolutionName, ref bloodstream.BloodSolution, out var blood)
+            && _solutionContainer.ResolveSolution(ent.Owner, bloodstream.ChemicalSolutionName, ref bloodstream.ChemicalSolution, out var chem))
+        {
+            FixedPoint2 bloodProportion = blood.Volume/(chem.Volume + blood.Volume);
+            FixedPoint2 chemProportion = 1 - bloodProportion;
+            FixedPoint2 bloodTransfer = FixedPoint2.Min(ent.Comp.SuctionUnits * bloodProportion, availabaleVolume * bloodProportion);
+            FixedPoint2 chemTransfer = FixedPoint2.Min(ent.Comp.SuctionUnits * chemProportion, availabaleVolume * chemProportion);
+            foreach (var stomach in stomachList)
+            {
+                var bloodSolution = blood.SplitSolutionWithout(bloodTransfer/FixedPoint2.New(stomachList.Count), ent.Comp.ToxinReagent); // we don't want slime sucking it's own toxin instad of drinking blood
+                _stomach.TryTransferSolution(stomach.Owner, bloodSolution, stomach); // blood first, other chemicals later
+                var chemSolution = blood.SplitSolution(chemTransfer/FixedPoint2.New(stomachList.Count));
+                _stomach.TryTransferSolution(stomach.Owner, chemSolution, stomach);
+            }
+            chem.AddReagent(ent.Comp.ToxinReagent, ent.Comp.ToxinUnits);
         }
     }
 
@@ -199,19 +240,31 @@ public sealed partial class SlimeLatchSystem : EntitySystem
             return false;
         }
 
-        var attemptPopup = Loc.GetString("slime-latch-attempt", ("slime", ent), ("ent", target));
-        _popup.PopupEntity(attemptPopup, ent, PopupType.MediumCaution);
+        if (HasComp<BeingLatchedComponent>(target))
+        {
+            var maxEntitiesPopup = Loc.GetString("slime-latch-fail-already-latched", ("ent", target));
+            _popup.PopupEntity(maxEntitiesPopup, ent, ent);
+
+            return false;
+        }
 
         var doAfterArgs = new DoAfterArgs(EntityManager, ent, ent.Comp.LatchDoAfterDuration, new SlimeLatchDoAfterEvent(), ent, target)
         {
             BreakOnDamage = true,
             BreakOnMove = true,
+            AttemptFrequency = AttemptFrequency.StartAndEnd,
         };
 
         BeginLatchAttempt(ent, target);
         EnsureComp<BeingLatchedComponent>(target);
         _doAfter.TryStartDoAfter(doAfterArgs);
         return true;
+    }
+
+    private void OnDoAfterAttempt(EntityUid uid, SlimeComponent comp, ref DoAfterAttemptEvent<SlimeLatchDoAfterEvent> args)
+    {
+        if (HasComp<BeingLatchedComponent>(args.Event.Target))
+            args.Cancel();
     }
 
     private void OnSlimeLatchDoAfter(Entity<SlimeComponent> ent, ref SlimeLatchDoAfterEvent args)
@@ -310,6 +363,7 @@ public sealed partial class SlimeLatchSystem : EntitySystem
 
         ent.Comp.LatchedTarget = target;
 
+        EnsureComp<BeingLatchedComponent>(target);
         EnsureComp(target, out SlimeDamageOvertimeComponent comp);
         comp.SourceEntityUid = ent;
 

@@ -52,6 +52,7 @@ thunderdome-loadout-estoc = Estoc
 thunderdome-loadout-advlaser = Advanced Laser
 thunderdome-loadout-laserrifle = Laser Carbine
 thunderdome-loadout-lasersniper = Laser Sniper
+thunderdome-loadout-mosin = Kardashev-Mosin
 
 # Weapon descriptions (tooltips)
 thunderdome-desc-shotgun = Pump shotgun + 1 box buckshot, 1 box slugs

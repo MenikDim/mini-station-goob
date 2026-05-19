@@ -22,6 +22,14 @@
       "directions": 4
     },
     {
+      "name": "inhand-left",
+      "directions": 4
+    },
+    {
+      "name": "inhand-right",
+      "directions": 4
+    },
+    {
       "name": "off-equipped-HELMET-vox",
       "directions": 4
     },
@@ -38,10 +46,12 @@
       "directions": 4
     },
     {
-      "name": "inhand-left"
+      "name": "off-equipped-HELMET-feroxi",
+      "directions": 4
     },
     {
-      "name": "inhand-right"
+      "name": "on-equipped-HELMET-feroxi",
+      "directions": 4
     }
   ]
 }

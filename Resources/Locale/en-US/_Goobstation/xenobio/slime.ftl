@@ -4,7 +4,9 @@ slime-latch-attempt = {$slime} пытается прикрепиться к {$en
 
 slime-latch-fail-target-dead = Ты не хочешь поглощать {$ent}, оно мертво!
 
-slime-latch-fail-max-entities = Ты не можешь поглотить {$ent}, ты сыт!
+slime-latch-fail-already-latched = You can't latch to the {$ent}, it latched by somebody else!
+
+slime-latch-fail-max-entities = You cannot consume the {$ent}, you are full!
 
 slime-examined-stomach = [color=red]Ты видишь, как что-то движется внутри![/color]
 
