@@ -1,0 +1,11 @@
+- type: entityTable
+  id: RandomSkillBookTable
+  table: !type:GroupSelector
+    children:
+    - id: SkillBookSurgery
+    - id: SkillBookSelfSurgery
+    - id: SkillBookMedicalEquipment
+    - id: SkillBookShooting
+    - id: SkillBookShuttleControl
+    - id: SkillBookAdvancedBuilding
+    - id: SkillBookButchering

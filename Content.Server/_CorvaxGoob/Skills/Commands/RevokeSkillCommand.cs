@@ -1,9 +1,9 @@
 using System.Linq;
 using Content.Server.Administration;
 using SkillTypes = Content.Shared._CorvaxGoob.Skills.Skills;
+using Content.Shared._CorvaxGoob.Skills;
 using Content.Shared.Administration;
-using Content.Shared.Mind;
-using Content.Shared.Mind.Components;
+using Content.Shared.Mobs.Components;
 using Robust.Shared.Console;
 
 namespace Content.Server._CorvaxGoob.Skills.Commands;
@@ -12,7 +12,6 @@ namespace Content.Server._CorvaxGoob.Skills.Commands;
 public sealed class RevokeSkillCommand : LocalizedEntityCommands
 {
     [Dependency] private readonly ILocalizationManager _localization = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
     [Dependency] private readonly SkillsSystem _skills = default!;
 
     public override string Command => "revokeskill";
@@ -37,7 +36,7 @@ public sealed class RevokeSkillCommand : LocalizedEntityCommands
             return;
         }
 
-        if (!_mind.TryGetMind(entity.Value, out _, out var _))
+        if (!EntityManager.HasComponent<MobStateComponent>(entity.Value))
         {
             shell.WriteError(_localization.GetString("shell-invalid-entity-id"));
             return;
@@ -45,13 +44,14 @@ public sealed class RevokeSkillCommand : LocalizedEntityCommands
 
         var skills = new HashSet<SkillTypes>();
 
-        for (int i = 1; i < args.Length; i++)
+        for (var i = 1; i < args.Length; i++)
         {
             if (!Enum.TryParse<SkillTypes>(args[i], out var skill))
             {
                 shell.WriteError(Loc.GetString("cmd-revokeskill-not-a-skill-type", ("args", args[i])));
                 return;
             }
+
             skills.Add(skill);
         }
 
@@ -63,24 +63,20 @@ public sealed class RevokeSkillCommand : LocalizedEntityCommands
         if (args.Length == 1)
         {
             return CompletionResult.FromHintOptions(
-                CompletionHelper.Components<MindContainerComponent>(args[0], EntityManager, 1000).Where(option =>
-                !EntityManager.HasComponent<MindComponent>(new EntityUid(int.Parse(option.Value))) &&
-                EntityManager.GetComponent<MindContainerComponent>(new EntityUid(int.Parse(option.Value))).HasMind),
+                CompletionHelper.Components<MobStateComponent>(args[0], EntityManager),
                 _localization.GetString("shell-argument-net-entity"));
         }
 
-        var component = int.TryParse(args[0], out var id)
-            ? EntityManager.TryGetEntity(new(id), out var entity)
-                ? _mind.TryGetMind(entity.Value, out _, out var comp)
-                    ? comp
-                    : null
-                : null
-            : null;
-
-        var existingSkills = component?.Skills ?? new HashSet<SkillTypes>();
+        HashSet<SkillTypes> existingSkills = new();
+        if (NetEntity.TryParse(args[0], out var netEntity)
+            && EntityManager.TryGetEntity(netEntity, out var entity)
+            && _skills.TryGetSkills(entity!.Value, out var found))
+        {
+            existingSkills = found;
+        }
 
         var alreadyEnteredSkills = new HashSet<SkillTypes>();
-        for (int i = 1; i < args.Length - 1; i++)
+        for (var i = 1; i < args.Length - 1; i++)
         {
             if (Enum.TryParse<SkillTypes>(args[i], out var skill))
                 alreadyEnteredSkills.Add(skill);

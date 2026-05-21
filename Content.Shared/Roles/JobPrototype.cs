@@ -263,7 +263,7 @@ namespace Content.Shared.Roles
         /// CorvaxGoob: Skills that will be given on joining job.
         /// </summary>
         [DataField]
-        public HashSet<Skills> Skills = [];
+        public HashSet<Skills> Skills = new();
     }
 
     /// <summary>

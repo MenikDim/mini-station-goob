@@ -78,6 +78,9 @@
   special: # Goobstation start - Librarian should speak most languages.
   - !type:AddImplantSpecial
     implants: [ LibrarianTranslatorImplant ] # Goobstation end
+  - !type:AddComponentSpecial
+    components:
+      - type: LibrarianSkillTrainer
 
 - type: startingGear
   id: LibrarianGear

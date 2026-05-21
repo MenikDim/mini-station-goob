@@ -67,6 +67,11 @@
       - id: BookRandomStory
       - id: BookRandom
     - !type:GroupSelector
+      prob: 0.08
+      children:
+      - !type:NestedSelector
+        tableId: RandomSkillBookTable
+    - !type:GroupSelector
       prob: 0.15
       children:
       - id: Flare

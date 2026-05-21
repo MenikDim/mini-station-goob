@@ -45,6 +45,11 @@
       rolls: !type:RangeNumberSelector
         range: 0, 3
       tableId: RandomHandwrittenBookTable
+    # Skill textbooks (CorvaxGoob-Skills)
+    - !type:NestedSelector
+      rolls: !type:RangeNumberSelector
+        range: 0, 1
+      tableId: RandomSkillBookTable
 
 - type: entityTable
   id: RandomHandwrittenBookTable
@@ -110,3 +115,5 @@
       tableId: RandomGuidebookTable
     - !type:NestedSelector
       tableId: RandomHandwrittenBookTable
+    - !type:NestedSelector
+      tableId: RandomSkillBookTable

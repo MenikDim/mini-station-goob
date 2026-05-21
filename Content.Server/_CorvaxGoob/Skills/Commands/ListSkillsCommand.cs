@@ -1,9 +1,9 @@
 using System.Linq;
 using System.Text;
 using Content.Server.Administration;
+using Content.Shared._CorvaxGoob.Skills;
 using Content.Shared.Administration;
-using Content.Shared.Mind;
-using Content.Shared.Mind.Components;
+using Content.Shared.Mobs.Components;
 using Robust.Shared.Console;
 
 namespace Content.Server._CorvaxGoob.Skills.Commands;
@@ -12,7 +12,7 @@ namespace Content.Server._CorvaxGoob.Skills.Commands;
 public sealed class ListSkillsCommand : LocalizedEntityCommands
 {
     [Dependency] private readonly ILocalizationManager _localization = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
+    [Dependency] private readonly SkillsSystem _skills = default!;
 
     public override string Command => "listskills";
 
@@ -36,18 +36,15 @@ public sealed class ListSkillsCommand : LocalizedEntityCommands
             return;
         }
 
-        if (!_mind.TryGetMind(entity.Value, out _, out var mind))
+        if (!_skills.TryGetSkills(entity.Value, out var skills))
         {
-            shell.WriteError(_localization.GetString("shell-invalid-entity-id"));
+            shell.WriteLine(string.Empty);
             return;
         }
 
-        StringBuilder builder = new();
-
-        builder.AppendJoin('\n', mind.Skills.Order());
-
+        var builder = new StringBuilder();
+        builder.AppendJoin('\n', skills.Order());
         builder.Append('\n');
-
         shell.WriteLine(builder.ToString());
     }
 
@@ -56,11 +53,10 @@ public sealed class ListSkillsCommand : LocalizedEntityCommands
         if (args.Length == 1)
         {
             return CompletionResult.FromHintOptions(
-                CompletionHelper.Components<MindContainerComponent>(args[0], EntityManager, 1000).Where(option =>
-                !EntityManager.HasComponent<MindComponent>(new EntityUid(int.Parse(option.Value))) &&
-                EntityManager.GetComponent<MindContainerComponent>(new EntityUid(int.Parse(option.Value))).HasMind),
+                CompletionHelper.Components<MobStateComponent>(args[0], EntityManager),
                 _localization.GetString("shell-argument-net-entity"));
         }
+
         return CompletionResult.Empty;
     }
 }

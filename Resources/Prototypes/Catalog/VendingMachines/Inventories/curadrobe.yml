@@ -28,6 +28,13 @@
     ClothingUniformJumpskirtLibrarian: 3
     ClothingShoesBootsLaceup: 2
     ClothingHeadsetService: 2
+    SkillBookSurgery: 1
+    SkillBookSelfSurgery: 1
+    SkillBookMedicalEquipment: 1
+    SkillBookShooting: 1
+    SkillBookShuttleControl: 1
+    SkillBookAdvancedBuilding: 1
+    SkillBookButchering: 1
   contrabandInventory:
     ToyFigurineLibrarian: 1
   emaggedInventory: # Goobstation

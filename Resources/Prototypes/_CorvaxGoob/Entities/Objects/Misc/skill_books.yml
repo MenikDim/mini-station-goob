@@ -1,0 +1,76 @@
+- type: entity
+  parent: BaseItem
+  id: SkillBookBase
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_base
+      color: "#332d27"
+    - state: decor_wingette
+      color: "#453f3a"
+    - state: icon_text
+  - type: Item
+    size: Small
+  - type: Tag
+    tags:
+    - Book
+  - type: StaticPrice
+    price: 500
+  - type: MeleeWeapon
+    soundHit:
+      collection: Punch
+    damage:
+      types:
+        Blunt: 1
+
+- type: entity
+  parent: SkillBookBase
+  id: SkillBookSurgery
+  components:
+  - type: SkillBook
+    skill: Surgery
+
+- type: entity
+  parent: SkillBookBase
+  id: SkillBookSelfSurgery
+  components:
+  - type: SkillBook
+    skill: SelfSurgery
+
+- type: entity
+  parent: SkillBookBase
+  id: SkillBookMedicalEquipment
+  components:
+  - type: SkillBook
+    skill: MedicalEquipment
+
+- type: entity
+  parent: SkillBookBase
+  id: SkillBookShooting
+  components:
+  - type: SkillBook
+    skill: Shooting
+
+- type: entity
+  parent: SkillBookBase
+  id: SkillBookShuttleControl
+  components:
+  - type: SkillBook
+    skill: ShuttleControl
+
+- type: entity
+  parent: SkillBookBase
+  id: SkillBookAdvancedBuilding
+  components:
+  - type: SkillBook
+    skill: AdvancedBuilding
+
+- type: entity
+  parent: SkillBookBase
+  id: SkillBookButchering
+  components:
+  - type: SkillBook
+    skill: Butchering

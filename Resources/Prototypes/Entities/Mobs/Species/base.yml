@@ -429,6 +429,7 @@
   - type: Scent # Einstein Engines
   - type: MindContainer
     showExamineInfo: true
+  - type: EntitySkills # CorvaxGoob - skills on body
   - type: CanEnterCryostorage
   - type: InteractionPopup
     successChance: 1
@@ -459,6 +460,8 @@
         requireInputValidation: false
       enum.RadarConsoleUiKey.Key: #goob - contractor
         type: RadarConsoleBoundUserInterface
+      enum.SkillTrainingUiKey.Key: # CorvaxGoob - skill training
+        type: SkillTrainingBoundUserInterface
   - type: Puller
   - type: Speech
     speechSounds: Alto
