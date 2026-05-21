@@ -569,7 +569,7 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
             special.AfterEquip(ent);
 
         if (def.Skills is not null && def.Skills.Count > 0) // CorvaxGoob-Skills
-            _skills.GrantSkill(player, def.Skills);
+            _skills.GrantSkill(player, new HashSet<Content.Shared._CorvaxGoob.Skills.Skills>(def.Skills));
 
         var afterEv = new AfterAntagEntitySelectedEvent(session, player, ent, def);
         RaiseLocalEvent(ent, ref afterEv, true);

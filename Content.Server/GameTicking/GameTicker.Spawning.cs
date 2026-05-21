@@ -84,6 +84,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Server._CorvaxGoob.Skills;
+using SkillTypes = Content.Shared._CorvaxGoob.Skills.Skills;
 using Content.Server.Administration.Managers;
 using Content.Server.Administration.Systems;
 using Content.Server.GameTicking.Events;
@@ -447,7 +448,7 @@ namespace Content.Server.GameTicking
             }
 
             if (jobPrototype is not null) // CorvaxGoob-Skills
-                _skills.GrantSkill(mob, jobPrototype.Skills, true);
+                _skills.GrantSkill(mob, new HashSet<SkillTypes>(jobPrototype.Skills), true);
 
             // We raise this event directed to the mob, but also broadcast it so game rules can do something now.
             PlayersJoinedRoundNormally++;

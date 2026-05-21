@@ -1,0 +1,18 @@
+<controls:FancyWindow xmlns="https://spacestation14.io"
+            xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls"
+            Title="{Loc 'skill-training-ui-title'}"
+            MinSize="340 320"
+            MaxSize="420 520">
+    <BoxContainer Orientation="Vertical" Margin="10">
+        <RichTextLabel Name="HintLabel" Access="Public"
+                       Text="{Loc 'skill-training-ui-hint'}"
+                       StyleClasses="LabelSubText"
+                       Margin="0 0 0 8"/>
+        <ScrollContainer VerticalExpand="True" HorizontalExpand="True" HScrollEnabled="False">
+            <BoxContainer Name="SkillButtonContainer" Access="Public"
+                          Orientation="Vertical"
+                          SeparationOverride="6"
+                          HorizontalExpand="True"/>
+        </ScrollContainer>
+    </BoxContainer>
+</controls:FancyWindow>

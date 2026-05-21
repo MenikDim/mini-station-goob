@@ -1,10 +1,9 @@
 using System.Linq;
-using System.Diagnostics;
+using Content.Server.GameTicking.Events;
 using Content.Shared._CorvaxGoob.CCCVars;
 using Content.Shared._CorvaxGoob.Skills;
 using SkillTypes = Content.Shared._CorvaxGoob.Skills.Skills;
 using Content.Shared.Implants;
-using Content.Shared.Mind;
 using Content.Shared.Tag;
 using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
@@ -15,10 +14,11 @@ public sealed partial class SkillsSystem : SharedSkillsSystem
 {
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
 
     public static readonly ProtoId<TagPrototype> SkillsTag = "Skills";
     private bool _skillsEnabled = true;
+
+    private readonly HashSet<HashSet<SkillTypes>> _ownedSkillSets = new();
 
     public override void Initialize()
     {
@@ -28,19 +28,14 @@ public sealed partial class SkillsSystem : SharedSkillsSystem
         Subs.CVar(_cfg, CCCVars.SkillsEnabled, value => _skillsEnabled = value);
 
         SubscribeLocalEvent<ImplantImplantedEvent>(OnImplantImplanted);
+        SubscribeLocalEvent<EntitySkillsComponent, ComponentInit>(OnSkillsComponentInit);
+        SubscribeLocalEvent<RoundStartingEvent>(OnRoundStarting);
+
+        DedupeAllEntitySkills();
     }
 
-    public bool IsSkillsEnabled()
-    {
-        return _skillsEnabled;
-    }
+    public bool IsSkillsEnabled() => _skillsEnabled;
 
-    /// <summary>
-    /// Check does entity has current skill
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <param name="skill"></param>
-    /// <returns>true if has, else false</returns>
     public override bool HasSkill(EntityUid entity, SkillTypes skill)
     {
         if (!_skillsEnabled)
@@ -49,13 +44,62 @@ public sealed partial class SkillsSystem : SharedSkillsSystem
         if (HasComp<IgnoreSkillsComponent>(entity))
             return true;
 
-        if (!_mind.TryGetMind(entity, out _, out var mind))
+        if (!TryComp<EntitySkillsComponent>(entity, out var skills))
             return false;
 
-        if (mind.Skills.Contains(SkillTypes.All))
+        EnsureSkillsInstance(entity, skills);
+
+        if (skills.Skills.Contains(SkillTypes.All))
             return true;
 
-        return mind.Skills.Contains(skill);
+        return skills.Skills.Contains(skill);
+    }
+
+    public bool TryGetSkills(EntityUid entity, out HashSet<SkillTypes> skills)
+    {
+        skills = new HashSet<SkillTypes>();
+
+        if (!TryComp<EntitySkillsComponent>(entity, out var comp))
+            return false;
+
+        EnsureSkillsInstance(entity, comp);
+        skills = comp.Skills;
+        return true;
+    }
+
+    private void OnSkillsComponentInit(Entity<EntitySkillsComponent> ent, ref ComponentInit args)
+    {
+        EnsureSkillsInstance(ent.Owner, ent.Comp);
+    }
+
+    private void OnRoundStarting(RoundStartingEvent ev)
+    {
+        _ownedSkillSets.Clear();
+        DedupeAllEntitySkills();
+    }
+
+    private void DedupeAllEntitySkills()
+    {
+        var query = EntityQueryEnumerator<EntitySkillsComponent>();
+        while (query.MoveNext(out var uid, out var skills))
+            EnsureSkillsInstance(uid, skills);
+    }
+
+    private void EnsureSkillsInstance(EntityUid uid, EntitySkillsComponent skills)
+    {
+        if (_ownedSkillSets.Add(skills.Skills))
+            return;
+
+        skills.Skills = new HashSet<SkillTypes>(skills.Skills);
+        Dirty(uid, skills);
+        _ownedSkillSets.Add(skills.Skills);
+    }
+
+    private EntitySkillsComponent EnsureSkills(EntityUid entity)
+    {
+        var comp = EnsureComp<EntitySkillsComponent>(entity);
+        EnsureSkillsInstance(entity, comp);
+        return comp;
     }
 
     private void OnImplantImplanted(ref ImplantImplantedEvent ev)
@@ -69,146 +113,89 @@ public sealed partial class SkillsSystem : SharedSkillsSystem
         GrantAllSkills(ev.Implanted.Value);
     }
 
-    /// <summary>
-    /// Grant all skills on target mind.
-    /// </summary>
-    /// <param name="entity">Entity with target mind</param>
-    public void GrantAllSkills(EntityUid entity)
-    {
-        GrantSkill(entity, SkillTypes.All);
-    }
+    public void GrantAllSkills(EntityUid entity) => GrantSkill(entity, SkillTypes.All);
 
-    /// <summary>
-    /// Grant new skills on target mind. Can full clear skills on mind if clearSkills set to true
-    /// </summary>
-    /// <param name="entity">Entity with target mind</param>
-    /// <param name="skills">What skills we grant</param>
-    /// <param name="clearSkills">Does we need to clear all skills before grant new</param>
     public void GrantSkill(EntityUid entity, HashSet<SkillTypes> skills, bool clearSkills = false)
     {
-        if (!_mind.TryGetMind(entity, out var mind, out var mindComp))
-        {
-            Log.Error($"Can't get mind from entity {entity.Id}");
-            return;
-        }
-
-        HashSet<SkillTypes> oldSkills = new HashSet<SkillTypes>(mindComp.Skills);
+        var comp = EnsureSkills(entity);
+        var oldSkills = new HashSet<SkillTypes>(comp.Skills);
+        var incoming = new HashSet<SkillTypes>(skills);
+        var bodySkills = new HashSet<SkillTypes>(comp.Skills);
 
         if (clearSkills)
-            mindComp.Skills.Clear();
+            bodySkills.Clear();
 
-        if (skills.Count < 1)
+        if (incoming.Count < 1)
         {
-            Log.Info($"HashSet<Skills> skills is empty, entity {entity.Id}, clearskills: {clearSkills}.");
+            comp.Skills = bodySkills;
+            Dirty(entity, comp);
             return;
         }
 
-        if (skills.Contains(SkillTypes.All))
-        {
-            mindComp.Skills.Clear();
-            mindComp.Skills.Add(SkillTypes.All);
-        }
+        if (incoming.Contains(SkillTypes.All))
+            bodySkills = new HashSet<SkillTypes> { SkillTypes.All };
         else
-            mindComp.Skills.UnionWith(skills);
+            bodySkills.UnionWith(incoming);
 
-        HashSet<SkillTypes> newSkills = new HashSet<SkillTypes>(mindComp.Skills);
+        comp.Skills = bodySkills;
+        Dirty(entity, comp);
+        _ownedSkillSets.Add(comp.Skills);
+
+        var newSkills = new HashSet<SkillTypes>(comp.Skills);
         newSkills.ExceptWith(oldSkills);
 
         if (newSkills.Count < 1)
-        {
-            Log.Info($"No new skills added to entity {entity.Id} with mind {mind.Id}. Clear skills: {clearSkills}.");
             return;
-        }
 
-        string skillsMassive = string.Join(", ", newSkills.Select(s => s.ToString()));
-
-        Log.Info($"Grant {(skills.Contains(SkillTypes.All) ? $"{SkillTypes.All.ToString()}" : $"{skillsMassive}")} skills to entity {entity.Id} with mind {mind.Id}. Clear skills: {clearSkills}");
+        var skillsMassive = string.Join(", ", newSkills.Select(s => s.ToString()));
+        Log.Info($"Grant {(incoming.Contains(SkillTypes.All) ? $"{SkillTypes.All}" : skillsMassive)} skills to entity {entity.Id}. Clear skills: {clearSkills}");
     }
 
-    /// <summary>
-    /// Grant new skills on target mind. Can full clear skills on mind if clearSkills set to true
-    /// </summary>
-    /// <param name="entity">Entity with target mind</param>
-    /// <param name="skills">What skills we grant</param>
-    /// <param name="clearSkills">Does we need to clear all skills before grant new</param>
     public void GrantSkill(EntityUid entity, bool clearSkills = false, params SkillTypes[] skills)
-    {
-        GrantSkill(entity, new HashSet<SkillTypes>(skills), clearSkills);
-    }
+        => GrantSkill(entity, new HashSet<SkillTypes>(skills), clearSkills);
 
-    /// <summary>
-    /// Grant new skill on target mind. Can full clear skills on mind if clearSkills set to true
-    /// </summary>
-    /// <param name="entity">Entity with target mind</param>
-    /// <param name="skill">What skill we grant</param>
-    /// <param name="clearSkills">Does we need to clear all skills before grant new</param>
     public void GrantSkill(EntityUid entity, SkillTypes skill, bool clearSkills = false)
-    {
-        GrantSkill(entity, new HashSet<SkillTypes>() { skill }, clearSkills);
-    }
+        => GrantSkill(entity, new HashSet<SkillTypes> { skill }, clearSkills);
 
-    /// <summary>
-    /// Revoke skills on target mind. If skill is Skills.All - clear all mind skills
-    /// </summary>
-    /// <param name="entity">Entity with target mind</param>
-    /// <param name="skills">What skills we revoke</param>
     public void RevokeSkill(EntityUid entity, HashSet<SkillTypes> skills)
     {
-        if (!_mind.TryGetMind(entity, out var mind, out var mindComp))
-        {
-            Log.Error($"Can't get mind from entity {entity.Id}");
+        if (!TryComp<EntitySkillsComponent>(entity, out var comp))
             return;
-        }
+
+        EnsureSkillsInstance(entity, comp);
 
         if (skills.Count < 1)
-        {
-            Log.Info($"HashSet<Skills> skills is empty, entity {entity}.");
             return;
-        }
 
-        HashSet<SkillTypes> oldSkills = new HashSet<SkillTypes>(mindComp.Skills);
+        var oldSkills = new HashSet<SkillTypes>(comp.Skills);
+        var incoming = new HashSet<SkillTypes>(skills);
+        var bodySkills = new HashSet<SkillTypes>(comp.Skills);
 
-        if (skills.Contains(SkillTypes.All))
-            mindComp.Skills.Clear();
+        if (incoming.Contains(SkillTypes.All))
+            bodySkills.Clear();
         else
         {
-            foreach (var skill in skills)
-            {
-                mindComp.Skills.Remove(skill);
-            }
+            foreach (var skill in incoming)
+                bodySkills.Remove(skill);
         }
 
-        HashSet<SkillTypes> revokedSkills = new HashSet<SkillTypes>(oldSkills);
-        revokedSkills.ExceptWith(mindComp.Skills);
+        comp.Skills = bodySkills;
+        Dirty(entity, comp);
+        _ownedSkillSets.Add(comp.Skills);
+
+        var revokedSkills = new HashSet<SkillTypes>(oldSkills);
+        revokedSkills.ExceptWith(comp.Skills);
 
         if (revokedSkills.Count < 1)
-        {
-            Log.Info($"No skills revoked from entity {entity.Id} with mind {mind.Id}");
             return;
-        }
 
-        string skillsMassive = string.Join(", ", revokedSkills.Select(s => s.ToString()));
-
-        Log.Info($"Revoke {(skills.Contains(SkillTypes.All) ? $"{SkillTypes.All.ToString()}" : $"{skillsMassive}")} skills from entity {entity.Id} with mind {mind.Id}");
+        var skillsMassive = string.Join(", ", revokedSkills.Select(s => s.ToString()));
+        Log.Info($"Revoke {(incoming.Contains(SkillTypes.All) ? $"{SkillTypes.All}" : skillsMassive)} skills from entity {entity.Id}");
     }
 
-    /// <summary>
-    /// Revoke skills on target mind. If skill is Skills.All - clear all mind skills
-    /// </summary>
-    /// <param name="entity">Entity with target mind</param>
-    /// <param name="skills">What skills we revoke</param>
     public void RevokeSkill(EntityUid entity, params SkillTypes[] skills)
-    {
-        RevokeSkill(entity, new HashSet<SkillTypes>(skills));
-    }
+        => RevokeSkill(entity, new HashSet<SkillTypes>(skills));
 
-    /// <summary>
-    /// Revoke skills on target mind. If skill is Skills.All - clear all mind skills
-    /// </summary>
-    /// <param name="entity">Entity with target mind</param>
-    /// <param name="skill">What skill we revoke</param>
     public void RevokeSkill(EntityUid entity, SkillTypes skill)
-    {
-        RevokeSkill(entity, new HashSet<SkillTypes>() { skill });
-    }
+        => RevokeSkill(entity, new HashSet<SkillTypes> { skill });
 }

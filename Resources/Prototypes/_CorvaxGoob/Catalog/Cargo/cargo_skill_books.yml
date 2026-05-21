@@ -1,0 +1,19 @@
+- type: cargoProduct
+  id: ServiceSkillBooks
+  icon:
+    sprite: Objects/Misc/books.rsi
+    state: book_icon
+  product: CrateServiceSkillBooks
+  cost: 2200
+  category: cargoproduct-category-name-service
+  group: market
+
+- type: cargoProduct
+  id: ServiceSkillBooksBulk
+  icon:
+    sprite: Objects/Misc/books.rsi
+    state: book_icon
+  product: CrateServiceSkillBooksBulk
+  cost: 5500
+  category: cargoproduct-category-name-service
+  group: market
