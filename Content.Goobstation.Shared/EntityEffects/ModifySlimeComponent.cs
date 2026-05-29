@@ -25,6 +25,12 @@ public sealed partial class ModifySlimeComponent : EntityEffect
     public int? OffspringBonus;
 
     /// <summary>
+    /// Caps <see cref="SlimeComponent.MaxOffspring"/> after applying <see cref="OffspringBonus"/>.
+    /// </summary>
+    [DataField]
+    public int? MaxOffspringCap;
+
+    /// <summary>
     /// How much will we increase/decrease the mutation chance?
     /// </summary>
     [DataField]
@@ -40,6 +46,9 @@ public sealed partial class ModifySlimeComponent : EntityEffect
 
         slime.ExtractsProduced += ExtractBonus ?? 0;
         slime.MaxOffspring += OffspringBonus ?? 0;
+
+        if (MaxOffspringCap is { } cap)
+            slime.MaxOffspring = Math.Min(slime.MaxOffspring, cap);
 
         if (ChanceModifier is { } chanceMod)
             slime.MutationChance = Math.Clamp(slime.MutationChance + chanceMod, 0f, 1f);

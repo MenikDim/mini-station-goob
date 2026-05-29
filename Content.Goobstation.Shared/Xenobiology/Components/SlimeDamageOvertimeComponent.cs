@@ -50,7 +50,7 @@ public sealed partial class SlimeDamageOvertimeComponent : Component
     {
         DamageDict = new Dictionary<string, FixedPoint2>
         {
-            { "Caustic", 6 },
+            { "Caustic", 5 },
         },
     };
 }

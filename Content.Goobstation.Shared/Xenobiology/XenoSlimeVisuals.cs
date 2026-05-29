@@ -14,5 +14,6 @@ namespace Content.Goobstation.Shared.Xenobiology
     {
         Color,
         Shader,
+        ClusterScale,
     }
 }

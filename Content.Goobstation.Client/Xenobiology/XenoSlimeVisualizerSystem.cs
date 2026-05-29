@@ -5,7 +5,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-using System.Diagnostics;
+using System.Numerics;
 using Content.Client.DamageState;
 using Content.Goobstation.Shared.Xenobiology;
 using Content.Goobstation.Shared.Xenobiology.Components;
@@ -25,20 +25,28 @@ public sealed class XenoSlimeVisualizerSystem : VisualizerSystem<SlimeComponent>
 
     protected override void OnAppearanceChange(EntityUid uid, SlimeComponent component, ref AppearanceChangeEvent args)
     {
-        if (args.Sprite == null || !AppearanceSystem.TryGetData<Color>(uid, XenoSlimeVisuals.Color, out var color, args.Component) || !TryComp<SpriteComponent>(uid, out var spriteComponent))
+        if (args.Sprite == null || !TryComp<SpriteComponent>(uid, out _))
             return;
 
-        foreach (var layer in args.Sprite.AllLayers)
-            layer.Color = color.WithAlpha(layer.Color.A);
+        if (AppearanceSystem.TryGetData<Color>(uid, XenoSlimeVisuals.Color, out var color, args.Component))
+        {
+            foreach (var layer in args.Sprite.AllLayers)
+                layer.Color = color.WithAlpha(layer.Color.A);
+        }
+
+        if (AppearanceSystem.TryGetData<float>(uid, XenoSlimeVisuals.ClusterScale, out var scale, args.Component))
+            args.Sprite.Scale = new Vector2(scale, scale);
 
         if (!AppearanceSystem.TryGetData<string>(uid, XenoSlimeVisuals.Shader, out var shader, args.Component))
             return;
+
         var spriteComp = args.Sprite;
         var newShader = _proto.Index<ShaderPrototype>(shader).InstanceUnique();
 
         var layerExists = _sprite.LayerMapTryGet(uid, DamageStateVisualLayers.Base, out var layerKey, false);
         if (!layerExists)
             return;
+
         spriteComp.LayerSetShader(layerKey, newShader);
         spriteComp.GetScreenTexture = true;
         spriteComp.RaiseShaderEvent = true;

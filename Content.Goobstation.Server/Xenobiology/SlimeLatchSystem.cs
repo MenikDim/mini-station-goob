@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Goobstation.Shared.Nutrition.EntitySystems;
 using Content.Goobstation.Shared.Xenobiology;
 using Content.Goobstation.Shared.Xenobiology.Components;
 using Content.Goobstation.Shared.Xenobiology.Components.Equipment;
@@ -50,6 +51,7 @@ public sealed partial class SlimeLatchSystem : EntitySystem
     [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainer = default!;
     [Dependency] private readonly StomachSystem _stomach = default!;
+    [Dependency] private readonly GoobHungerSystem _goobHunger = default!;
 
     public override void Initialize()
     {
@@ -96,7 +98,7 @@ public sealed partial class SlimeLatchSystem : EntitySystem
             return;
 
         ent.Comp.NextTickTime = _gameTiming.CurTime + ent.Comp.Interval;
-        _damageable.TryChangeDamage(ent, ent.Comp.Damage, ignoreResistances: true, targetPart: TargetBodyPart.All);
+        _damageable.TryChangeDamage(ent, ent.Comp.Damage, ignoreResistances: true, targetPart: TargetBodyPart.Chest);
 
         if (ent.Comp.SourceEntityUid is not { } source)
             return;
@@ -204,6 +206,12 @@ public sealed partial class SlimeLatchSystem : EntitySystem
         if (IsLatched(ent))
         {
             Unlatch(ent);
+            return;
+        }
+
+        if (!TryValidateLatchTarget((args.Performer, slime), args.Target, out var failMessage))
+        {
+            _popup.PopupEntity(failMessage, ent, ent);
             return;
         }
 
@@ -340,12 +348,36 @@ public sealed partial class SlimeLatchSystem : EntitySystem
 
     public bool CanLatch(Entity<SlimeComponent> ent, EntityUid target, bool ignoreBeingLatched = false)
     {
-        return !(IsLatched(ent) // already latched
-            || _mobState.IsDead(target) // target dead
-            || !_actionBlocker.CanInteract(ent, target) // can't reach
-            || (!ignoreBeingLatched && HasComp<BeingLatchedComponent>(target)) // target already being latched
-            || HasComp<SlimeDamageOvertimeComponent>(target) // target already latched
-            || !HasComp<MobStateComponent>(target)); // make any mob work
+        return TryValidateLatchTarget(ent, target, out _)
+            && !(IsLatched(ent)
+            || _mobState.IsDead(target)
+            || !_actionBlocker.CanInteract(ent, target)
+            || (!ignoreBeingLatched && HasComp<BeingLatchedComponent>(target))
+            || HasComp<SlimeDamageOvertimeComponent>(target)
+            || !HasComp<MobStateComponent>(target));
+    }
+
+    private bool TryValidateLatchTarget(Entity<SlimeComponent> ent, EntityUid target, out string failMessage)
+    {
+        failMessage = string.Empty;
+
+        if (ent.Comp.Tamer != target)
+            return true;
+
+        if (TryComp<MobGrowthComponent>(ent, out var growth) && growth.IsFirstStage)
+        {
+            failMessage = Loc.GetString("slime-latch-fail-tamer", ("ent", target));
+            return false;
+        }
+
+        if (TryComp<HungerComponent>(ent, out var hunger)
+            && _goobHunger.IsHungerAboveState(ent, HungerThreshold.Peckish, comp: hunger))
+        {
+            failMessage = Loc.GetString("slime-latch-fail-tamer", ("ent", target));
+            return false;
+        }
+
+        return true;
     }
 
     public bool NpcTryLatch(Entity<SlimeComponent> ent, EntityUid target)

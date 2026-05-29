@@ -23,6 +23,9 @@ public sealed partial class XenoVacClearEvent : InstantActionEvent;
 [Serializable, NetSerializable]
 public sealed partial class SlimeLatchDoAfterEvent : SimpleDoAfterEvent;
 
+[Serializable, NetSerializable]
+public sealed partial class SlimeClusterPeelDoAfterEvent : SimpleDoAfterEvent;
+
 public sealed partial class SlimeTamedEvent : EntityEventArgs
 {
     public EntityUid Tamer;

@@ -279,6 +279,18 @@ public sealed partial class GoobCVars
     public static readonly CVarDef<float> BreedingInterval =
         CVarDef.Create("xenobiology.breeding.interval", 1f, CVar.REPLICATED | CVar.SERVER);
 
+    public static readonly CVarDef<float> OvercrowdingRadius =
+        CVarDef.Create("xenobiology.overcrowding.radius", 4f, CVar.SERVERONLY);
+
+    public static readonly CVarDef<int> OvercrowdingHtnThreshold =
+        CVarDef.Create("xenobiology.overcrowding.htn_threshold", 8, CVar.SERVERONLY);
+
+    public static readonly CVarDef<int> OvercrowdingMergeThreshold =
+        CVarDef.Create("xenobiology.overcrowding.merge_threshold", 10, CVar.SERVERONLY);
+
+    public static readonly CVarDef<float> OvercrowdingCheckInterval =
+        CVarDef.Create("xenobiology.overcrowding.check_interval", 3f, CVar.SERVERONLY);
+
     #endregion
 
     #region Goobcoins

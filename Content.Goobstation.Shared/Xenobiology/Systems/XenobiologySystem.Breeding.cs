@@ -60,7 +60,9 @@ public partial class XenobiologySystem
         var query = EntityQueryEnumerator<SlimeComponent, MobGrowthComponent, HungerComponent>();
         while (query.MoveNext(out var uid, out var slime, out var growthComp, out var hungerComp))
         {
-            if (_gameTiming.CurTime < slime.NextUpdateTime
+            if (HasComp<SlimeClusterComponent>(uid)
+                || HasComp<SlimeOvercrowdedComponent>(uid)
+                || _gameTiming.CurTime < slime.NextUpdateTime
                 || _mobState.IsDead(uid)
                 || growthComp.IsFirstStage)
                 continue;
