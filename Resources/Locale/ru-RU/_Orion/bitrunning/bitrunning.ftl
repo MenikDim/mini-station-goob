@@ -8,6 +8,7 @@ bitrunning-server-active = Сервер сейчас выполняет доме
 bitrunning-netpod-no-server = Рядом нет подключённого квантового сервера.
 bitrunning-netpod-entered = Вы залезаете в капсулу.
 bitrunning-netpod-enter-failed = Сейчас вы не можете залезть в капсулу.
+bitrunning-netpod-manipulate-failed = В вашем текущем состоянии вы не можете взаимодействовать с нейрокапсулой.
 bitrunning-netpod-connected = Нейросессия установлена.
 bitrunning-netpod-disconnected = Сессия аватара завершена.
 bitrunning-netpod-connect-failed = Не удалось установить связь с аватаром.

@@ -3,13 +3,22 @@ using Content.Server._Orion.Bitrunning.Components;
 using Content.Server.Power.Components;
 using Content.Shared._Orion.Bitrunning;
 using Content.Shared._Orion.Bitrunning.Components;
+using Content.Shared._Orion.Bitrunning.Systems;
+using Content.Shared.ActionBlocker;
+using Content.Shared.Administration.Logs;
+using Content.Shared.Climbing.Systems;
+using Content.Shared.Containers;
+using Content.Shared.Database;
 using Content.Shared.Destructible;
 using Content.Shared.DeviceLinking;
 using Content.Shared.DeviceLinking.Events;
+using Content.Shared.DoAfter;
+using Content.Shared.DragDrop;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Power;
 using Content.Shared.Roles;
+using Content.Shared.Verbs;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
@@ -20,7 +29,7 @@ using Robust.Shared.Timing;
 
 namespace Content.Server._Orion.Bitrunning.Systems;
 
-public sealed class NetpodSystem : EntitySystem
+public sealed class NetpodSystem : SharedNetpodSystem
 {
     [Dependency] private readonly QuantumServerSystem _server = default!;
     [Dependency] private readonly SharedDeviceLinkSystem _deviceLink = default!;
@@ -33,6 +42,10 @@ public sealed class NetpodSystem : EntitySystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
+    [Dependency] private readonly ClimbSystem _climb = default!;
+    [Dependency] private readonly ISharedAdminLogManager _adminLog = default!;
 
     private Dictionary<ProtoId<StartingGearPrototype>, string>? _startingGearToJobName;
 
@@ -43,6 +56,8 @@ public sealed class NetpodSystem : EntitySystem
 
     public override void Initialize()
     {
+        base.Initialize();
+
         SubscribeLocalEvent<NetpodComponent, ComponentInit>(OnInit);
         SubscribeLocalEvent<NetpodComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<NetpodComponent, DestructionEventArgs>(OnDestroyed);
@@ -55,6 +70,9 @@ public sealed class NetpodSystem : EntitySystem
         SubscribeLocalEvent<NetpodComponent, NetpodSelectLoadoutMessage>(OnSelectLoadout);
         SubscribeLocalEvent<NetpodComponent, NewLinkEvent>(OnNewLink);
         SubscribeLocalEvent<NetpodComponent, PortDisconnectedEvent>(OnPortDisconnected);
+        SubscribeLocalEvent<NetpodComponent, DragDropTargetEvent>(OnDragDropTarget, before: [typeof(DragInsertContainerSystem)]);
+        SubscribeLocalEvent<NetpodComponent, GetVerbsEvent<AlternativeVerb>>(OnGetAlternativeVerb);
+        SubscribeLocalEvent<NetpodComponent, NetpodInteractionDoAfterEvent>(OnInteractionDoAfter);
     }
 
     public override void Update(float frameTime)
@@ -152,6 +170,18 @@ public sealed class NetpodSystem : EntitySystem
         if (args.Entity == EntityUid.Invalid || !Exists(args.Entity))
             return;
 
+        if (!CanAcceptOccupant(args.Entity, ent.Comp))
+        {
+            Timer.Spawn(TimeSpan.Zero,
+                () =>
+            {
+                if (Exists(ent.Owner))
+                    EjectOccupant(ent.Owner);
+            });
+            _popup.PopupEntity(Loc.GetString("bitrunning-netpod-enter-failed"), ent, args.Entity);
+            return;
+        }
+
         if (TryComp<ApcPowerReceiverComponent>(ent.Owner, out var power) && !power.Powered)
         {
             Timer.Spawn(TimeSpan.Zero,
@@ -161,18 +191,6 @@ public sealed class NetpodSystem : EntitySystem
                     EjectOccupant(ent.Owner);
             });
             _popup.PopupEntity(Loc.GetString("bitrunning-netpod-no-power"), ent, args.Entity);
-            return;
-        }
-
-        if (TryComp<MobStateComponent>(args.Entity, out var mobState) && mobState.CurrentState == MobState.Dead)
-        {
-            Timer.Spawn(TimeSpan.Zero,
-                () =>
-            {
-                if (Exists(ent.Owner))
-                    EjectOccupant(ent.Owner);
-            });
-            _popup.PopupEntity(Loc.GetString("bitrunning-netpod-enter-failed"), ent, args.Entity);
             return;
         }
 
@@ -391,5 +409,156 @@ public sealed class NetpodSystem : EntitySystem
         }
 
         return lookup;
+    }
+
+    private void OnDragDropTarget(Entity<NetpodComponent> ent, ref DragDropTargetEvent args)
+    {
+        if (args.Handled)
+            return;
+
+        if (!CanManipulateNetpod(args.User))
+        {
+            _popup.PopupEntity(Loc.GetString("bitrunning-netpod-manipulate-failed"), ent, args.User);
+            args.Handled = true;
+            return;
+        }
+
+        if (!CanAcceptOccupant(args.Dragged, ent.Comp))
+        {
+            _popup.PopupEntity(Loc.GetString("bitrunning-netpod-enter-failed"), ent, args.User);
+            args.Handled = true;
+        }
+    }
+
+    private void OnGetAlternativeVerb(Entity<NetpodComponent> ent, ref GetVerbsEvent<AlternativeVerb> args)
+    {
+        if (!args.CanInteract || !args.CanAccess || args.Hands == null)
+            return;
+
+        if (!_actionBlocker.CanInteract(args.User, ent))
+            return;
+
+        if (!CanManipulateNetpod(args.User))
+            return;
+
+        if (!_container.TryGetContainer(ent, BodyContainerId, out var container))
+            return;
+
+        var user = args.User;
+
+        if (container.ContainedEntities.Count > 0)
+        {
+            var emptyableCount = 0;
+            foreach (var contained in container.ContainedEntities)
+            {
+                if (_container.CanRemove(contained, container))
+                    emptyableCount++;
+            }
+
+            if (emptyableCount > 0)
+            {
+                args.Verbs.Add(new AlternativeVerb
+                {
+                    Act = () => TryStartEjectDoAfter(ent, user, container),
+                    Category = VerbCategory.Eject,
+                    Text = Loc.GetString("container-verb-text-empty"),
+                    Priority = 1,
+                });
+            }
+        }
+
+        if (_container.CanInsert(user, container) && _actionBlocker.CanMove(user))
+        {
+            args.Verbs.Add(new AlternativeVerb
+            {
+                Act = () => TryStartInsertDoAfter(ent, user, user, container),
+                Text = Loc.GetString("container-verb-text-enter"),
+                Priority = 2,
+            });
+        }
+    }
+
+    private void OnInteractionDoAfter(Entity<NetpodComponent> ent, ref NetpodInteractionDoAfterEvent args)
+    {
+        if (args.Handled || args.Cancelled || args.Args.Target == null)
+            return;
+
+        if (!_container.TryGetContainer(ent, BodyContainerId, out var container))
+            return;
+
+        var user = args.User;
+        if (user == EntityUid.Invalid || !CanManipulateNetpod(user))
+            return;
+
+        args.Handled = true;
+
+        if (args.Eject)
+        {
+            _adminLog.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(user):player} emptied container {ToPrettyString(ent)}");
+            var ents = _container.EmptyContainer(container);
+            foreach (var contained in ents)
+                _climb.ForciblySetClimbing(contained, ent);
+
+            return;
+        }
+
+        if (!CanAcceptOccupant(args.Args.Target.Value, ent.Comp))
+        {
+            _popup.PopupEntity(Loc.GetString("bitrunning-netpod-enter-failed"), ent, user);
+            return;
+        }
+
+        if (!_container.Insert(args.Args.Target.Value, container))
+            return;
+
+        _adminLog.Add(LogType.Action, LogImpact.Medium,
+            $"{ToPrettyString(user):player} inserted {ToPrettyString(args.Args.Target):player} into container {ToPrettyString(ent)}");
+    }
+
+    private void TryStartInsertDoAfter(Entity<NetpodComponent> ent, EntityUid user, EntityUid target, BaseContainer container)
+    {
+        var delay = GetEntryDelay(ent.Owner);
+        if (delay <= TimeSpan.Zero)
+        {
+            if (!_container.Insert(target, container))
+                return;
+
+            _adminLog.Add(LogType.Action, LogImpact.Medium,
+                $"{ToPrettyString(user):player} inserted {ToPrettyString(target):player} into container {ToPrettyString(ent)}");
+            return;
+        }
+
+        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, user, delay, new NetpodInteractionDoAfterEvent(), ent, target, ent)
+        {
+            BreakOnDamage = true,
+            BreakOnMove = true,
+            NeedHand = false,
+        });
+    }
+
+    private void TryStartEjectDoAfter(Entity<NetpodComponent> ent, EntityUid user, BaseContainer container)
+    {
+        var delay = ent.Comp.EjectDelay;
+        if (delay <= TimeSpan.Zero)
+        {
+            _adminLog.Add(LogType.Action, LogImpact.Low, $"{ToPrettyString(user):player} emptied container {ToPrettyString(ent)}");
+            var ents = _container.EmptyContainer(container);
+            foreach (var contained in ents)
+                _climb.ForciblySetClimbing(contained, ent);
+
+            return;
+        }
+
+        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, user, delay, new NetpodInteractionDoAfterEvent { Eject = true }, ent, ent, ent)
+        {
+            BreakOnDamage = true,
+            BreakOnMove = true,
+            NeedHand = false,
+        });
+    }
+
+    private TimeSpan GetEntryDelay(EntityUid uid)
+    {
+        return TryComp<DragInsertContainerComponent>(uid, out var drag) ? drag.EntryDelay : TimeSpan.Zero;
     }
 }

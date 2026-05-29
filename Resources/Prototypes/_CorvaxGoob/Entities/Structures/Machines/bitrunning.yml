@@ -108,7 +108,9 @@
       - netpod-body
   - type: DragInsertContainer
     containerId: netpod-body
-    entryDelay: 1
+    entryDelay: 3
+    delaySelfEntry: true
+    useVerbs: false
   - type: ExitContainerOnMove
     containerId: netpod-body
   - type: NetpodContainer
@@ -135,6 +137,12 @@
     nameSet: true
     mobile: true
   - type: Netpod
+    ejectDelay: 3
+    occupantBlacklist:
+      components:
+      - BorgChassis
+      - Silicon
+      - Revenant
     allowedLoadout:
     - BitrunnerAvatarPassengerGear
     - BitrunnerAvatarClownGear

@@ -8,6 +8,7 @@ bitrunning-server-active = Server is actively running a domain.
 bitrunning-netpod-no-server = No linked quantum server found.
 bitrunning-netpod-entered = You climb into the netpod.
 bitrunning-netpod-enter-failed = You cannot enter the netpod right now.
+bitrunning-netpod-manipulate-failed = You cannot interact with the netpod in your current state.
 bitrunning-netpod-connected = Neural session established.
 bitrunning-netpod-disconnected = Avatar session disconnected.
 bitrunning-netpod-connect-failed = Unable to establish avatar connection.

@@ -1,4 +1,5 @@
 using Content.Shared.Roles;
+using Content.Shared.Whitelist;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
@@ -22,6 +23,12 @@ public sealed partial class NetpodComponent : Component
 
     [DataField]
     public List<ProtoId<StartingGearPrototype>> AllowedLoadout = new();
+
+    [DataField]
+    public TimeSpan EjectDelay = TimeSpan.FromSeconds(3);
+
+    [DataField]
+    public EntityWhitelist? OccupantBlacklist;
 
     [DataField]
     public SoundSpecifier OpenSound = new SoundPathSpecifier("/Audio/_Orion/Machines/tram/tramopen.ogg", AudioParams.Default.WithVolume(-2f).WithVariation(0.1f));
