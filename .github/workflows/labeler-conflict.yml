@@ -21,6 +21,9 @@ on:
 jobs:
   Label:
     if: ( github.event.pull_request.draft == false )
+    permissions:
+      issues: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Check for Merge Conflicts
