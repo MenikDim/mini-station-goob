@@ -1406,7 +1406,8 @@ public sealed class AntagTokenSystem : EntitySystem
             return false;
         }
 
-        if (role.Mode == AntagPurchaseMode.LobbyDeposit && cache.RoundstartBlockedByPreset)
+        if (cache.RoundstartBlockedByPreset &&
+            role.Mode is AntagPurchaseMode.LobbyDeposit or AntagPurchaseMode.GhostRule)
         {
             statusLocKey = "antag-store-status-unavailable";
             return false;
