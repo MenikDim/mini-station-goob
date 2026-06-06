@@ -1,9 +1,8 @@
-﻿using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared.WhiteDream.BloodCult.Components;
+namespace Content.Server.WhiteDream.BloodCult.Components;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent]
 public sealed partial class TwistedConstructionTargetComponent : Component
 {
     [DataField(required: true)]

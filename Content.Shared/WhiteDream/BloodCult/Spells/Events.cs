@@ -125,11 +125,7 @@ public sealed partial class PhaseShiftEvent : InstantActionEvent
 }
 
 [Serializable, NetSerializable]
-public sealed partial class BloodCultShacklesDoAfterEvent : SimpleDoAfterEvent
-{
-    public TimeSpan MuteDuration;
-    public TimeSpan KnockdownDuration;
-}
+public sealed partial class BloodCultShacklesDoAfterEvent : SimpleDoAfterEvent;
 
 [Serializable, NetSerializable]
 public sealed partial class TwistedConstructionDoAfterEvent : SimpleDoAfterEvent;

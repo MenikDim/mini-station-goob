@@ -1,10 +1,11 @@
 ﻿using Content.Server.DoAfter;
 using Content.Server.Mind;
 using Content.Server.Stack;
+using Content.Server.WhiteDream.BloodCult.Components;
 using Content.Shared.DoAfter;
 using Content.Shared.Materials;
 using Content.Shared.Stacks;
-using Content.Shared.WhiteDream.BloodCult.Components;
+using Content.Shared.Tag;
 using Content.Shared.WhiteDream.BloodCult.Spells;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
@@ -17,9 +18,11 @@ public sealed class TwistedConstructionSystem : EntitySystem
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly StackSystem _stack = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
 
     private static readonly ProtoId<MaterialPrototype> SteelMaterial = "Steel";
     private static readonly ProtoId<MaterialPrototype> PlasteelMaterial = "Plasteel";
+    private static readonly ProtoId<TagPrototype> TwistedConstructionTargetTag = "TwistedConstructionTarget";
 
     public override void Initialize()
     {
@@ -41,6 +44,7 @@ public sealed class TwistedConstructionSystem : EntitySystem
 
         var twisted = EnsureComp<TwistedConstructionTargetComponent>(ent);
         twisted.ReplacementProto = "RunedMetal";
+        _tag.AddTag(ent, TwistedConstructionTargetTag);
     }
 
     private void OnTwistedConstruction(BloodCultTwistedConstructionEvent ev)

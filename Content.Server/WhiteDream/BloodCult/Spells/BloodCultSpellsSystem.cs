@@ -228,17 +228,11 @@ public sealed class BloodCultSpellsSystem : EntitySystem
             return;
         }
 
-        var doAfterEvent = new BloodCultShacklesDoAfterEvent
-        {
-            MuteDuration = ev.MuteDuration,
-            KnockdownDuration = ev.KnockdownDuration
-        };
-
         var doAfter = new DoAfterArgs(
             EntityManager,
             ev.Performer,
             ev.CuffDuration,
-            doAfterEvent,
+            new BloodCultShacklesDoAfterEvent(),
             ev.Target,
             ev.Target,
             shackles)
@@ -286,8 +280,8 @@ public sealed class BloodCultSpellsSystem : EntitySystem
             return;
         }
 
-        _stun.TryKnockdown(target, args.KnockdownDuration, true);
-        _statusEffects.TryAddStatusEffect<MutedComponent>(target, "Muted", args.MuteDuration, true);
+        _stun.TryKnockdown(target.Owner, TimeSpan.FromSeconds(1), true);
+        _statusEffects.TryAddStatusEffect<MutedComponent>(target, "Muted", TimeSpan.FromSeconds(5), true);
     }
 
     private void OnSummonEquipment(SummonEquipmentEvent ev)

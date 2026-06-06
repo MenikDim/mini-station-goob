@@ -151,7 +151,7 @@
   - type: EntityTargetAction
     canTargetSelf: false
     whitelist:
-      components:
+      tags:
       - TwistedConstructionTarget
     event: !type:BloodCultTwistedConstructionEvent
       speech: "Ethra p'ni dedol!"
