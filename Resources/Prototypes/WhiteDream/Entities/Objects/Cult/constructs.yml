@@ -87,6 +87,7 @@
   - type: ContentEye
   - type: Actions
   - type: Hands
+  - type: ContainerContainer
   - type: IsDeadIC
   - type: ShowHealthBars
     damageContainers:

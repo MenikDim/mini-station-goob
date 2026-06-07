@@ -44,7 +44,6 @@ public sealed class BloodCultSpellsSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<BaseCultSpellComponent, ComponentStartup>(OnSpellStartup);
         SubscribeLocalEvent<BaseCultSpellComponent, EntityTargetActionEvent>(OnCultTargetEvent);
         SubscribeLocalEvent<BaseCultSpellComponent, ActionGettingDisabledEvent>(OnActionGettingDisabled);
 
@@ -63,12 +62,6 @@ public sealed class BloodCultSpellsSystem : EntitySystem
     }
 
     #region BaseHandlers
-
-    private void OnSpellStartup(Entity<BaseCultSpellComponent> action, ref ComponentStartup args)
-    {
-        if (TryComp<ActionComponent>(action, out var actionComp) && actionComp.UseDelay != null)
-            _actions.StartUseDelay((action, actionComp));
-    }
 
     private void OnCultTargetEvent(Entity<BaseCultSpellComponent> spell, ref EntityTargetActionEvent args)
     {

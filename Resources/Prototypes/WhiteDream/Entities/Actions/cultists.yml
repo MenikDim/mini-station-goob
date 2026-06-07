@@ -1,8 +1,8 @@
 ﻿- type: entity
   parent: BaseAction
   id: ActionBloodCultSelectSpells
-  name: blood-cult-select-spells-action
-  description: blood-cult-select-spells-action-desc
+  name: Prepare blood spells
+  description: Opens the menu to prepare blood spells.
   categories: [ HideSpawnMenu ]
   components:
   - type: Action
@@ -16,8 +16,8 @@
 - type: entity
   parent: BaseAction
   id: ActionBloodCultRemoveSpells
-  name: blood-cult-remove-spells-action
-  description: blood-cult-remove-spells-action-desc
+  name: Remove blood spells
+  description: Opens the menu to remove prepared blood spells.
   categories: [ HideSpawnMenu ]
   components:
   - type: Action
