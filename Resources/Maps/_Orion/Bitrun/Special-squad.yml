@@ -3949,14 +3949,14 @@ entities:
     - type: Transform
       pos: -4.720226,37.720245
       parent: 1
-- proto: MagazineHighCaliberAP
+- proto: MagazineHighCaliberExplosive
   entities:
   - uid: 741
     components:
     - type: Transform
       pos: -4.4544034,37.70058
       parent: 1
-- proto: MagazineLightMachineGunRPD
+- proto: MagazineLightRifleBox
   entities:
   - uid: 895
     components:
@@ -3975,7 +3975,7 @@ entities:
     - type: Transform
       pos: -8.344844,11.408643
       parent: 1
-- proto: MagazinePulseShotgun
+- proto: MagazineShotgun
   entities:
   - uid: 814
     components:
@@ -7911,7 +7911,7 @@ entities:
         actions: !type:Container
           ents:
           - 633
-- proto: WeaponLightMachineGunRPD
+- proto: WeaponLightMachineGunL6
   entities:
   - uid: 903
     components:
@@ -7937,7 +7937,7 @@ entities:
       rot: 3.141592653589793 rad
       pos: 0.50990343,37.446014
       parent: 1
-- proto: WeaponPulseShotgunHellHammer
+- proto: WeaponShotgunBulldog
   entities:
   - uid: 647
     components:
@@ -7951,7 +7951,7 @@ entities:
     - type: Transform
       pos: -7.501094,11.577256
       parent: 1
-- proto: WeaponRifleFamas
+- proto: WeaponRifleAk
   entities:
   - uid: 825
     components:
