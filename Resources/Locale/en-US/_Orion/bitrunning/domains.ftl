@@ -24,3 +24,6 @@ bitrunning-domain-zealot-arena-desc = Dance, puppets, dance!
 
 bitrunning-domain-bubblegum-arena-name = Bubblegum Arena
 bitrunning-domain-bubblegum-arena-desc = A pink nightmare from the ashlands. Don't step in the blood.
+
+bitrunning-domain-special-squad-name = Special Squad
+bitrunning-domain-special-squad-desc = After a successful revolution, a "special" ERT unit was sent to your station. The Syndicate has sent you supplies for the battle, so don't let them down.

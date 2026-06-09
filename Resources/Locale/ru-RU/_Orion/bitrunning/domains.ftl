@@ -24,3 +24,6 @@ bitrunning-domain-zealot-arena-desc = Танцуйте, марионетки, т
 
 bitrunning-domain-bubblegum-arena-name = Арена Бабблгума
 bitrunning-domain-bubblegum-arena-desc = Розовый кошмар из пепельных земель. Не наступайте в кровь.
+
+bitrunning-domain-special-squad-name = Специальный отряд
+bitrunning-domain-special-squad-desc = После удачной революции на вашу станцию выслали "особый" отряд ОБР. Синдикат выслал вам припасы для боя, не подведите его.
