@@ -35,15 +35,19 @@ public sealed class XATDeathSystem : BaseXATSystem<XATDeathComponent>
         var query = EntityQueryEnumerator<XATDeathComponent, XenoArtifactNodeComponent>();
         while (query.MoveNext(out var uid, out var comp, out var node))
         {
-            if (node.Attached == null)
+            if (node.Attached == null || Deleted(uid))
                 continue;
 
-            var artifact = _xenoArtifactQuery.Get(GetEntity(node.Attached.Value));
+            var artifactUid = GetEntity(node.Attached.Value);
+            if (!_xenoArtifactQuery.TryComp(artifactUid, out var artifactComp) || Deleted(artifactUid))
+                continue;
+
+            var artifact = (artifactUid, artifactComp);
 
             if (!CanTrigger(artifact, (uid, node)))
                 continue;
 
-            var artifactCoords = Transform(artifact).Coordinates;
+            var artifactCoords = Transform(artifactUid).Coordinates;
             if (_transform.InRange(targetCoords, artifactCoords, comp.Range))
                 Trigger(artifact, (uid, comp, node));
         }
