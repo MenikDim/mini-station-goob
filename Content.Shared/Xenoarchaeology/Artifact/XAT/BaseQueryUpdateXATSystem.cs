@@ -28,10 +28,14 @@ public abstract class BaseQueryUpdateXATSystem<T> : BaseXATSystem<T> where T : C
         var query = EntityQueryEnumerator<T, XenoArtifactNodeComponent>();
         while (query.MoveNext(out var uid, out var comp, out var node))
         {
-            if (node.Attached == null)
+            if (node.Attached == null || Deleted(uid))
                 continue;
 
-            var artifact = _xenoArtifactQuery.Get(GetEntity(node.Attached.Value));
+            var artifactUid = GetEntity(node.Attached.Value);
+            if (!_xenoArtifactQuery.TryComp(artifactUid, out var artifactComp) || Deleted(artifactUid))
+                continue;
+
+            var artifact = (artifactUid, artifactComp);
 
             if (!CanTrigger(artifact, (uid, node)))
                 continue;

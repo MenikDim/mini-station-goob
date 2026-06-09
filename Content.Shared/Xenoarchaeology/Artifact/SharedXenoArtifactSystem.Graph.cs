@@ -71,8 +71,10 @@ public abstract partial class SharedXenoArtifactSystem
         if (index < 0 || index >= ent.Comp.NodeVertices.Length)
             return false;
 
-        if (ent.Comp.NodeVertices[index] is { } netUid && GetEntity(netUid) is var uid)
-            node = (uid, XenoArtifactNode(uid));
+        if (ent.Comp.NodeVertices[index] is { } netUid
+            && GetEntity(netUid) is var uid
+            && _nodeQuery.TryComp(uid, out var nodeComp))
+            node = (uid, nodeComp);
 
         return node != null;
     }
