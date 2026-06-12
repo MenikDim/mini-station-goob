@@ -175,10 +175,10 @@
 
 # Midpop 25–55
 
-- type: additionalMap
-  id: CorvaxBagel
-  maps:
-    - Typan
+# - type: additionalMap
+#   id: CorvaxBagel
+#   maps:
+#     - Typan
 
 - type: additionalMap
   id: CorvaxMascara
