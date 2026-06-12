@@ -634,17 +634,19 @@ namespace Content.Server.Voting.Managers
 
                 if(_playerManager.PlayerCount > (preset.MaxPlayers ?? int.MaxValue))
                     continue;
-                if(preset.ModeTitle == "traitor-title" && _playerManager.PlayerCount<10)
+                if(preset.ModeTitle == "traitor-title" && _playerManager.PlayerCount<7)
                     continue;
-                if(preset.ModeTitle == "nukeops-title" && _playerManager.PlayerCount<25)
+                if(preset.ModeTitle == "nukeops-title" && _playerManager.PlayerCount<20)
                     continue;
-                if(preset.ModeTitle == "cosmiccult-title" && _playerManager.PlayerCount<25)
+                if(preset.ModeTitle == "cosmiccult-title" && _playerManager.PlayerCount<20)
                     continue;
-                if(preset.ModeTitle == "survivalplus-title" && _playerManager.PlayerCount<25)
+                if(preset.ModeTitle == "blood-cult-title" && _playerManager.PlayerCount<20)
                     continue;
-                if(preset.ModeTitle == "secretplus-mid-title" && _playerManager.PlayerCount<25)
+                if(preset.ModeTitle == "survivalplus-title" && _playerManager.PlayerCount<10)
                     continue;
-                if(preset.ModeTitle == "rev-title" && _playerManager.PlayerCount<30)
+                if(preset.ModeTitle == "secretplus-mid-title" && _playerManager.PlayerCount<15)
+                    continue;
+                if(preset.ModeTitle == "rev-title" && _playerManager.PlayerCount<25)
                     continue;
                 if(preset.ModeTitle == "zombie-title" && _playerManager.PlayerCount<30)
                     continue;

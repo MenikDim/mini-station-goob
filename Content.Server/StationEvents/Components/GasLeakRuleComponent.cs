@@ -30,6 +30,11 @@ public sealed partial class GasLeakRuleComponent : Component
         Gas.Healium, // Assmos - /tg/ gases
         Gas.Nitrium, // Assmos - /tg/ gases
         Gas.Pluoxium, // Assmos - /tg/ gases
+        Gas.WaterVapor,
+        // WD EDIT START
+        Gas.Hydrogen,
+        Gas.Halon,
+        // WD EDIT END
     };
 
     /// <summary>

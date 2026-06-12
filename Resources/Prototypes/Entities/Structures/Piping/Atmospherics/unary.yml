@@ -133,6 +133,37 @@
     - type: ExtensionCableReceiver
     - type: DeviceNetwork
       prefix: device-address-prefix-vent
+      sendBroadcastAttemptEvent: true
+      examinableAddress: true
+    - type: WiredNetworkConnection
+    - type: DeviceNetworkRequiresPower
+    - type: AtmosDevice
+    - type: AtmosMonitor
+      temperatureThresholdId: stationTemperature
+      pressureThresholdId: stationPressure
+      gasThresholdPrototypes:
+        Oxygen: stationOxygen
+        Nitrogen: ignore
+        CarbonDioxide: stationCO2
+        Plasma: stationPlasma # everything below is usually bad
+        Tritium: danger
+        WaterVapor: stationWaterVapor
+        Ammonia: stationAmmonia
+        NitrousOxide: stationNO
+        Frezon: danger
+        # WD EDIT START
+        BZ: danger
+        Pluoxium: unwanted
+        Hydrogen: danger
+        Nitrium: unwanted
+        Healium: danger
+        HyperNoblium: unwanted
+        ProtoNitrate: danger
+        Zauker: danger
+        Halon: danger
+        Helium: unwanted
+        AntiNoblium: danger
+        # WD EDIT END
     - type: Tag
       tags:
         - GasVent
@@ -240,6 +271,34 @@
     - type: ExtensionCableReceiver
     - type: DeviceNetwork
       prefix: device-address-prefix-scrubber
+      examinableAddress: true
+    - type: DeviceNetworkRequiresPower
+    - type: AtmosMonitor
+      temperatureThresholdId: stationTemperature
+      pressureThresholdId: stationPressure
+      gasThresholdPrototypes:
+        Oxygen: stationOxygen
+        Nitrogen: ignore
+        CarbonDioxide: stationCO2
+        Plasma: stationPlasma # everything below is usually bad
+        Tritium: danger
+        WaterVapor: stationWaterVapor
+        Ammonia: stationAmmonia
+        NitrousOxide: stationNO
+        Frezon: danger
+        # WD EDIT START
+        BZ: danger
+        Pluoxium: unwanted
+        Hydrogen: danger
+        Nitrium: unwanted
+        Healium: danger
+        HyperNoblium: unwanted
+        ProtoNitrate: danger
+        Zauker: danger
+        Halon: danger
+        Helium: unwanted
+        AntiNoblium: danger
+        # WD EDIT END
     - type: Tag
       tags:
         - GasScrubber

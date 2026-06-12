@@ -113,10 +113,10 @@
       "name": "water_vapor-1"
     },
     {
-      "name": "purple"
+      "name": "scrubber-connector"
     },
     {
-      "name": "purple-1"
+      "name": "scrubber-open"
     },
     {
       "name": "brown"
@@ -125,16 +125,64 @@
       "name": "brown-1"
     },
     {
+      "name": "purple"
+    },
+    {
+      "name": "purple-1"
+    },
+    {
+      "name": "helium"
+    },
+    {
+      "name": "helium-1"
+    },
+    {
+      "name": "nob"
+    },
+    {
+      "name": "nob-1"
+    },
+    {
       "name": "healium"
     },
     {
       "name": "healium-1"
     },
     {
-      "name": "scrubber-connector"
+      "name": "proto_nitrate"
     },
     {
-      "name": "scrubber-open"
+      "name": "proto_nitrate-1"
+    },
+    {
+      "name": "halon"
+    },
+    {
+      "name": "halon-1"
+    },
+    {
+      "name": "darkpurple"
+    },
+    {
+      "name": "darkpurple-1"
+    },
+    {
+      "name": "antinob"
+    },
+    {
+      "name": "antinob-1"
+    },
+    {
+      "name": "h2"
+    },
+    {
+      "name": "h2-1"
+    },
+    {
+      "name": "zauker"
+    },
+    {
+      "name": "zauker-1"
     }
   ]
 }

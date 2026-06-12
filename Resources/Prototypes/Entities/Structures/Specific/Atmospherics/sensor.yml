@@ -108,6 +108,15 @@
         Nitrium: danger
         Pluoxium: ignore
         # </Goobstation>
+        # WD EDIT START
+        Hydrogen: danger
+        HyperNoblium: unwanted
+        ProtoNitrate: danger
+        Zauker: danger
+        Halon: danger
+        Helium: unwanted
+        AntiNoblium: danger
+        # WD EDIT END
     - type: Tag
       tags:
         - AirSensor

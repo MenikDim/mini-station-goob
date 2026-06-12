@@ -425,13 +425,20 @@ public sealed partial class SupermatterComponent : Component
         {Gas.Plasma, 0f},
         {Gas.Tritium, 0f},
         {Gas.WaterVapor, 0f},
-        {Gas.Frezon, 0f }, // EE Compatibility
-        {Gas.Ammonia, 0f }, // EE Compatibility
-        {Gas.NitrousOxide, 0f }, // EE Compatibility
-        {Gas.Nitrium, 0f }, // EE Compatibility
-        {Gas.BZ, 0f}, // Assmos - /tg/ gases
-        {Gas.Healium, 0f}, // Assmos - /tg/ gases
-        {Gas.Pluoxium, 0f} // Assmos - /tg/ gases
+        {Gas.Frezon, 0f},
+        {Gas.Ammonia, 0f},
+        {Gas.NitrousOxide, 0f},
+        {Gas.Nitrium, 0f},
+        {Gas.BZ, 0f},
+        {Gas.Healium, 0f},
+        {Gas.Pluoxium, 0f},
+        {Gas.Hydrogen, 0f},
+        {Gas.HyperNoblium, 0f},
+        {Gas.ProtoNitrate, 0f},
+        {Gas.Zauker, 0f},
+        {Gas.Halon, 0f},
+        {Gas.Helium, 0f},
+        {Gas.AntiNoblium, 0f}
     };
 
     /// <summary>
@@ -448,10 +455,17 @@ public sealed partial class SupermatterComponent : Component
         [Gas.Frezon] = (TransmitModifier: 3f, HeatPenalty: -10f, PowerMixRatio: -1f),
         [Gas.Ammonia] = (TransmitModifier: 0f, HeatPenalty: .5f, PowerMixRatio: 1f),
         [Gas.NitrousOxide] = (TransmitModifier: 0f, HeatPenalty: -5f, PowerMixRatio: -1f),
-        [Gas.Nitrium] = (TransmitModifier: 0f, HeatPenalty: -5f, PowerMixRatio: -1f), // EE Gas compatibility (Need to Change)
-        [Gas.BZ] = (TransmitModifier: 0f, HeatPenalty: 5f, PowerMixRatio: 1f), // Assmos - /tg/ gases
-        [Gas.Healium] = (TransmitModifier: 2.4f, HeatPenalty: 4f, PowerMixRatio: 1f), // Assmos - /tg/ gases
-        [Gas.Pluoxium] = (TransmitModifier: 0f, HeatPenalty: -2.5f, PowerMixRatio: -1f), // Assmos - /tg/ gases
+        [Gas.Nitrium] = (TransmitModifier: 0f, HeatPenalty: -5f, PowerMixRatio: -1f),
+        [Gas.BZ] = (TransmitModifier: 0f, HeatPenalty: 5f, PowerMixRatio: 1f),
+        [Gas.Healium] = (TransmitModifier: 2.4f, HeatPenalty: 4f, PowerMixRatio: 1f),
+        [Gas.Pluoxium] = (TransmitModifier: 0f, HeatPenalty: -2.5f, PowerMixRatio: -1f),
+        [Gas.Hydrogen] = (TransmitModifier: 15f, HeatPenalty: 5f, PowerMixRatio: 1f),
+        [Gas.HyperNoblium] = (TransmitModifier: 0f, HeatPenalty: 2f, PowerMixRatio: 1f),
+        [Gas.ProtoNitrate] = (TransmitModifier: 0f, HeatPenalty: 0.1f, PowerMixRatio: 2f),
+        [Gas.Zauker] = (TransmitModifier: 2f, HeatPenalty: 2f, PowerMixRatio: 1f),
+        [Gas.Halon] = (TransmitModifier: 0f, HeatPenalty: 0f, PowerMixRatio: 0f),
+        [Gas.Helium] = (TransmitModifier: 0f, HeatPenalty: 0f, PowerMixRatio: 0f),
+        [Gas.AntiNoblium] = (TransmitModifier: .1f, HeatPenalty: .01f, PowerMixRatio: 1f),
     };
 
     #endregion SM Gas
