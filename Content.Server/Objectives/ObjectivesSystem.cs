@@ -448,6 +448,6 @@ public record struct ObjectivesTextGetInfoEvent(List<(EntityUid, string)> Minds,
 
 /// <summary>
 /// Raised on the game rule before text for each agent's objectives is added, letting you prepend something.
-/// </summary>
+/// </summary>}
 [ByRefEvent]
 public record struct ObjectivesTextPrependEvent(string Text);
