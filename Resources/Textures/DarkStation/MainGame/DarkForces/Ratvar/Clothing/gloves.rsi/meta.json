@@ -15,6 +15,18 @@
             "directions": 4
         },
         {
+            "name": "clockwork_gauntlets"
+        },
+        {
+            "name": "clockwork_gauntlets_overlay_1"
+        },
+        {
+            "name": "clockwork_gauntlets_overlay_2"
+        },
+        {
+            "name": "clockwork_gauntlets_overlay_3"
+        },
+        {
             "name": "inhand-left",
             "directions": 4
         },
