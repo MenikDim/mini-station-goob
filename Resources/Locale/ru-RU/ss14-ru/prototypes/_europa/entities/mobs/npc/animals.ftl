@@ -1,6 +1,3 @@
-ent-MobWisdomCow = мудрая корова
-    .desc = Известна своей мудростью, делится ею со всеми.
-
 ent-MobCorticalBorer = кортикальный паразит
     .desc = Червь, что пробирается в мозг.
 ent-CorticalBorerEgg = яйцо
