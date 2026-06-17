@@ -33,6 +33,14 @@
   id: Plating
   name: tiles-plating
   sprite: /Textures/Tiles/plating.png
+  # Orion-Start
+  variants: 4
+  placementVariants:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  # Orion-End
   baseTurf: Lattice
   isSubfloor: true
   # Goobstation - Fireaxe plating prying
@@ -47,11 +55,12 @@
   id: PlatingDamaged
   name: tiles-plating
   sprite: /Textures/Tiles/plating_damaged.png
-  variants: 3
+  variants: 4 # Orion-Edit: 3 > 4
   placementVariants:
   - 1.0
   - 1.0
   - 1.0
+  - 1.0 # Orion
   baseTurf: Lattice
   isSubfloor: true
   # Goobstation - Fireaxe plating prying
@@ -66,6 +75,14 @@
   id: PlatingBurnt
   name: tiles-plating
   sprite: /Textures/Tiles/plating_burnt.png
+  # Orion-Start
+  variants: 4
+  placementVariants:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  # Orion-End
   baseTurf: Lattice
   isSubfloor: true
   # Goobstation - Fireaxe plating prying
@@ -108,6 +125,14 @@
   id: PlatingSnow
   name: tiles-snow-plating
   sprite: /Textures/Tiles/snow_plating.png #Not in the snow planet RSI because it doesn't have any metadata. Should probably be moved to its own folder later.
+  # Orion-Start
+  variants: 4
+  placementVariants:
+  - 1.0
+  - 1.0
+  - 1.0
+  - 1.0
+  # Orion-End
   baseTurf: Lattice
   isSubfloor: true
   # Goobstation - Fireaxe plating prying
