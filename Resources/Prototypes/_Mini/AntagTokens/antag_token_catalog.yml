@@ -129,9 +129,9 @@
       ghostRulesLocKey: ghost-role-information-freeagent-rules
       gameRuleId: CorticalBorerInfestation
       tagLocKey: antag-token-window-tag-ghost
-      minimumPlayers: 1
+      minimumPlayers: 15
       requiresInRound: true
-      minimumTimeFromRoundStart: 1
+      minimumTimeFromRoundStart: 300
       freeMinimumSponsorLevel: 2
 
     - id: bingle
