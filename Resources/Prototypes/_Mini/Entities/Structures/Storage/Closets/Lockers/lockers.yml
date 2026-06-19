@@ -105,6 +105,20 @@
       access: [["TypanScience"]]
 
 - type: entity
+  id: LockerSyndicateScienceFilledXenobiology
+  name: шкаф учёного
+  parent: LockerScienceFilledXenobiology
+  description: Хранилище вещей учёного.
+  components:
+    - type: Appearance
+    - type: EntityStorageVisuals
+      stateBaseClosed: typan_sci
+      stateDoorOpen: tac_open
+      stateDoorClosed: typan_sci_door
+    - type: AccessReader
+      access: [["TypanScience"]]
+
+- type: entity
   id: LockerSyndicateBot
   name: шкаф ботаника
   parent: LockerBotanistFilled
