@@ -262,6 +262,8 @@ public sealed partial class RadioSystem : EntitySystem
             // Mini Station test fixes start
             ("color", channel.Color),
             ("languageColor", channel.Color),
+            ("jobIcon", (object?)jobIcon ?? ""),
+            ("jobName", jobName ?? ""),
             // Mini Station test fixes end
             ("fontType", speech.FontId),
             ("fontSize", speech.FontSize),
@@ -448,12 +450,16 @@ public sealed partial class RadioSystem : EntitySystem
 
         var nameString = jobIcon is null // (unrelated to loudspeakers but still goob)
             ? name
-            : Loc.GetString("chat-radio-message-name-with-icon", ("jobIcon", jobIcon), ("jobName", jobName ?? ""), ("name", name));
+            : Loc.GetString("chat-radio-message-name-with-icon", ("jobIcon", jobIcon!), ("jobName", jobName ?? ""), ("name", name));
         // goob end
 
         return Loc.GetString(wrapId,
             ("channel-color", channel.Color),
             ("color", channel.Color),
+            // Mini Station start
+            ("jobIcon", (object?)jobIcon ?? ""),
+            ("jobName", jobName ?? ""),
+            // Mini Station end
             ("languageColor", languageColor),
             ("fontType", language.SpeechOverride.FontId ?? speech.FontId),
             ("fontSize", loudSpeakFont ?? language.SpeechOverride.FontSize ?? speech.FontSize), // goob edit - "loudSpeakFont"
