@@ -160,6 +160,10 @@ using System.Linq;
 using System.Text;
 using System.Text;
 using Content.Shared._RMC14.CCVar;
+using Content.Shared.StatusIcon; // Goobstation
+using Content.Goobstation.Shared.Radio; // Goobstation
+using Content.Server.Inventory;
+using Content.Shared.Inventory;
 
 namespace Content.Server.Chat.Systems;
 
@@ -192,6 +196,8 @@ public sealed partial class ChatSystem : SharedChatSystem
     [Dependency] private readonly ScryingOrbSystem _scrying = default!; // Goobstation Change
     [Dependency] private readonly CollectiveMindUpdateSystem _collectiveMind = default!; // Goobstation - Starlight collective mind port
     [Dependency] private readonly LanguageSystem _language = default!; // Einstein Engines - Language
+    [Dependency] private readonly RadioJobIconSystem _radioIconSystem = default!; // Goobstation - radio icons
+    [Dependency] private readonly InventorySystem _inventory = default!;
 
     public const int VoiceRange = 10; // how far voice goes in world units
     public const int WhisperClearRange = 2; // how far whisper goes while still being understandable, in world units
@@ -740,6 +746,16 @@ public sealed partial class ChatSystem : SharedChatSystem
         message = FormattedMessage.EscapeText(message); // Escape after removing markup
         message = TransformSpeech(source, message, language);
 
+        // Goobstation - Job icons for local chat
+        ProtoId<JobIconPrototype>? jobIcon = null;
+        string? jobName = null;
+
+        if (_radioIconSystem.TryGetJobIcon(source, out var icon, out var jName))
+        {
+            jobIcon = icon;
+            jobName = jName;
+        }
+
         if (message.Length == 0)
             return;
 
@@ -780,13 +796,13 @@ public sealed partial class ChatSystem : SharedChatSystem
         }
 
         // The chat message wrapped in a "x says y" string.
-        var wrappedMessage = WrapPublicMessage(source, name, message, language: language, colorOverride);
+        var wrappedMessage = WrapPublicMessage(source, name, message, language: language, colorOverride, jobIcon, jobName);
         // The chat message obfuscated via language obfuscation.
         var obfuscated = SanitizeInGameICMessage(source, _language.ObfuscateSpeech(message, language), out var emoteStr, true, _configurationManager.GetCVar(CCVars.ChatPunctuation),
         (!CultureInfo.CurrentCulture.IsNeutralCulture && CultureInfo.CurrentCulture.Parent.Name == "en")
         || (CultureInfo.CurrentCulture.IsNeutralCulture && CultureInfo.CurrentCulture.Name == "en"));
         // The language-obfuscated message wrapped in a "x says y" string.
-        var wrappedObfuscated = WrapPublicMessage(source, name, obfuscated, language: language, colorOverride);
+        var wrappedObfuscated = WrapPublicMessage(source, name, obfuscated, language: language, colorOverride, jobIcon, jobName);
         // Einstein Engines - Language end
 
         SendInVoiceRange(
@@ -848,6 +864,15 @@ public sealed partial class ChatSystem : SharedChatSystem
         message = FormattedMessage.EscapeText(message);
         message = TransformSpeech(source, message, language); // Einstein Engines - Language
         // Goob edit end
+        // Goobstation - Job icons for local chat
+        ProtoId<JobIconPrototype>? jobIcon = null;
+        string? jobName = null;
+
+        if (_radioIconSystem.TryGetJobIcon(source, out var icon, out var jName))
+        {
+            jobIcon = icon;
+            jobName = jName;
+        }
         if (message.Length == 0)
             return;
 
@@ -906,13 +931,13 @@ public sealed partial class ChatSystem : SharedChatSystem
             {
                 // Scenario 1: the listener can clearly understand the message
                 result = perceivedMessage;
-                wrappedMessage = WrapWhisperMessage(source, "chat-manager-entity-whisper-wrap-message", name, result, language, colorOverride);
+                wrappedMessage = WrapWhisperMessage(source, "chat-manager-entity-whisper-wrap-message", name, result, language, colorOverride, jobIcon, jobName);
             }
             else if (_examineSystem.InRangeUnOccluded(source, listener, WhisperMuffledRange)) // UNEDIT FROM Einstein Engines - Language // They are out of date, this has been reverted to current ChatSystem
             {
                 // Scenario 2: if the listener is too far, they only hear fragments of the message
                 result = ObfuscateMessageReadability(perceivedMessage);
-                wrappedMessage = WrapWhisperMessage(source, "chat-manager-entity-whisper-wrap-message", nameIdentity, result, language, colorOverride);
+                wrappedMessage = WrapWhisperMessage(source, "chat-manager-entity-whisper-wrap-message", nameIdentity, result, language, colorOverride, jobIcon, jobName);
             }
             else
             {
@@ -927,7 +952,7 @@ public sealed partial class ChatSystem : SharedChatSystem
             _chatManager.ChatMessageToOne(ChatChannel.Whisper, result, wrappedMessage, source, false, session.Channel);
         }
 
-        var replayWrap = WrapWhisperMessage(source, "chat-manager-entity-whisper-wrap-message", name, message, language, colorOverride);
+        var replayWrap = WrapWhisperMessage(source, "chat-manager-entity-whisper-wrap-message", name, message, language, colorOverride, jobIcon, jobName);
         _replay.RecordServerMessage(new ChatMessage(ChatChannel.Whisper, message, replayWrap, GetNetEntity(source), null, MessageRangeHideChatForReplay(range)));
         // Einstein Engines - Languages end
 
@@ -964,6 +989,15 @@ public sealed partial class ChatSystem : SharedChatSystem
         bool ignoreActionBlocker = false)
     {
         var message = TransformSpeech(source, FormattedMessage.RemoveMarkupOrThrow(originalMessage), language);
+        // Goobstation - Job icons for local chat
+        ProtoId<JobIconPrototype>? jobIcon = null;
+        string? jobName = null;
+
+        if (_radioIconSystem.TryGetJobIcon(source, out var icon, out var jName))
+        {
+            jobIcon = icon;
+            jobName = jName;
+        }
         if (message.Length == 0)
             return;
 
@@ -1353,27 +1387,27 @@ public sealed partial class ChatSystem : SharedChatSystem
     }
 
     // Einstein Engines - Language begin
-       /// <summary>
+    /// <summary>
     ///     Wraps a message sent by the specified entity into an "x says y" string.
     /// </summary>
-    public string WrapPublicMessage(EntityUid source, string name, string message, LanguagePrototype? language = null, Color? colorOverride = null)
+    public string WrapPublicMessage(EntityUid source, string name, string message, LanguagePrototype? language = null, Color? colorOverride = null, ProtoId<JobIconPrototype>? jobIcon = null, string? jobName = null) // Goobstation
     {
         var wrapId = GetSpeechVerb(source, message).Bold ? "chat-manager-entity-say-bold-wrap-message" : "chat-manager-entity-say-wrap-message";
-        return WrapMessage(wrapId, InGameICChatType.Speak, source, name, message, language, colorOverride);
+        return WrapMessage(wrapId, InGameICChatType.Speak, source, name, message, language, colorOverride, jobIcon, jobName);
     }
 
     /// <summary>
     ///     Wraps a message whispered by the specified entity into an "x whispers y" string.
     /// </summary>
-    public string WrapWhisperMessage(EntityUid source, LocId defaultWrap, string entityName, string message, LanguagePrototype? language = null, Color? colorOverride = null)
+    public string WrapWhisperMessage(EntityUid source, LocId defaultWrap, string entityName, string message, LanguagePrototype? language = null, Color? colorOverride = null, ProtoId<JobIconPrototype>? jobIcon = null, string? jobName = null)
     {
-        return WrapMessage(defaultWrap, InGameICChatType.Whisper, source, entityName, message, language, colorOverride);
+        return WrapMessage(defaultWrap, InGameICChatType.Whisper, source, entityName, message, language, colorOverride, jobIcon, jobName);
     }
 
     /// <summary>
     ///     Wraps a message sent by the specified entity into the specified wrap string.
     /// </summary>
-    public string WrapMessage(LocId wrapId, InGameICChatType chatType, EntityUid source, string entityName, string message, LanguagePrototype? language, Color? colorOverride)
+    public string WrapMessage(LocId wrapId, InGameICChatType chatType, EntityUid source, string entityName, string message, LanguagePrototype? language, Color? colorOverride, ProtoId<JobIconPrototype>? jobIcon = null, string? jobName = null)
     {
         var speech = GetSpeechVerb(source, message);
         language ??= _language.GetLanguage(source);
@@ -1418,7 +1452,11 @@ public sealed partial class ChatSystem : SharedChatSystem
             }
 
         // goob end
-
+        // goob start - job icons in local chat
+        var nameString = jobIcon is null
+            ? entityName
+            : Loc.GetString("chat-radio-message-name-with-icon", ("jobIcon", jobIcon!), ("jobName", jobName ?? ""), ("name", entityName));
+        // goob end
         return Loc.GetString(wrapId,
             ("color", color),
             ("entityName", entityName),
@@ -1427,7 +1465,9 @@ public sealed partial class ChatSystem : SharedChatSystem
             ("fontSize", loudSpeakFont ?? language.SpeechOverride.FontSize ?? speech.FontSize), // goob edit - "loudSpeakFont"
             ("boldFontType", language.SpeechOverride.BoldFontId ?? language.SpeechOverride.FontId ?? speech.FontId), // Goob Edit - Custom Bold Fonts
             ("message", message),
-            ("language", languageDisplay));
+            ("language", languageDisplay),
+            ("jobIcon", (object?)jobIcon ?? ""),
+            ("jobName", jobName ?? ""));
     }
     // Einstein Engines - Language end
 
