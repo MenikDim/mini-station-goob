@@ -3,6 +3,9 @@
   id: MobCorticalBorer
   name: cortical borer
   description: Worm that burrows into brains.
+  requirements:
+    - !type:OverallPlaytimeRequirement
+      time: 3600 # 1 hrs
   components:
   - type: CombatMode
     combatToggleAction: ActionCombatModeToggleOff
@@ -18,9 +21,6 @@
     - MindRoleCorticalBorer
     raffle:
       settings: default
-    requirements:
-    - !type:OverallPlaytimeRequirement
-      time: 36000 # 10 hrs
   - type: GhostTakeoverAvailable
   - type: Sprite
     scale: 0.6, 0.6
@@ -103,9 +103,9 @@
       path: "/Audio/Voice/Slime/slime_squish.ogg"
     maxScanRange: .5
   - type: CanEscapeInventory
-  - type: GuideHelp
-    guides:
-    - CorticalBorer
+  # - type: GuideHelp
+  #   guides:
+  #   - CorticalBorer
   - type: Body
     thermalVisibility: false
   - type: UniversalLanguageSpeaker
@@ -120,6 +120,9 @@
   id: CorticalBorerEgg
   name: cortical borer egg
   description: This egg is so nice, wet and soft...
+  requirements:
+    - !type:OverallPlaytimeRequirement
+      time: 3600 # 1 hrs
   components:
   - type: Sprite
     sprite: _Orion/Mobs/Aliens/cortical_borer_egg.rsi
@@ -130,9 +133,6 @@
     name: cortical-borer-ghostrole-name
     description: cortical-borer-ghostrole-desc
     rules: ghost-role-information-freeagent-rules
-    requirements:
-    - !type:OverallPlaytimeRequirement
-      time: 36000 # 10 hrs
     mindRoles:
     - MindRoleCorticalBorer
   - type: GhostRoleMobSpawner

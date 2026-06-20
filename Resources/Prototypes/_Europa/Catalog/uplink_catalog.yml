@@ -1,37 +1,11 @@
 - type: listing
-  id: UplinkBookCodespeakLanguage
-  name: uplink-book-codespeak-language-name
-  description: uplink-book-codespeak-language-desc
-  icon: { sprite: /Textures/_Orion/Objects/Misc/books.rsi, state: syndicate }
-  productEntity: ManualCodespeak
-  cost:
-    Telecrystal: 2
-  categories:
-  - UplinkDeception
-
-- type: listing
-  id: UplinkEnergyDomeSyndie
-  name: uplink-energy-dome-name
-  description: uplink-energy-dome-desc
-  productEntity: EnergyDomeGeneratorPersonalSyndie
-  cost:
-    Telecrystal: 10
-  categories:
-    - UplinkWearables
-  conditions:
-    - !type:StoreWhitelistCondition
-      whitelist:
-        tags:
-          - NukeOpsUplink
-
-- type: listing
   id: UplinkCorticalBorerEgg
   name: uplink-cortical-borer-egg-name
   description: uplink-cortical-borer-egg-desc
   icon: { sprite: /Textures/_Orion/Mobs/Aliens/cortical_borer_egg.rsi, state: icon }
   productEntity: CorticalBorerEgg
   cost:
-    Telecrystal: 8
+    Telecrystal: 2
   categories:
   - UplinkAllies
   conditions:
@@ -48,7 +22,7 @@
   icon: { sprite: /Textures/_Orion/Mobs/Aliens/cortical_borer_egg.rsi, state: icon }
   productEntity: CorticalBorerEgg
   cost:
-    Telecrystal: 20
+    Telecrystal: 4
   categories:
   - UplinkAllies
   conditions:
