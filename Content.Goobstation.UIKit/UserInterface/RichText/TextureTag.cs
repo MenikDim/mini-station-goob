@@ -17,6 +17,15 @@ public sealed class TextureTag : BaseTextureTag, IMarkupTagHandler
 
     public string Name => "tex";
 
+    // Whitelist путей для системных иконок, не относящихся к стикерам
+    private static readonly HashSet<string> AllowedTexturePaths = new()
+    {
+        "/Textures/Interface/Misc/job_icons.rsi",
+        "/Textures/_Mini/Interface/Misc/job_icons.rsi",
+        "/Textures/_Goobstation/Interface/Misc/job_icons.rsi",
+        "/Textures/_CorvaxGoob/Interface/Misc/job_icons.rsi",
+    };
+
     public bool TryCreateControl(MarkupNode node, [NotNullWhen(true)] out Control? control)
     {
         control = null;
@@ -26,7 +35,7 @@ public sealed class TextureTag : BaseTextureTag, IMarkupTagHandler
             return false;
 
         // Amour edit start
-        if (!IsValidStickerPath(rawPath))
+        if (!IsValidTexturePath(rawPath))
         {
             Logger.WarningS("texture-tag", $"Attempted to use non-whitelisted texture path: {rawPath}");
             return false;
@@ -80,14 +89,23 @@ public sealed class TextureTag : BaseTextureTag, IMarkupTagHandler
     }
 
     // Amour edit start
-    private bool IsValidStickerPath(string path)
+    /// <summary>
+    ///     Проверяет, разрешён ли путь к текстуре.
+    ///     Сначала проверяет whitelist системных путей, затем прототипы стикеров.
+    /// </summary>
+    private bool IsValidTexturePath(string path)
     {
+        // Проверяем whitelist системных путей
+        if (AllowedTexturePaths.Contains(path))
+            return true;
+
+        // Проверяем пути из прототипов стикеров
         foreach (var sticker in _prototypeManager.EnumeratePrototypes<StickerPrototype>())
         {
             if (sticker.TexturePath.ToString() == path)
                 return true;
         }
-        
+
         return false;
     }
     // Amour edit end

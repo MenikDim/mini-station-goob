@@ -1,5 +1,6 @@
 using System.Linq;
 using Content.Client._Mini.UserInterface.Controls;
+using Content.Shared.Roles;
 using Robust.Client.UserInterface.Controls;
 using GhostWarpPlayer = Content.Shared.Ghost.SharedGhostSystem.GhostWarpPlayer;
 using GhostWarpPlace = Content.Shared.Ghost.SharedGhostSystem.GhostWarpPlace;
@@ -9,21 +10,85 @@ namespace Content.Client._Mini.UserInterface.Systems.Ghost.Controls;
 
 public sealed partial class MiniGhostTargetWindow
 {
-    private static readonly Color AntagonistButtonColor = Color.FromHex("#7F4141");
+    private static readonly Color AntagonistButtonColor = Color.FromHex("#c85a5a");
     private static readonly Color PlaceButtonColor = Color.FromHex("#969696");
 
     private const int DefaultButtonWidth = 180;
     private const int DefaultButtonHeight = 30;
     private const float DefaultTooltipDelay = 0.1f;
-
     private const int MaxLenght = 15;
     private const int MaxLenghtWithoutIcons = 18;
 
-    // TODO: Дедупликация одинакового кода генерации
-    // UDPATE: Сначала я хотел это сделать, но потом понял, что AddPlayerButtons разительно отличается от остальных
-    // Так как в кнопках игроков идет итерация двух циклов, а у остальных один. И реализация generic метода не улучшит читабельность
-    // И просто усложнит понимание кода, структуры генерируемого куса и не принесет никакой пользы, кроме галочки за соблюдение DRY паттерна
-    // TODO-2: Придумать как реализовать generic метод, не усложняя понимание кода, без вреда читабельности
+    // Коэффициенты усиления цвета
+    private const float SaturationBoost = 2f;   // Насыщенность +30%
+    private const float BrightnessBoost = 0.6f;  // Яркость +15%
+
+    /// <summary>
+    ///     Усиливает цвет: увеличивает насыщенность и яркость.
+    ///     Делает кнопки отделов более выразительными.
+    /// </summary>
+    private static Color BoostColor(Color color)
+    {
+        var r = color.R;
+        var g = color.G;
+        var b = color.B;
+
+        var max = Math.Max(r, Math.Max(g, b));
+        var min = Math.Min(r, Math.Min(g, b));
+        var delta = max - min;
+
+        // Hue
+        float h = 0;
+        if (delta > 0.001f)
+        {
+            if (Math.Abs(max - r) < 0.001f)
+                h = ((g - b) / delta) % 6;
+            else if (Math.Abs(max - g) < 0.001f)
+                h = (b - r) / delta + 2;
+            else
+                h = (r - g) / delta + 4;
+
+            h /= 6;
+            if (h < 0) h += 1;
+        }
+
+        // Saturation
+        var s = max > 0.001f ? delta / max : 0;
+
+        // Value
+        var v = max;
+
+        // Усиливаем насыщенность
+        s = Math.Clamp(s * SaturationBoost, 0f, 1f);
+
+        // Усиливаем яркость
+        v = Math.Clamp(v + (1f - v) * BrightnessBoost, 0f, 1f);
+
+        // Конвертируем обратно в RGB
+        if (s < 0.001f)
+            return new Color(v, v, v, color.A);
+
+        var hue = h * 6;
+        var sector = (int)Math.Floor(hue);
+        var frac = hue - sector;
+        var p = v * (1 - s);
+        var q = v * (1 - s * frac);
+        var t = v * (1 - s * (1 - frac));
+
+        return sector switch
+        {
+            0 => new Color(v, t, p, color.A),
+            1 => new Color(q, v, p, color.A),
+            2 => new Color(p, v, t, color.A),
+            3 => new Color(p, q, v, color.A),
+            4 => new Color(t, p, v, color.A),
+            _ => new Color(v, p, q, color.A),
+        };
+    }
+
+    // ============================================================
+    // Методы добавления кнопок
+    // ============================================================
 
     private void AddPlayerButtons(List<GhostWarpPlayer> warps, string text)
     {
@@ -57,11 +122,14 @@ public sealed partial class MiniGhostTargetWindow
                 StyleClasses = { "LabelSecondaryColor" },
             };
 
+            // Усиливаем цвет отдела: ярче и насыщеннее
+            var boostedColor = BoostColor(department.Color);
+
             foreach (var player in players)
             {
                 var playerButton = new RichTextButton
                 {
-                    ModulateSelfOverride = department.Color,
+                    ModulateSelfOverride = boostedColor,
                     Text = GeneratePlayerLabel(player),
                     TextAlign = Label.AlignMode.Right,
                     HorizontalAlignment = HAlignment.Center,

@@ -3075,10 +3075,10 @@
   id: MobGiantSpiderAngry
   components:
   # Mini edit start
-  - type: GhostPanelAntagonistMarker
-    name: ghost-panel-antagonist-spider-name
-    description: ghost-panel-antagonist-spider-description
-    priority: 100
+  # - type: GhostPanelAntagonistMarker
+  #   name: ghost-panel-antagonist-spider-name
+  #   description: ghost-panel-antagonist-spider-description
+  #   priority: 100
   # Mini edit end
 
 - type: entity
@@ -3088,10 +3088,10 @@
   description: Combines the two most terrifying things in existence, spiders and clowns.
   components:
     # Mini edit start
-    - type: GhostPanelAntagonistMarker
-      name: ghost-panel-antagonist-spider-clown-name
-      description: ghost-panel-antagonist-spider-clown-description
-      priority: 90
+    # - type: GhostPanelAntagonistMarker
+    #   name: ghost-panel-antagonist-spider-clown-name
+    #   description: ghost-panel-antagonist-spider-clown-description
+    #   priority: 90
     # Mini edit end
     - type: Sprite
       drawdepth: Mobs

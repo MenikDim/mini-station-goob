@@ -365,10 +365,10 @@
   components:
   - type: VentCrawler # goobstation - Ventcrawl
   # Mini edit start
-  - type: GhostPanelAntagonistMarker
-    name: ghost-panel-antagonist-rats-name
-    description: ghost-panel-antagonist-rats-description
-    priority: 110
+  # - type: GhostPanelAntagonistMarker
+  #   name: ghost-panel-antagonist-rats-name
+  #   description: ghost-panel-antagonist-rats-description
+  #   priority: 110
   # Mini edit end
   - type: CombatMode
   - type: MovementSpeedModifier
