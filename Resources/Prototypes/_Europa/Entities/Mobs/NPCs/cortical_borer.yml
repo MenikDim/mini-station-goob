@@ -120,9 +120,9 @@
   id: CorticalBorerEgg
   name: cortical borer egg
   description: This egg is so nice, wet and soft...
-  requirements:
-    - !type:OverallPlaytimeRequirement
-      time: 3600 # 1 hrs
+  # requirements:
+  #   - !type:OverallPlaytimeRequirement
+  #     time: 3600 # 1 hrs
   components:
   - type: Sprite
     sprite: _Orion/Mobs/Aliens/cortical_borer_egg.rsi
