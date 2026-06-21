@@ -4,9 +4,9 @@
   name: ghost role spawn point
   suffix: cortical borer
   categories: [ Spawner ]
-  requirements:
-    - !type:OverallPlaytimeRequirement
-      time: 36000 # 10 hrs
+  # requirements:
+  #   - !type:OverallPlaytimeRequirement
+  #     time: 36000 # 10 hrs
   components:
   - type: GhostRole
     name: cortical-borer-ghostrole-name

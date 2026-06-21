@@ -2,7 +2,7 @@
 - type: gameMapPool
   id: DefaultMapPool
   maps:
-  # - Atlas
+  - Atlas
   - Amber
   - Bagel
   - Box
@@ -17,7 +17,7 @@
   - Oasis
   - MiniOmega
   - Origin
-  # - Saltern
+  - Saltern
   - MiniPacked
   #- Reach # Goobstation, removed from map pool
   #- Train # Goobstation - all my friends hate train

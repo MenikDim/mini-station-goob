@@ -145,6 +145,9 @@ using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using Content.Server.Preferences.Managers;
 using Content.Shared.Database;
+using Robust.Shared.Prototypes;
+using Content.Shared._Amour.Stickers;
+using Content.Server._Amour.Stickers;
 
 namespace Content.Server.Administration.Systems
 {
@@ -165,6 +168,7 @@ namespace Content.Server.Administration.Systems
         [Dependency] private readonly PlayerRateLimitManager _rateLimit = default!;
         [Dependency] private readonly IServerPreferencesManager _preferencesManager = default!;
         [Dependency] private readonly IBanManager _banManager = default!; // Mini-Ahelp-Antispam
+        [Dependency] private readonly StickerSanitizerSystem _stickerSanitizer = default!; // Amour edit
 
         [GeneratedRegex(@"^https://(?:(?:canary|ptb)\.)?discord\.com/api/webhooks/(\d+)/((?!.*/).*)$")]
         private static partial Regex DiscordRegex();
@@ -403,7 +407,7 @@ namespace Content.Server.Administration.Systems
                 // _messageQueues[session.UserId].Enqueue(discordMessage);
 
                 var queue = _messageQueues.GetOrNew(session.UserId);
-                var escapedText = FormattedMessage.EscapeText(message);
+                var escapedText = _stickerSanitizer.SanitizeMessageWithStickers(message); // Amour edit FormattedMessage.EscapeText -> _stickerSanitizer.SanitizeMessageWithStickers
                 messageParams.Message = escapedText;
                 var discordMessage = GenerateAHelpMessage(messageParams);
                 queue.Enqueue(discordMessage);
@@ -839,7 +843,7 @@ namespace Content.Server.Administration.Systems
         {
             _activeConversations[bwoinkParams.Message.UserId] = DateTime.Now;
 
-            var escapedText = FormattedMessage.EscapeText(bwoinkParams.Message.Text);
+            var escapedText = _stickerSanitizer.SanitizeMessageWithStickers(bwoinkParams.Message.Text);
             var adminColor = _config.GetCVar(GoobCVars.AdminBwoinkColor);
             var adminPrefix = "";
             var bwoinkText = $"{bwoinkParams.SenderName}";
