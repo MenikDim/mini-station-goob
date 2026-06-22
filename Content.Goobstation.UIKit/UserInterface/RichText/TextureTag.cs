@@ -24,6 +24,8 @@ public sealed class TextureTag : BaseTextureTag, IMarkupTagHandler
         "/Textures/_Mini/Interface/Misc/job_icons.rsi",
         "/Textures/_Goobstation/Interface/Misc/job_icons.rsi",
         "/Textures/_CorvaxGoob/Interface/Misc/job_icons.rsi",
+        "/Textures/_Lavaland/Interface/Misc/job_icons.rsi",
+        "/Textures/_Goobstation/Hertic/",
     };
 
     public bool TryCreateControl(MarkupNode node, [NotNullWhen(true)] out Control? control)
