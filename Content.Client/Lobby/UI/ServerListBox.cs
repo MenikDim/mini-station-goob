@@ -75,7 +75,7 @@ public sealed class ServerListBox : BoxContainer
             "/Textures/_Mini/Interface/Ghost.png",
             OpenGhostShop
         );
-        ghostShopButton.Margin = new Thickness(0, 5, 0, 0);
+        ghostShopButton.Margin = new Thickness(0, 0, 0, 5);
 
         actionButtonsContainer.AddChild(ghostShopButton);
 
