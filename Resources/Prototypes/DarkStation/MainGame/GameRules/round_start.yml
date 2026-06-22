@@ -1,0 +1,48 @@
+- type: entity
+  id: Ratvar
+  parent: BaseGameRule
+  components:
+  - type: GameRule
+    minPlayers: 15
+  - type: RatvarRule
+  - type: AntagSelection
+    selectionTime: IntraPlayerSpawn
+    definitions:
+    - prefRoles: [ RatvarRighteous ]
+      min: 2
+      max: 3
+      playerRatio: 10
+      blacklist:
+        components:
+        - AntagImmune
+      lateJoinAdditional: true
+      briefing:
+        text: ratvar-righteous-briefing
+        color: CornflowerBlue
+        sound: "/Audio/DarkStation/DarkForces/Ratvar/clockcult.ogg"
+      components:
+      - type: RatvarRighteous
+      - type: RatvarAbilities
+      - type: NpcFactionMember
+        factions:
+        - Ratvar
+      - type: IntrinsicRadioTransmitter
+        channels:
+        - Ratvar
+      - type: ActiveRadio
+        channels:
+        - Ratvar
+      - type: IntrinsicRadioReceiver
+      mindRoles:
+      - MindRoleRatvar
+
+- type: entity
+  parent: BaseMindRoleAntag
+  id: MindRoleRatvar
+  name: Ratvar Cultist Role
+  #  description: mind-role-thief-description
+  components:
+  - type: MindRole
+    antagPrototype: RatvarRighteous
+    roleType: TeamAntagonist
+  - type: RatvarRole

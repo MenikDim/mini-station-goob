@@ -495,6 +495,12 @@
   id: RatvarianSpear
 
 - type: Tag
+  id: RatvarDroneUsable
+
+- type: Tag
+  id: RatvarBorgModule
+
+- type: Tag
   id: DragonsTail
 
 - type: Tag

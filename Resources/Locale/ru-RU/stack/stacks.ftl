@@ -398,3 +398,9 @@ stack-white-marble-floor = white marble floor
 stack-dark-marble-floor = dark marble floor
 stack-plasma-marble-floor = plasmarble floor
 stack-uranium-marble-floor = uranium marble floor
+stack-brass-plasteel =
+    { $amount ->
+        [1] лист
+        [few] листа
+       *[other] листов
+    } латунной пластали

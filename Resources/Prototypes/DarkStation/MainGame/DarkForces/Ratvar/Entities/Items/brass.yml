@@ -1,0 +1,46 @@
+- type: material
+  id: BrassPlasteel
+  stackEntity: SheetBrassPlasteel1R
+  name: materials-plasteel
+  icon: { sprite: Objects/Materials/Sheets/metal.rsi, state: brass }
+  color: "#696969"
+  price: 0.28
+
+- type: stack
+  id: BrassPlasteel
+  name: stack-brass-plasteel
+  icon: { sprite: Objects/Materials/Sheets/metal.rsi, state: brass }
+  spawn: SheetBrassPlasteel1R
+  maxCount: 50
+
+- type: entity
+  parent: SheetMetalBase
+  id: SheetBrassPlasteel
+  name: Латунь
+  components:
+  - type: Material
+  - type: Sprite
+    state: brass
+  - type: Stack
+    stackType: BrassPlasteel
+
+- type: entity
+  parent: SheetBrassPlasteel
+  id: SheetBrassPlasteel1R
+  name: Латунь
+  suffix: Single
+  components:
+  - type: Sprite
+    state: brass
+  - type: Stack
+    stackType: BrassPlasteel
+    count: 1
+
+- type: entity
+  parent: SheetBrassPlasteel
+  id: SheetBrassPlasteelLingering
+  suffix: Lingering, 10
+  components:
+  - type: Stack
+    lingering: true
+    count: 0

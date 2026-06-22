@@ -1,0 +1,15 @@
+- type: gamePreset
+  id: RatvarRighteous
+  alias:
+  - ratvar
+  - righteous
+  - ratvarrighteous
+  name: ratvar-righteous-title
+  description: ratvar-righteous-description
+  showInVote: true
+  rules:
+  - Ratvar
+  - BasicStationEventScheduler
+  - AntagStationEventScheduler
+  - BasicRoundstartVariation
+  - SubGamemodesRule
