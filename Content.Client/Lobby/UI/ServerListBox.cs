@@ -30,6 +30,11 @@ public sealed class ServerListBox : BoxContainer
         _consoleHost.ExecuteCommand("antagtokenmenu");
     }
 
+    private void OpenGhostShop()
+    {
+        _consoleHost.ExecuteCommand("ghostshop");
+    }
+
     public ServerListBox()
     {
         IoCManager.InjectDependencies(this);
@@ -63,6 +68,16 @@ public sealed class ServerListBox : BoxContainer
 
         actionButtonsContainer.AddChild(dailyRewardsButton);
         actionButtonsContainer.AddChild(antagTokensButton);
+
+        // Кнопка магазина призраков
+        var ghostShopButton = CreateActionButton(
+            "Призраки",
+            "/Textures/_Mini/Interface/Ghost.png",
+            OpenGhostShop
+        );
+        ghostShopButton.Margin = new Thickness(0, 5, 0, 0);
+
+        actionButtonsContainer.AddChild(ghostShopButton);
 
         AddChild(actionButtonsContainer);
 

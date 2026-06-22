@@ -1,0 +1,119 @@
+# Кастомные темы призраков, покупаемые за монеты в магазине призраков
+# Price = 0 = обычный призрак (всегда доступен)
+# Price > 0 = покупается в магазине
+
+- type: customGhost
+  id: GhostThemeDefault
+  name: "Обычный"
+  description: "Обычный призрак"
+  price: 0
+  order: 0
+  sprite: Mobs/Ghosts/ghost_human.rsi
+
+- type: customGhost
+  id: GhostThemeDiscoCat
+  name: "Диско-кот"
+  description: "And i dance-dance-dance..."
+  price: 50
+  order: 1
+  sprite: _Mini/Ghosts/discocat.rsi
+  ghostName: "Диско-кот"
+
+- type: customGhost
+  id: GhostThemeParrot
+  name: "Попугай"
+  description: "Говорящий призрак"
+  price: 100
+  order: 2
+  sprite: _Mini/Ghosts/parrot.rsi
+  ghostName: "Попугай"
+
+- type: customGhost
+  id: GhostThemeWhite
+  name: "Белый"
+  description: "Чистый и холодный"
+  price: 100
+  order: 3
+  sprite: _Mini/Ghosts/white_ghost_human.rsi
+  ghostName: "Белый"
+
+- type: customGhost
+  id: GhostThemeRed
+  name: "Красный"
+  description: "Алый призрак"
+  price: 125
+  order: 4
+  sprite: _Mini/Ghosts/red_ghost_human.rsi
+  ghostName: "Красный"
+
+- type: customGhost
+  id: GhostThemePink
+  name: "Розовый"
+  description: "Нежный розовый дух"
+  price: 125
+  order: 5
+  sprite: _Mini/Ghosts/pink_ghost_human.rsi
+  ghostName: "Розовый"
+
+- type: customGhost
+  id: GhostThemePurple
+  name: "Фиолетовый"
+  description: "Королевский цвет"
+  price: 125
+  order: 6
+  sprite: _Mini/Ghosts/purple_ghost_human.rsi
+  ghostName: "Фиолетовый"
+
+- type: customGhost
+  id: GhostThemeSilver
+  name: "Серебряный"
+  description: "Лунное сияние"
+  price: 175
+  order: 7
+  sprite: _Mini/Ghosts/silver_ghost_human.rsi
+  ghostName: "Серебряный"
+
+- type: customGhost
+  id: GhostThemeGold
+  name: "Золотой"
+  description: "Яркий и дорогой"
+  price: 225
+  order: 8
+  sprite: _Mini/Ghosts/gold_ghost_human.rsi
+  ghostName: "Золотой"
+
+- type: customGhost
+  id: GhostThemePlatinum
+  name: "Платиновый"
+  description: "Элитный дух"
+  price: 300
+  order: 9
+  sprite: _Mini/Ghosts/platinum_ghost_human.rsi
+  ghostName: "Платиновый"
+
+- type: customGhost
+  id: GhostThemeRainbow
+  name: "Радужный"
+  description: "Сияет всеми цветами"
+  price: 350
+  order: 10
+  sprite: _Mini/Ghosts/rainbow.rsi
+  ghostName: "Радужный"
+
+- type: customGhost
+  id: GhostThemeFire
+  name: "Пламя"
+  description: "Горящий призрак"
+  price: 400
+  order: 11
+  sprite: _Mini/Ghosts/fire.rsi
+  ghostName: "Пламя"
+
+- type: customGhost
+  id: GhostThemeBlazeit
+  name: "Огненный"
+  description: "Пылающий дух"
+  price: 500
+  order: 12
+  sprite: _Mini/Ghosts/blazeit.rsi
+  ghostName: "Огненный"
