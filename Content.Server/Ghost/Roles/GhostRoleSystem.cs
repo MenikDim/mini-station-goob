@@ -784,8 +784,8 @@ public sealed class GhostRoleSystem : EntitySystem
         if (ghostRole is not {} ghost)
             return;
 
-        ghost.Comp.Requirements ??= [];
-        ghost.Comp.Requirements.Add(job);
+        //ghost.Comp.Requirements ??= []; // CorvaxGoob-NO
+        //ghost.Comp.Requirements.Add(job); // CorvaxGoob-NO Ограничение роли через хардкод?! Вы нормальные? Вам может лечиться надо? Нахрен такое дерьмо.
 
     }
     private void OnPlayerAttached(PlayerAttachedEvent message)
