@@ -13,6 +13,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Client.Chemistry.EntitySystems;
+// Mini station edit: guide-book
+using Content.Client.Guidebook;
 using Content.Client.Guidebook.Richtext;
 using Content.Client.Message;
 using Content.Client.UserInterface.ControlExtensions;
@@ -34,12 +36,16 @@ namespace Content.Client.Guidebook.Controls;
 ///     Control for embedding a reagent into a guidebook.
 /// </summary>
 [UsedImplicitly, GenerateTypedNameReferences]
-public sealed partial class GuideReagentEmbed : BoxContainer, IDocumentTag, ISearchableControl
+// Mini station edit start: guide-book
+public sealed partial class GuideReagentEmbed : BoxContainer, IDocumentTag, ISearchableControl, IGuidebookEntryAnchor
 {
     [Dependency] private readonly IEntitySystemManager _systemManager = default!;
     [Dependency] private readonly IPrototypeManager _prototype = default!;
 
     private readonly ChemistryGuideDataSystem _chemistryGuideData;
+
+    public IPrototype? AnchorPrototype { get; private set; }
+// Mini station edit end: guide-book
 
     public GuideReagentEmbed()
     {
@@ -92,6 +98,9 @@ public sealed partial class GuideReagentEmbed : BoxContainer, IDocumentTag, ISea
 
     private void GenerateControl(ReagentPrototype reagent)
     {
+        // Mini station edit: guide-book
+        AnchorPrototype = reagent;
+
         NameBackground.PanelOverride = new StyleBoxFlat
         {
             BackgroundColor = reagent.SubstanceColor

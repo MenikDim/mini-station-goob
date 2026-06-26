@@ -112,6 +112,7 @@ guide-entry-biological = Биологические
 guide-entry-botanicals = Ботаника
 guide-entry-special = Специальное
 guide-entry-others = Другие
+guide-entry-ingredient-recipes = Ингредиенты
 guide-entry-pizza-recipes = Пиццы
 guide-entry-savory-recipes = Солёно-пряное
 guide-entry-bread-recipes = Хлеба

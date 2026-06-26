@@ -3,6 +3,9 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System.Diagnostics.CodeAnalysis;
+// Mini station edit: guide-book
+using System.Numerics;
 using Content.Client.Guidebook.Controls;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
@@ -72,6 +75,43 @@ public static class ControlExtension
 
         return controlList;
     }
+
+    // Mini station edit start: guide-book
+    public static bool TryGetParentHandler<T>(this Control child, [NotNullWhen(true)] out T? result)
+    {
+        for (var control = child; control is not null; control = control.Parent)
+        {
+            if (control is not T handler)
+                continue;
+
+            result = handler;
+            return true;
+        }
+
+        result = default;
+        return false;
+    }
+
+    public static Vector2? GetControlScrollPosition(this Control child)
+    {
+        if (!child.VisibleInTree)
+            return null;
+
+        var position = new Vector2();
+        var control = child;
+
+        while (control is not null)
+        {
+            if (control.Parent is ScrollContainer)
+                break;
+
+            position += control.Position;
+            control = control.Parent;
+        }
+
+        return position;
+    }
+    // Mini station edit end: guide-book
 
     public static bool ChildrenContainText(this Control parent, string search)
     {
