@@ -41,14 +41,10 @@
   id: TypanPatrol
   equipment:
     ears: ClothingHeadsetAltSyndicate
-    shoes: ClothingShoesBootsCombat
-    gloves: ClothingHandsGlovesCombat
     id: SyndiPDAOff
-    head: ClothingHeadHatSyndie
     pocket1: WeaponPistolViper
     mask: ClothingMaskGasSyndicate
     eyes: ClothingEyesHudTypanPatrol
-    outerClothing: ClothingOuterWinterSyndieCapArmored
   storage:
     back:
     - MagazinePistolIncendiary

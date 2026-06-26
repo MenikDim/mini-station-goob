@@ -33,6 +33,4 @@
   equipment:
     eyes: ClothingEyesHudTypanDiagnostic
     ears: ClothingHeadsetAltSyndicate
-    shoes: ClothingShoesBootsTypan
     id: SyndiPDAEng
-    outerClothing: ClothingOuterCoatAtmosWorking

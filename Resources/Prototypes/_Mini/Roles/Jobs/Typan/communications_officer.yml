@@ -42,15 +42,10 @@
   id: TypanCommander
   equipment:
     ears: ClothingHeadsetAltSyndicate
-    shoes: ClothingShoesBootsCombat
-    gloves: ClothingHandsGlovesCombat
     id: SyndiPDACom
     pocket1: SyndicateWhistle
     pocket2: ClothingMaskGasSyndicate
     eyes: ClothingEyesHudTypanAdvanced
-    head: ClothingHeadHatSyndieMAA
-    neck: ClothingNeckCloakSyndicateAdmiral
-    outerClothing: ClothingOuterTrenchTypanCommunicationsOfficer
   storage:
     back:
     - AccessConfiguratorTypan

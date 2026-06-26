@@ -32,7 +32,6 @@
   id: TypanTechnicalOperationsSupervisorGear
   equipment:
     ears: ClothingHeadsetAltSyndicate
-    shoes: ClothingShoesBootsLaceup
     id: SyndiPDAEng
 
 - type: chameleonOutfit

@@ -6,23 +6,121 @@
 
 - type: loadout
   id: TypanCommunicationsOfficerJumpskirt
-
   equipment:
     jumpsuit: ClothingUniformJumpskirtTypanCommunicationsOfficer
+
+# Outer Clothing
+- type: loadout
+  id: TypanCommanderTrench
+  equipment:
+    outerClothing: ClothingOuterTrenchTypanCommunicationsOfficer
+
+- type: loadout
+  id: TypanCommanderArmoredWinterCoat
+  equipment:
+    outerClothing: ClothingOuterWinterSyndieCapArmored
+
+# Gloves
+- type: loadout
+  id: TypanCommanderCombatGloves
+  equipment:
+    gloves: ClothingHandsGlovesCombat
+
+- type: loadout
+  id: TypanCommanderBlackGloves
+  equipment:
+    gloves: ClothingHandsGlovesColorBlack
+
+# Shoes
+- type: loadout
+  id: TypanCommanderCombatBoots
+  equipment:
+    shoes: ClothingShoesBootsCombat
+
+- type: loadout
+  id: TypanCommanderLaceupShoes
+  equipment:
+    shoes: ClothingShoesBootsLaceup
+
+# Head
+- type: loadout
+  id: TypanCommanderMAAHat
+  equipment:
+    head: ClothingHeadHatSyndieMAA
+
+- type: loadout
+  id: TypanCommanderBeret
+  equipment:
+    head: ClothingHeadHatBeret
+
+# Neck
+- type: loadout
+  id: TypanCommanderAdmiralCloak
+  equipment:
+    neck: ClothingNeckCloakSyndicateAdmiral
+
+- type: loadout
+  id: TypanCommanderRedScarf
+  equipment:
+    neck: ClothingNeckScarfStripedSyndieRed
+
+- type: loadout
+  id: TypanCommanderGreenScarf
+  equipment:
+    neck: ClothingNeckScarfStripedSyndieGreen
+
+- type: loadout
+  id: TypanCommanderRedTie
+  equipment:
+    neck: ClothingNeckTieRed
 
 # Loadout Groups
 - type: loadoutGroup
   id: TypanCommunicationsOfficerUniform
   name: loadout-group-typan-communications-officer-uniform
-  hidden: true
   minLimit: 1
   loadouts:
   - TypanCommunicationsOfficerJumpsuit
   - TypanCommunicationsOfficerJumpskirt
 
 - type: loadoutGroup
-  id: TypanCommunicationsOfficerUnderwear
-  name: loadout-group-typan-communications-officer-underwear
-  hidden: true
-  minLimit: 0
-  loadouts: []
+  id: TypanCommanderOuterClothing
+  name: loadout-group-typan-commander-outerclothing
+  minLimit: 1
+  loadouts:
+  - TypanCommanderTrench
+  - TypanCommanderArmoredWinterCoat
+
+- type: loadoutGroup
+  id: TypanCommanderGloves
+  name: loadout-group-typan-commander-gloves
+  minLimit: 1
+  loadouts:
+  - TypanCommanderCombatGloves
+  - TypanCommanderBlackGloves
+
+- type: loadoutGroup
+  id: TypanCommanderShoes
+  name: loadout-group-typan-commander-shoes
+  minLimit: 1
+  loadouts:
+  - TypanCommanderCombatBoots
+  - TypanCommanderLaceupShoes
+
+- type: loadoutGroup
+  id: TypanCommanderHead
+  name: loadout-group-typan-commander-head
+  minLimit: 1
+  loadouts:
+  - TypanCommanderMAAHat
+  - TypanCommanderBeret
+
+- type: loadoutGroup
+  id: TypanCommanderNeck
+  name: loadout-group-typan-commander-neck
+  minLimit: 1
+  loadouts:
+  - TypanCommanderAdmiralCloak
+  - TypanCommanderRedScarf
+  - TypanCommanderGreenScarf
+  - TypanCommanderRedTie

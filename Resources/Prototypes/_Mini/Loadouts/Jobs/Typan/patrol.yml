@@ -3,12 +3,112 @@
   id: TypanPatrolJumpsuit
   equipment:
     jumpsuit: ClothingUniformJumpsuitTypanPatrol
+
+- type: loadout
+  id: TypanPatrolJumpskirt
+  equipment:
+    jumpsuit: ClothingUniformJumpskirtTypanRecruit
+
+# Outer Clothing
+- type: loadout
+  id: TypanPatrolArmoredWinterCoat
+  equipment:
+    outerClothing: ClothingOuterWinterSyndieCapArmored
+
+- type: loadout
+  id: TypanPatrolArmorVest
+  equipment:
+    outerClothing: ClothingOuterArmorBasicSlim
+
+# Gloves
+- type: loadout
+  id: TypanPatrolCombatGloves
+  equipment:
+    gloves: ClothingHandsGlovesCombat
+
+- type: loadout
+  id: TypanPatrolBlackGloves
+  equipment:
+    gloves: ClothingHandsGlovesColorBlack
+
+# Shoes
+- type: loadout
+  id: TypanPatrolCombatBoots
+  equipment:
+    shoes: ClothingShoesBootsCombat
+
+- type: loadout
+  id: TypanPatrolWinterBoots
+  equipment:
+    shoes: ClothingShoesBootsWinterSyndicate
+
+# Head
+- type: loadout
+  id: TypanPatrolSyndieHat
+  equipment:
+    head: ClothingHeadHatSyndie
+
+- type: loadout
+  id: TypanPatrolBeret
+  equipment:
+    head: ClothingHeadHatBeret
+
+# Neck
+- type: loadout
+  id: TypanPatrolRedScarf
+  equipment:
+    neck: ClothingNeckScarfStripedSyndieRed
+
+- type: loadout
+  id: TypanPatrolGreenScarf
+  equipment:
+    neck: ClothingNeckScarfStripedSyndieGreen
+
 # Loadout Groups
 - type: loadoutGroup
   id: TypanPatrolUniform
   name: loadout-group-typan-patrol-uniform
-  hidden: true
   minLimit: 1
   loadouts:
   - TypanPatrolJumpsuit
+  - TypanPatrolJumpskirt
 
+- type: loadoutGroup
+  id: TypanPatrolOuterClothing
+  name: loadout-group-typan-patrol-outerclothing
+  minLimit: 1
+  loadouts:
+  - TypanPatrolArmoredWinterCoat
+  - TypanPatrolArmorVest
+
+- type: loadoutGroup
+  id: TypanPatrolGloves
+  name: loadout-group-typan-patrol-gloves
+  minLimit: 1
+  loadouts:
+  - TypanPatrolCombatGloves
+  - TypanPatrolBlackGloves
+
+- type: loadoutGroup
+  id: TypanPatrolShoes
+  name: loadout-group-typan-patrol-shoes
+  minLimit: 1
+  loadouts:
+  - TypanPatrolCombatBoots
+  - TypanPatrolWinterBoots
+
+- type: loadoutGroup
+  id: TypanPatrolHead
+  name: loadout-group-typan-patrol-head
+  minLimit: 1
+  loadouts:
+  - TypanPatrolSyndieHat
+  - TypanPatrolBeret
+
+- type: loadoutGroup
+  id: TypanPatrolNeck
+  name: loadout-group-typan-patrol-neck
+  minLimit: 1
+  loadouts:
+  - TypanPatrolRedScarf
+  - TypanPatrolGreenScarf

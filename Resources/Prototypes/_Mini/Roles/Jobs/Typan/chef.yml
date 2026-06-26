@@ -30,6 +30,4 @@
   id: TypanChef
   equipment:
     ears: ClothingHeadsetAltSyndicate
-    outerClothing: ClothingOuterApronTypanChef
-    shoes: ClothingShoesColorBlack
     id: SyndiPDAChef

@@ -9,12 +9,49 @@
   equipment:
     jumpsuit: ClothingUniformJumpskirtTypanChef
 
+# Outer Clothing
+- type: loadout
+  id: TypanChefApron
+  equipment:
+    outerClothing: ClothingOuterApronTypanChef
+
+- type: loadout
+  id: TypanChefWinterCoat
+  equipment:
+    outerClothing: ClothingOuterWinterTypanChef
+
+# Shoes
+- type: loadout
+  id: TypanChefShoes
+  equipment:
+    shoes: ClothingShoesColorBlack
+
+- type: loadout
+  id: TypanChefCombatBoots
+  equipment:
+    shoes: ClothingShoesBootsCombat
+
 # Loadout Groups
 - type: loadoutGroup
   id: TypanChefUniform
   name: loadout-group-typan-chef-uniform
-  hidden: true
   minLimit: 1
   loadouts:
   - TypanChefJumpsuit
   - TypanChefJumpskirt
+
+- type: loadoutGroup
+  id: TypanChefOuterClothing
+  name: loadout-group-typan-chef-outerclothing
+  minLimit: 1
+  loadouts:
+  - TypanChefApron
+  - TypanChefWinterCoat
+
+- type: loadoutGroup
+  id: TypanChefShoes
+  name: loadout-group-typan-chef-shoes
+  minLimit: 1
+  loadouts:
+  - TypanChefShoes
+  - TypanChefCombatBoots

@@ -42,7 +42,4 @@
   equipment:
     eyes: ClothingEyesHudTypanResearch
     ears: ClothingHeadsetAltSyndicate
-    shoes: ClothingShoesBootsCombat
-    gloves: ClothingHandsRDTypan
     id: SyndiPDARD
-    outerClothing: ClothingOuterTypanCoatLabResearchDirector

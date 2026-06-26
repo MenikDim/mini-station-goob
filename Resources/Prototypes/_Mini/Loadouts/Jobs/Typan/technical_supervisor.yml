@@ -9,20 +9,68 @@
   equipment:
     jumpsuit: ClothingUniformJumpskirtTypanTechnicalOperationsSupervisor
 
+# Outer Clothing
+- type: loadout
+  id: TypanTechSupCoat
+  equipment:
+    outerClothing: ClothingOuterCoatAtmosWorking
+
+- type: loadout
+  id: TypanTechSupArmorVest
+  equipment:
+    outerClothing: ClothingOuterArmorBasicSlim
+
+# Gloves
+- type: loadout
+  id: TypanTechSupCombatGloves
+  equipment:
+    gloves: ClothingHandsGlovesCombat
+
+- type: loadout
+  id: TypanTechSupBlackGloves
+  equipment:
+    gloves: ClothingHandsGlovesColorBlack
+
+# Shoes
+- type: loadout
+  id: TypanTechSupLaceupShoes
+  equipment:
+    shoes: ClothingShoesBootsLaceup
+
+- type: loadout
+  id: TypanTechSupCombatBoots
+  equipment:
+    shoes: ClothingShoesBootsCombat
+
 # Loadout Groups
 - type: loadoutGroup
   id: TypanTechnicalOperationsSupervisorUniform
   name: loadout-group-typan-technical-supervisor-uniform
-  hidden: true
   minLimit: 1
   loadouts:
   - TypanTechnicalOperationsSupervisorJumpsuit
   - TypanTechnicalOperationsSupervisorJumpskirt
 
-# Role Loadout
-- type: roleLoadout
-  id: JobTypanTechnicalOperationsSupervisor
-  groups:
-  - TypanTechnicalOperationsSupervisorUniform
-  - GroupSpeciesBreathTool
-  - GroupTankHarness
+- type: loadoutGroup
+  id: TypanTechnicalOperationsSupervisorOuterClothing
+  name: loadout-group-typan-technical-supervisor-outerclothing
+  minLimit: 1
+  loadouts:
+  - TypanTechSupCoat
+  - TypanTechSupArmorVest
+
+- type: loadoutGroup
+  id: TypanTechnicalOperationsSupervisorGloves
+  name: loadout-group-typan-technical-supervisor-gloves
+  minLimit: 1
+  loadouts:
+  - TypanTechSupCombatGloves
+  - TypanTechSupBlackGloves
+
+- type: loadoutGroup
+  id: TypanTechnicalOperationsSupervisorShoes
+  name: loadout-group-typan-technical-supervisor-shoes
+  minLimit: 1
+  loadouts:
+  - TypanTechSupLaceupShoes
+  - TypanTechSupCombatBoots

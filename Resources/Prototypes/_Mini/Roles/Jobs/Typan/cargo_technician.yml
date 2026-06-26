@@ -33,8 +33,5 @@
   equipment:
     eyes: ClothingEyesHudTypanDiagnostic
     ears: ClothingHeadsetAltSyndicate
-    jumpsuit: ClothingUniformJumpsuitTypanCargotech
-    shoes: ClothingShoesBootsCombatSyndie
     id: SyndiPDACargo
-    outerClothing: ClothingOuterCoatLetterman
 

@@ -6,16 +6,71 @@
 
 - type: loadout
   id: TypanResearcherJumpskirt
-
   equipment:
     jumpsuit: ClothingUniformJumpskirtTypanResearcher
+
+# Outer Clothing
+- type: loadout
+  id: TypanResearcherLabCoat
+  equipment:
+    outerClothing: ClothingOuterTypanCoatLabResearcher
+
+- type: loadout
+  id: TypanResearcherWinterCoat
+  equipment:
+    outerClothing: ClothingOuterWinterSyndie
+
+# Gloves
+- type: loadout
+  id: TypanResearcherGloves
+  equipment:
+    gloves: ClothingHandsScienceTypan
+
+- type: loadout
+  id: TypanResearcherCombatGloves
+  equipment:
+    gloves: ClothingHandsGlovesCombat
+
+# Shoes
+- type: loadout
+  id: TypanResearcherCombatBoots
+  equipment:
+    shoes: ClothingShoesBootsCombat
+
+- type: loadout
+  id: TypanResearcherJackboots
+  equipment:
+    shoes: ClothingShoesBootsJack
 
 # Loadout Groups
 - type: loadoutGroup
   id: TypanResearcherUniform
   name: loadout-group-typan-researcher-uniform
-  hidden: true
   minLimit: 1
   loadouts:
   - TypanResearcherJumpsuit
   - TypanResearcherJumpskirt
+
+- type: loadoutGroup
+  id: TypanResearcherOuterClothing
+  name: loadout-group-typan-researcher-outerclothing
+  minLimit: 1
+  loadouts:
+  - TypanResearcherLabCoat
+  - TypanResearcherWinterCoat
+
+- type: loadoutGroup
+  id: TypanResearcherGloves
+  name: loadout-group-typan-researcher-gloves
+  minLimit: 1
+  loadouts:
+  - TypanResearcherGloves
+  - TypanResearcherCombatGloves
+
+- type: loadoutGroup
+  id: TypanResearcherShoes
+  name: loadout-group-typan-researcher-shoes
+  minLimit: 1
+  loadouts:
+  - TypanResearcherCombatBoots
+  - TypanResearcherJackboots

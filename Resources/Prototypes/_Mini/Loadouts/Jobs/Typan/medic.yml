@@ -6,16 +6,52 @@
 
 - type: loadout
   id: TypanMedicJumpskirt
-
   equipment:
     jumpsuit: ClothingUniformJumpskirtTypanMedic
+
+# Outer Clothing
+- type: loadout
+  id: TypanMedicLabCoat
+  equipment:
+    outerClothing: ClothingOuterTypanCoatLabMed
+
+- type: loadout
+  id: TypanMedicWinterCoat
+  equipment:
+    outerClothing: ClothingOuterWinterSyndie
+
+# Shoes
+- type: loadout
+  id: TypanMedicCombatBoots
+  equipment:
+    shoes: ClothingShoesBootsCombat
+
+- type: loadout
+  id: TypanMedicWinterBoots
+  equipment:
+    shoes: ClothingShoesBootsWinterSyndicate
 
 # Loadout Groups
 - type: loadoutGroup
   id: TypanMedicUniform
   name: loadout-group-typan-medic-uniform
-  hidden: true
   minLimit: 1
   loadouts:
   - TypanMedicJumpsuit
   - TypanMedicJumpskirt
+
+- type: loadoutGroup
+  id: TypanMedicOuterClothing
+  name: loadout-group-typan-medic-outerclothing
+  minLimit: 1
+  loadouts:
+  - TypanMedicLabCoat
+  - TypanMedicWinterCoat
+
+- type: loadoutGroup
+  id: TypanMedicShoes
+  name: loadout-group-typan-medic-shoes
+  minLimit: 1
+  loadouts:
+  - TypanMedicCombatBoots
+  - TypanMedicWinterBoots

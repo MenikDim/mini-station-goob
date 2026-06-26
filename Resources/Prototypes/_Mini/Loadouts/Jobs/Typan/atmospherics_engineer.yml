@@ -9,13 +9,49 @@
   equipment:
     jumpsuit: ClothingUniformJumpskirtTypanAtmosphericsEngineer
 
+# Outer Clothing
+- type: loadout
+  id: TypanAtmosTechCoat
+  equipment:
+    outerClothing: ClothingOuterCoatAtmosWorking
+
+- type: loadout
+  id: TypanAtmosTechWinterCoat
+  equipment:
+    outerClothing: ClothingOuterWinterSyndie
+
+# Shoes
+- type: loadout
+  id: TypanAtmosTechBoots
+  equipment:
+    shoes: ClothingShoesBootsTypan
+
+- type: loadout
+  id: TypanAtmosTechWinterBoots
+  equipment:
+    shoes: ClothingShoesBootsWinterSyndicate
+
 # Loadout Groups
 - type: loadoutGroup
   id: TypanAtmosphericsEngineerUniform
   name: loadout-group-typan-atmospherics-engineer-uniform
-  hidden: true
   minLimit: 1
   loadouts:
   - TypanAtmosphericsEngineerJumpsuit
   - TypanAtmosphericsEngineerJumpskirt
 
+- type: loadoutGroup
+  id: TypanAtmosphericsEngineerOuterClothing
+  name: loadout-group-typan-atmospherics-engineer-outerclothing
+  minLimit: 1
+  loadouts:
+  - TypanAtmosTechCoat
+  - TypanAtmosTechWinterCoat
+
+- type: loadoutGroup
+  id: TypanAtmosphericsEngineerShoes
+  name: loadout-group-typan-atmospherics-engineer-shoes
+  minLimit: 1
+  loadouts:
+  - TypanAtmosTechBoots
+  - TypanAtmosTechWinterBoots

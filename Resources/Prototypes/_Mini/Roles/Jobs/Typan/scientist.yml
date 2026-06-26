@@ -32,7 +32,4 @@
   equipment:
     eyes: ClothingEyesHudTypanResearch
     ears: ClothingHeadsetAltSyndicate
-    outerClothing: ClothingOuterTypanCoatLabResearcher
-    gloves: ClothingHandsScienceTypan
-    shoes: ClothingShoesBootsCombat
     id: SyndiPDAScience

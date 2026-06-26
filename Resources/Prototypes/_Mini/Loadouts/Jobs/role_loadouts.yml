@@ -5,6 +5,8 @@
   - GroupTankHarness
   - SyndicateBackpack
   - Glasses
+  - TypanAtmosphericsEngineerShoes
+  - TypanAtmosphericsEngineerOuterClothing
   - Survival
   - Trinkets
   - GroupSpeciesBreathTool
@@ -17,6 +19,8 @@
   - GroupTankHarness
   - SyndicateBackpack
   - Glasses
+  - TypanBotanistShoes
+  - TypanBotanistOuterClothing
   - Survival
   - Trinkets
   - GroupSpeciesBreathTool
@@ -29,6 +33,8 @@
   - GroupTankHarness
   - SyndicateBackpack
   - Glasses
+  - TypanCargotechShoes
+  - TypanCargotechOuterClothing
   - Survival
   - Trinkets
   - GroupSpeciesBreathTool
@@ -41,6 +47,8 @@
   - GroupTankHarness
   - SyndicateBackpack
   - Glasses
+  - TypanChefShoes
+  - TypanChefOuterClothing
   - Survival
   - Trinkets
   - GroupSpeciesBreathTool
@@ -53,6 +61,8 @@
   - GroupTankHarness
   - SyndicateBackpack
   - Glasses
+  - TypanMedicShoes
+  - TypanMedicOuterClothing
   - Survival
   - Trinkets
   - GroupSpeciesBreathTool
@@ -65,6 +75,9 @@
   - GroupTankHarness
   - SyndicateBackpack
   - Glasses
+  - TypanResearchDirectorShoes
+  - TypanResearchDirectorGloves
+  - TypanResearchDirectorOuterClothing
   - Survival
   - Trinkets
   - GroupSpeciesBreathTool
@@ -77,6 +90,9 @@
   - GroupTankHarness
   - SyndicateBackpack
   - Glasses
+  - TypanResearcherShoes
+  - TypanResearcherGloves
+  - TypanResearcherOuterClothing
   - Survival
   - Trinkets
   - GroupSpeciesBreathTool
@@ -89,6 +105,11 @@
   - GroupTankHarness
   - SyndicateBackpack
   - Glasses
+  - TypanCommanderShoes
+  - TypanCommanderGloves
+  - TypanCommanderOuterClothing
+  - TypanCommanderHead
+  - TypanCommanderNeck
   - Survival
   - Trinkets
   - GroupSpeciesBreathTool
@@ -101,10 +122,30 @@
   - GroupTankHarness
   - SyndicateBackpack
   - Glasses
+  - TypanPatrolShoes
+  - TypanPatrolGloves
+  - TypanPatrolOuterClothing
+  - TypanPatrolHead
+  - TypanPatrolNeck
   - Survival
   - Trinkets
   - GroupSpeciesBreathTool
   - TypanPatrolUniform
+
+- type: roleLoadout
+  id: JobTypanTechnicalOperationsSupervisor
+  groups:
+  - Inventory # Corvax-Loadouts
+  - GroupTankHarness
+  - SyndicateBackpack
+  - Glasses
+  - TypanTechnicalOperationsSupervisorShoes
+  - TypanTechnicalOperationsSupervisorOuterClothing
+  - TypanTechnicalOperationsSupervisorGloves
+  - Survival
+  - Trinkets
+  - GroupSpeciesBreathTool
+  - TypanTechnicalOperationsSupervisorUniform
 
 - type: roleLoadout
   id: JobTypanBorg

@@ -9,12 +9,49 @@
   equipment:
     jumpsuit: ClothingUniformJumpskirtTypanBotanist
 
+# Outer Clothing
+- type: loadout
+  id: TypanBotanistApron
+  equipment:
+    outerClothing: ClothingOuterApronTypanBotanist
+
+- type: loadout
+  id: TypanBotanistLettermanCoat
+  equipment:
+    outerClothing: ClothingOuterCoatLetterman
+
+# Shoes
+- type: loadout
+  id: TypanBotanistShoes
+  equipment:
+    shoes: ClothingShoesColorBlack
+
+- type: loadout
+  id: TypanBotanistCombatBoots
+  equipment:
+    shoes: ClothingShoesBootsCombat
+
 # Loadout Groups
 - type: loadoutGroup
   id: TypanBotanistUniform
   name: loadout-group-typan-botanist-uniform
-  hidden: true
   minLimit: 1
   loadouts:
   - TypanBotanistJumpsuit
   - TypanBotanistJumpskirt
+
+- type: loadoutGroup
+  id: TypanBotanistOuterClothing
+  name: loadout-group-typan-botanist-outerclothing
+  minLimit: 1
+  loadouts:
+  - TypanBotanistApron
+  - TypanBotanistLettermanCoat
+
+- type: loadoutGroup
+  id: TypanBotanistShoes
+  name: loadout-group-typan-botanist-shoes
+  minLimit: 1
+  loadouts:
+  - TypanBotanistShoes
+  - TypanBotanistCombatBoots
