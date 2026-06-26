@@ -16,8 +16,6 @@ slime-eat-corpse-fail-not-dead = {THE($target)} should be dead!
 
 slime-examined-stomach = [color=red]You can see something moving inside of it![/color]
 
-slime-examined-stomach = [color=red]Ты видишь, как что-то движется внутри![/color]
-
 slime-examined-tamer = [color=green]Кажется, он рад тебя видеть![/color]
 
 slime-interaction-tame = Кажется, теперь ты ему нравишься!

@@ -35,6 +35,9 @@ public sealed partial class SlasherRegenerateComponent : Component
     [DataField, AutoNetworkedField]
     public int SoulCharges = 1;
 
+    [DataField, AutoNetworkedField]
+    public bool HasSoulAvailable = true; // Start with one soul available
+
     /// <summary>
     /// The sound that plays when regenerating
     /// </summary>
