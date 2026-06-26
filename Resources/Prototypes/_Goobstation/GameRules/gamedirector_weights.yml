@@ -32,7 +32,7 @@
   id: Nukeops
   modes:
   - Nukeops
-  - HonkOps
+  - Honkops
   - Zombie
   - Revolutionary
   - BlobGameMode
@@ -42,10 +42,10 @@
   - Wizard
 
 - type: incompatibleModes
-  id: HonkOps
+  id: Honkops
   modes:
   - Nukeops
-  - HonkOps
+  - Honkops
   - Zombie
   - Revolutionary
   - BlobGameMode
@@ -105,7 +105,7 @@
   id: CosmicCult
   modes:
   - Nukeops
-  - HonkOps
+  - Honkops
   - Zombie
   - Revolutionary
   - BlobGameMode
