@@ -121,6 +121,20 @@ ent-RatvarBeacon = Маяк Вестника
 ent-RatvarAltar = Алтарь из шестереней
     .desc = Странная латунная платформа из вращающихся шестерней. Она требует что-то в обмен на...
 
+# Construction
+construction-recipe-clockwork-wall = Стена часовых
+construction-recipe-clockwork-wall-desc = Построить стену из латуни. Требуется приверженность Ратвару.
+construction-recipe-pinion-airlock = Шестерёнчатый шлюз
+construction-recipe-pinion-airlock-desc = Построить дверь из латуни. Требуется приверженность Ратвару.
+construction-recipe-pinion-airlock-glass = Стеклянный шестерёнчатый шлюз
+construction-recipe-pinion-airlock-glass-desc = Построить стеклянную дверь из латуни. Требуется приверженность Ратвару.
+construction-recipe-ratvar-beacon = Маяк Вестника
+construction-recipe-ratvar-beacon-desc = Построить маяк, который генерирует энергию, лечит праведников и конвертирует окружение.
+construction-recipe-ratvar-altar = Алтарь Ратвара
+construction-recipe-ratvar-altar-desc = Построить алтарь для конвертации заблудших и призыва Ратвара.
+construction-recipe-ratvar-workshop = Мастерская Ратвара
+construction-recipe-ratvar-workshop-desc = Построить мастерскую для создания оружия и брони праведников.
+
 # Craft
 craft-category-RatvarWeapon = Оружие
 craft-category-RatvarArmor = Броня
@@ -153,9 +167,13 @@ action-name-ratvar-clock-magic = Зачаровать предмет
 action-desc-ratvar-clock-magic = Позволяет выбрать зачарование для оружия праведников.
 
 # Objectives
+objective-title-RatvarConvertObjective = Конвертация
 objective-description-RatvarConvertObjective = Используйте Алтарь, чтобы конвертировать члена экипажа
+objective-title-RatvarBeaconsObjective = Маяки
 objective-description-RatvarBeaconsObjective = Постройте маяки, чтобы набрать как можно больше энергии
+objective-title-RatvarPowerObjective = Энергия
 objective-description-RatvarPowerObjective = Накопите энергию, чтобы у нас была сила для призыва Ратвара!
+objective-title-RatvarSummonObjective = Призыв
 objective-description-RatvarSummonObjective = Мы готовы к призыву Ратвара!
 
 # Antags
@@ -163,7 +181,7 @@ antag-name-RatvarRighteous = Праведник Ратвара
 antag-objective-RatvarRighteous = Освободите Ратвара из заточения
 
 # Mind roles
-mind-role-name-ratvar = Ratvar Cultist Role
+mind-role-name-ratvar = Праведник Ратвара
 
 # Enchantments table labels
 enchantment-table-name-ratvar-sword = Зачарования меча
@@ -171,3 +189,39 @@ enchantment-table-name-ratvar-spear = Зачарования копья
 enchantment-table-name-ratvar-slab = Зачарования плиты
 enchantment-table-name-ratvar-shard = Зачарования осколка
 enchantment-table-name-ratvar-hammer = Зачарования молота
+
+# Workshop
+ratvar-workshop-title = Мастерская Ратвара
+ratvar-workshop-resources-title = Ресурсы
+ratvar-workshop-brass-label = Латунь:
+ratvar-workshop-brass = латуни
+ratvar-workshop-power-label = Энергия:
+ratvar-workshop-power = энергии
+ratvar-workshop-status-label = Статус:
+ratvar-workshop-status-ready = Готово к работе
+ratvar-workshop-status-busy = Идёт создание...
+ratvar-workshop-info-title = Информация
+ratvar-workshop-info-description = Выберите предмет для создания. Необходимые ресурсы будут потрачены.
+ratvar-workshop-craft-title = Рецепты создания
+ratvar-workshop-craft-button = Создать
+ratvar-workshop-craft-time = Время: {$seconds} сек.
+
+# Guide
+guide-entry-ratvar = Праведники Ратвара
+
+ent-RatvarConvertObjective = Конвертация
+ent-RatvarConvertObjective-desc = Используйте Алтарь, чтобы конвертировать члена экипажа
+
+ent-RatvarBeaconsObjective = Маяки
+ent-RatvarBeaconsObjective-desc = Постройте маяки, чтобы набрать как можно больше энергии
+
+ent-RatvarPowerObjective = Энергия
+ent-RatvarPowerObjective-desc = Накопите энергию, чтобы у нас была сила для призыва Ратвара!
+
+ent-RatvarSummonObjective = Призыв
+ent-RatvarSummonObjective-desc = Мы готовы к призыву Ратвара!
+
+ratvar-ui-roundstart-title = Праведники Ратвара
+ratvar-ui-roundstart-text-1 = Вы — Праведник Ратвара!
+ratvar-ui-roundstart-text-2 = Ваша цель — провести древний ритуал и вернуть Ратвару былую силу.
+ratvar-ui-popup-confirm = Принять

@@ -18,7 +18,7 @@
       lateJoinAdditional: true
       briefing:
         text: ratvar-righteous-briefing
-        color: "#7a3e00"
+        color: "#ba7b00"
         sound: "/Audio/DarkStation/DarkForces/Ratvar/clockcult.ogg"
       components:
       - type: RatvarRighteous

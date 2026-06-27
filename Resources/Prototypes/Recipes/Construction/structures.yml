@@ -147,18 +147,18 @@
   conditions:
     - !type:TileNotBlocked
 
-- type: construction
-  id: ClockworkGirder
-  graph: ClockworkGirder
-  startNode: start
-  targetNode: clockGirder
-  category: construction-category-structures
-  objectType: Structure
-  placementMode: SnapgridCenter
-  canRotate: false
-  canBuildInImpassable: false
-  conditions:
-    - !type:TileNotBlocked
+# - type: construction
+#   id: ClockworkGirder
+#   graph: ClockworkGirder
+#   startNode: start
+#   targetNode: clockGirder
+#   category: construction-category-structures
+#   objectType: Structure
+#   placementMode: SnapgridCenter
+#   canRotate: false
+#   canBuildInImpassable: false
+#   conditions:
+#     - !type:TileNotBlocked
 
 - type: construction
   id: Wall
@@ -186,18 +186,18 @@
   conditions:
     - !type:TileNotBlocked
 
-- type: construction
-  id: WallClock
-  graph: ClockworkGirder
-  startNode: start
-  targetNode: clockworkWall
-  category: construction-category-structures
-  objectType: Structure
-  placementMode: SnapgridCenter
-  canRotate: false
-  canBuildInImpassable: false
-  conditions:
-    - !type:TileNotBlocked
+# - type: construction
+#   id: WallClock
+#   graph: ClockworkGirder
+#   startNode: start
+#   targetNode: clockworkWall
+#   category: construction-category-structures
+#   objectType: Structure
+#   placementMode: SnapgridCenter
+#   canRotate: false
+#   canBuildInImpassable: false
+#   conditions:
+#     - !type:TileNotBlocked
 
 - type: construction
   id: WoodWall
@@ -1480,4 +1480,3 @@
   canBuildInImpassable: false
   conditions:
     - !type:TileNotBlocked
- 

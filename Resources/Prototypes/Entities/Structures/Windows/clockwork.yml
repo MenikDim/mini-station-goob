@@ -138,6 +138,7 @@
         acts: [ "Destruction" ]
   - type: StaticPrice
     price: 22.5
+  - type: ClockworkWindow
 
 - type: entity
   parent: ClockworkWindow
@@ -186,3 +187,4 @@
   - type: Construction
     graph: WindowDiagonal
     node: clockworkWindowDiagonal
+  - type: ClockworkWindow

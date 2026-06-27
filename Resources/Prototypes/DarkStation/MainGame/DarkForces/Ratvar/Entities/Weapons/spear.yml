@@ -12,10 +12,11 @@
     damage:
       types:
         Piercing: 12
+    canWideSwing: true
   - type: DamageOtherOnHit
     damage:
       types:
-        Piercing: 18
+        Piercing: 25
   - type: Appearance
   - type: GenericVisualizer
     visuals:

@@ -1,7 +1,7 @@
 ﻿- type: entity
   id: RatvarConvertObjective
   categories: [ HideSpawnMenu ]
-  description: objective-description-RatvarConvertObjective
+  description: Используйте Алтарь, чтобы конвертировать члена экипажа
   components:
   - type: Objective
     difficulty: 0.0
@@ -15,7 +15,7 @@
 - type: entity
   id: RatvarBeaconsObjective
   categories: [ HideSpawnMenu ]
-  description: objective-description-RatvarBeaconsObjective
+  description: Постройте маяки, чтобы набрать как можно больше энергии
   components:
   - type: Objective
     difficulty: 0.0
@@ -29,7 +29,7 @@
 - type: entity
   id: RatvarPowerObjective
   categories: [ HideSpawnMenu ]
-  description: objective-description-RatvarPowerObjective
+  description: Накопите энергию, чтобы у нас была сила для призыва Ратвара!
   components:
   - type: Objective
     difficulty: 0.0
@@ -43,7 +43,7 @@
 - type: entity
   id: RatvarSummonObjective
   categories: [ HideSpawnMenu ]
-  description: objective-description-RatvarSummonObjective
+  description: Мы готовы к призыву Ратвара!
   components:
   - type: Objective
     difficulty: 0.0

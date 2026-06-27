@@ -338,6 +338,7 @@
     pathStage: 4 # Mark of rust
   - type: CosmicCorruptible # DeltaV - Cosmic Cult
     convertTo: WallCosmicCult
+  - type: WallClock
 
 - type: entity
   parent: BaseWall
@@ -1952,6 +1953,6 @@
   - type: IconSmooth
     key: cards
     base: card
-  - type: Occluder 
+  - type: Occluder
   - type: BlockWeather
-  - type: SunShadowCast 
+  - type: SunShadowCast

@@ -116,6 +116,9 @@ antag-store-role-hastur-description = Гост роль короля в жёлт
 antag-store-role-vox-name = Вокс рейдер
 antag-store-role-vox-description = Гост роль вокса рейдера.
 
+antag-store-role-ratvar-cult-name = Праведник Ратвара
+antag-store-role-ratvar-cult-description = Очередь на раундстартовое событие культа Ратвара.
+
 # Server (AntagTokenSystem)
 antag-tokens-online-reward = Вы получили {$amount} билет(ов) за {$hours} ч. на сервере!
 antag-tokens-sponsor-bonus-popup = Донатерский бонус: +{$amount} билет(ов) (уровень {$tier})!

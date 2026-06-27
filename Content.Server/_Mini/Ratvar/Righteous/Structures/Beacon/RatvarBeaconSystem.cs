@@ -83,6 +83,12 @@ public sealed class RatvarBeaconSystem : EntitySystem
                 IncreasePower(component);
                 component.LastPowerTick = curTime + _powerTime;
             }
+
+            if (component.LastConversionTick <= curTime)
+            {
+                RaiseLocalEvent(uid, new BeaconConversionEvent());
+                component.LastConversionTick = curTime + component.ConversionInterval;
+            }
         }
     }
 

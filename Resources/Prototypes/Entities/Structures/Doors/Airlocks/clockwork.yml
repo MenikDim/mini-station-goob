@@ -19,6 +19,7 @@
   - type: Paintable
     group: null
   - type: PinionDoor
+  - type: PinionAirlock
 
 - type: entity
   parent: AirlockGlass
@@ -35,3 +36,4 @@
   - type: Paintable
     group: null
   - type: PinionDoor
+  - type: PinionAirlock

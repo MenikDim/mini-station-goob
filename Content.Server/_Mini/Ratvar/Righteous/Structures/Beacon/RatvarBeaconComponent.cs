@@ -29,6 +29,15 @@ public sealed partial class RatvarBeaconComponent : Component
         }
     };
 
+    [DataField]
+    public TimeSpan ConversionInterval = TimeSpan.FromSeconds(30);
+
+    [DataField]
+    public TimeSpan NextConversionTime;
+
+    [DataField]
+    public TimeSpan LastConversionTick;
+
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
     public TimeSpan LastHealTick;
 
@@ -37,4 +46,16 @@ public sealed partial class RatvarBeaconComponent : Component
 
     [DataField]
     public int PowerPerTick = 2;
+
+    [DataField]
+    public int CurrentConversionRadius;
+
+    [DataField]
+    public int MaxConversionsPerTick = 9;
+
+    [DataField]
+    public Queue<Vector2i>? ConversionQueue;
+
+    [DataField]
+    public HashSet<Vector2i>? ConvertedTiles;
 }

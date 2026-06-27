@@ -15,6 +15,8 @@ using Content.Server.RPSX.CCvars;
 using Robust.Shared.Player;
 using Content.Server.Antag;
 using Content.Server.RPSX.GameTicking.Rules.Ratvar;
+using Content.Server.EUI;
+using Content.Server.RPSX.DarkForces.Ratvar.UI;
 
 namespace Content.Server.RPSX.DarkForces.Ratvar.Righteous.Structures.Altar;
 
@@ -28,13 +30,13 @@ public sealed class RatvarAltarSystem : EntitySystem
     [Dependency] private readonly SharedAppearanceSystem _sharedAppearance = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly AntagSelectionSystem _antag = default!;
+    [Dependency] private readonly EuiManager _euiMan = default!;
 
     [ValidatePrototypeId<EntityPrototype>]
     private const string AltarGlow = "RatvarAltarActivateEffect";
 
     private readonly TimeSpan _timeToConvert = TimeSpan.FromSeconds(8);
     private readonly TimeSpan _timeToDie = TimeSpan.FromSeconds(16);
-
     private const int PowerForConvert = 500;
     private const int PowerForDie = 300;
 
@@ -94,6 +96,7 @@ public sealed class RatvarAltarSystem : EntitySystem
                     }
 
                     _antag.ForceMakeAntag<RatvarRuleComponent>(actor.PlayerSession, "Ratvar");
+                    _euiMan.OpenEui(new RatvarRoundStartEui(), actor.PlayerSession);
                     _progressSystem.TryRequestChangePower(PowerForConvert);
                     ToIdleState((uid, component));
                     break;
