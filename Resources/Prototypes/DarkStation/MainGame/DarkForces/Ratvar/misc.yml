@@ -21,7 +21,7 @@
 - type: radioChannel
   id: Ratvar
   name: chat-radio-ratvar
-  keycode: 'р'
+  keycode: 'щ'
   frequency: 1449
   color: "#D4AF37"
   longRange: true

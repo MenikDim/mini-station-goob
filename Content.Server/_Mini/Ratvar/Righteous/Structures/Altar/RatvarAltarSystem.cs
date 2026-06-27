@@ -17,6 +17,8 @@ using Content.Server.Antag;
 using Content.Server.RPSX.GameTicking.Rules.Ratvar;
 using Content.Server.EUI;
 using Content.Server.RPSX.DarkForces.Ratvar.UI;
+using Content.Server.Radio.Components;
+using Content.Server.Radio.EntitySystems;
 
 namespace Content.Server.RPSX.DarkForces.Ratvar.Righteous.Structures.Altar;
 
@@ -96,6 +98,10 @@ public sealed class RatvarAltarSystem : EntitySystem
                     }
 
                     _antag.ForceMakeAntag<RatvarRuleComponent>(actor.PlayerSession, "Ratvar");
+                    var transmitter = EnsureComp<IntrinsicRadioTransmitterComponent>(uid);
+                    var radio = EnsureComp<ActiveRadioComponent>(uid);
+                    radio.Channels.Add("Ratvar");
+                    transmitter.Channels.Add("Ratvar");
                     _euiMan.OpenEui(new RatvarRoundStartEui(), actor.PlayerSession);
                     _progressSystem.TryRequestChangePower(PowerForConvert);
                     ToIdleState((uid, component));
