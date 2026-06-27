@@ -1,0 +1,12 @@
+- type: factionIcon
+  id: RatvarRighteousIcon
+  isShaded: true
+  priority: 11
+  showTo:
+    components:
+      - RatvarRighteous
+      - ShowAntagIcons
+  locationPreference: Right
+  icon:
+    sprite: /Textures/_Mini/Interface/Misc/ratvar_cult_icons.rsi
+    state: Cultist

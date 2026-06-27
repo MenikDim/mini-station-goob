@@ -638,6 +638,8 @@ namespace Content.Server.Voting.Managers
                     continue;
                 if(preset.ModeTitle == "nukeops-title" && _playerManager.PlayerCount<20)
                     continue;
+                if(preset.ModeTitle == "ratvar-righteous-title" && _playerManager.PlayerCount<20)
+                    continue;
                 if(preset.ModeTitle == "cosmiccult-title" && _playerManager.PlayerCount<20)
                     continue;
                 if(preset.ModeTitle == "blood-cult-title" && _playerManager.PlayerCount<20)

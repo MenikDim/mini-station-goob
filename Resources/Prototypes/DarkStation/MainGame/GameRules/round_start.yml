@@ -18,7 +18,7 @@
       lateJoinAdditional: true
       briefing:
         text: ratvar-righteous-briefing
-        color: CornflowerBlue
+        color: "#7a3e00"
         sound: "/Audio/DarkStation/DarkForces/Ratvar/clockcult.ogg"
       components:
       - type: RatvarRighteous
@@ -45,4 +45,5 @@
   - type: MindRole
     antagPrototype: RatvarRighteous
     roleType: TeamAntagonist
+    subtype: antag-name-RatvarRighteous
   - type: RatvarRole

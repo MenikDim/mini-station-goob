@@ -9,3 +9,5 @@ secretplus-admeme-description = Если это может случиться �
 survivalplus-title = Выживание+
 survivalplus-description = Начинается довольно спокойно.
     Заканчивается... не совсем.
+secretplus-lowpop-title = Лоупоп+
+secretplus-lowpop-description = Для малелых экипажей станции.ы

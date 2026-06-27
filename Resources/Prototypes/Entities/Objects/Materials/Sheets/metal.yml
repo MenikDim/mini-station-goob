@@ -210,6 +210,8 @@
     - prototype: RatvarBeaconConstruction
     - prototype: RatvarWorkshopConstruction
     - prototype: RatvarAltarConstruction
+    - prototype: ClockworkWallConstruction
+    - prototype: PinionAirlockConstruction
 
 - type: entity
   parent: SheetBrass

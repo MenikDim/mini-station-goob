@@ -5,8 +5,8 @@
 - type: entity
   id: ActionHydrakinCoolOff
   parent: BaseAction
-  name: Cool off
-  description: Dispel some of your body heat.
+  name: Охладить тело
+  description: Охладить тело, чтобы снять эффект перегрева.
   categories: [ HideSpawnMenu ] # Frontier
   components:
   - type: Action

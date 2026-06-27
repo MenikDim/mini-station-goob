@@ -2,7 +2,7 @@ blood-cult-title = Культ Крови
 blood-cult-description = Старейшая и сильнейшая эмоция человечества — страх, а старейший и сильнейший вид страха — страх неизвестного.
 
 roles-antag-blood-cultist-name = Культист крови
-roles-antag-blood-cultist-objective = Призвать древнюю богиню Nar'Sie.
+roles-antag-blood-cultist-objective = Призвать древнюю богиню Нар'Си.
 
 blood-cult-role-greeting =
     Геометр Крови, Nar-Sie, направила на космическую станцию нескольких своих последователей.

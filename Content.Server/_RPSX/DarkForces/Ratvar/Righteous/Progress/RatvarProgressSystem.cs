@@ -11,6 +11,7 @@ using Robust.Shared.IoC;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.Timing;
+using Content.Shared.Access.Components;
 
 namespace Content.Server.RPSX.DarkForces.Ratvar.Righteous.Progress;
 
@@ -111,6 +112,9 @@ public sealed partial class RatvarProgressSystem : EntitySystem
     {
         if (!_mindSystem.TryGetMind(user, out var mindId, out var mind))
             return;
+
+        var access = EnsureComp<AccessComponent>(user);
+        access.Tags.Add("RatvarRighteous");
 
         foreach (var objective in objectiveEntities)
         {

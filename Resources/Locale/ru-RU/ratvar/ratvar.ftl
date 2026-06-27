@@ -10,7 +10,13 @@ ratvar-name = Ратвар
 ratvar-winstate-idle = [color=green]Праведники Ратвара не смогли вызволить его из заточения![/color]
 ratvar-winstate-summoning = [color=yellow]Праведники Ратвара не успели вызволить его заточения, до эвакуации![/color]
 ratvar-winstate-righteouswon = [color=crimson]Праведники Ратвара смогли вызволить его заточения![/color]
-ratvar-righteous-briefing = Вы один из праведников Ратвара. Выполните все задания и выпустите Ратвара из тюрьмы. Слава механизмам!
+ratvar-righteous-briefing =
+    Вы — Праведник Ратвара!
+    Вы — один из сих праведников, отринувших былое и переживших просветление.
+    Ваша цель — провести древний ритуал и вернуть Ратвару былую силу.
+    В ваших руках частичка силы Ратвара, покажите неверным искупление и очищение разума с помощью них.
+    Чтобы вселить в сознание понимание того, кто именно самый прекрасный бог, потребуется праведник (Вы) и алтарь.
+    Только так вы обеспечите победу!
 ratvar-righteous-message = Добро пожаловать к праведникам Ратвара! Помните, ваш культ является мирным и не устраивает резню!
 chat-radio-ratvar = Ратвар
 tool-quality-ratvar-screwing-name = Прикручивание Ратвара
@@ -111,6 +117,7 @@ ent-RatvarWorkshop = Мастерская Ратвара
 ent-RatvarPortal = Портал Ратвара
     .desc = До прихода Ратвара осталось совсем чуть-чуть...
 ent-RatvarBeacon = Маяк Вестника
+    .desc = Маяк, который собирает энергию для призыва Ратвара.
 ent-RatvarAltar = Алтарь из шестереней
     .desc = Странная латунная платформа из вращающихся шестерней. Она требует что-то в обмен на...
 
@@ -141,14 +148,14 @@ ent-MidasTouchBrass = Шестерня интеграции
 
 # Actions (from actions.yml)
 action-name-ratvar-midas-touch = Рука Мидаса
-action-desc-ratvar-midas-touch = Рука Мидаса — первое и главное заклинание, дарованное Светоносцем праведникам.
+action-desc-ratvar-midas-touch = Рука Мидаса — первое и главное заклинание. Превращает сталь в латунь для обрядов.
 action-name-ratvar-clock-magic = Зачаровать предмет
-action-desc-ratvar-clock-magic = Позволяет выбрать зачарование для предмета.
+action-desc-ratvar-clock-magic = Позволяет выбрать зачарование для оружия праведников.
 
 # Objectives
 objective-description-RatvarConvertObjective = Используйте Алтарь, чтобы конвертировать члена экипажа
-objective-description-RatvarBeaconsObjective = Постройте маяки, чтобы набрать как можно больше мощности
-objective-description-RatvarPowerObjective = Накопите мощность, чтобы у нас была сила для призыва Ратвара!
+objective-description-RatvarBeaconsObjective = Постройте маяки, чтобы набрать как можно больше энергии
+objective-description-RatvarPowerObjective = Накопите энергию, чтобы у нас была сила для призыва Ратвара!
 objective-description-RatvarSummonObjective = Мы готовы к призыву Ратвара!
 
 # Antags
