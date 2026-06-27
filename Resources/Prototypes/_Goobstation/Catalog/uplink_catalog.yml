@@ -1050,7 +1050,7 @@
   icon: { sprite: _Goobstation/Objects/Misc/sandevistan.rsi, state: icon }
   productEntity: AutosurgeonStatvekaSandevistan
   cost:
-    Telecrystal: 66
+    Telecrystal: 14
   categories:
   - UplinkImplants
   conditions:
