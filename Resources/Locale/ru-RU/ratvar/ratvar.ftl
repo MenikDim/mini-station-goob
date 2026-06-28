@@ -121,6 +121,12 @@ ent-RatvarBeacon = Маяк Вестника
 ent-RatvarAltar = Алтарь из шестереней
     .desc = Странная латунная платформа из вращающихся шестерней. Она требует что-то в обмен на...
 
+# Construction
+construction-recipe-clockwork-wall = Стена часовых
+construction-recipe-clockwork-wall-desc = Построить стену из латуни. Требуется приверженность Ратвару.
+construction-recipe-pinion-airlock-desc = Построить дверь из латуни. Требуется приверженность Ратвару.
+construction-recipe-pinion-airlock-glass-desc = Построить стеклянную дверь из латуни. Требуется приверженность Ратвару.
+
 # Craft
 craft-category-RatvarWeapon = Оружие
 craft-category-RatvarArmor = Броня
