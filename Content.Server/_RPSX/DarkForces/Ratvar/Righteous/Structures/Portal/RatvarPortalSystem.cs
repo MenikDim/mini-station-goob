@@ -28,7 +28,7 @@ public sealed class RatvarPortalSystem : EntitySystem
             if (component.RatvarSpawnTick > curTime)
                 continue;
 
-            var ratvar = Spawn("MobRatvarDark", Transform(uid).Coordinates);
+            var ratvar = Spawn("MobRatvarSpawn", Transform(uid).Coordinates);
             var ev = new RatvarSpawnedEvent(ratvar);
             RaiseLocalEvent(ref ev);
             QueueDel(uid);
