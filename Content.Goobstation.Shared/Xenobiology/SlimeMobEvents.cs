@@ -37,6 +37,7 @@ public sealed partial class SlimeTamedEvent : EntityEventArgs
         Tamer = tamer;
     }
 }
+[Serializable, NetSerializable]
 public sealed partial class EatCorpseDoAfterEvent : SimpleDoAfterEvent;
 
 /// <summary>
