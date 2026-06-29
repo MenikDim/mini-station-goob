@@ -56,7 +56,7 @@
   id: HydroponicsToolClippers
   result: HydroponicsToolClippers
 
-# - type: latheRecipe
-#   parent: HandheldHealthAnalyzer
-#   id: PlantAnalyzer
-#   result: PlantAnalyzer
+- type: latheRecipe
+  parent: HandheldHealthAnalyzer
+  id: PlantAnalyzer
+  result: PlantAnalyzer
