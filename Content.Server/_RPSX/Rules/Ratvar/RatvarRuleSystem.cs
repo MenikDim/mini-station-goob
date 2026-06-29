@@ -97,9 +97,10 @@ public sealed class RatvarRuleSystem : GameRuleSystem<RatvarRuleComponent>
 
         rule.WinState = WinState.RighteousWon;
 
+        var position = CoordinatesHelper.GetEntityMapPosition(EntityManager, ev.Ratvar);
         _chatSystem.DispatchStationAnnouncement(
             ev.Ratvar,
-            Loc.GetString("ratvar-spawn-end"),
+            Loc.GetString("ratvar-spawn-end", ("position", position)),
             Loc.GetString("ratvar-name"),
             false,
             null,
