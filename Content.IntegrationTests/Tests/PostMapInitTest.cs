@@ -258,7 +258,6 @@ namespace Content.IntegrationTests.Tests
             "CorvaxSilly",
             "CorvaxCluster",
             "Box_CS",
-            "Gate",
             // Corvax-Goob-Maps-end
 
             // Mini Station test maps start
