@@ -24,7 +24,6 @@
           False: { state: beacon-off }
   - type: Appearance
   - type: RatvarBeacon
-  - type: RatvarStructure
   - type: PointLight
     enabled: true
     radius: 4

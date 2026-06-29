@@ -82,6 +82,6 @@
   - type: CombatMode
     combatToggleAction: ActionCombatModeToggleOff
   - type: Puller
-    needsHands: true
+    needsHands: false
   - type: NameIdentifier
     group: GenericNumber

@@ -89,6 +89,13 @@
       whitelist:
         components:
         - RatvarSoulVessel
+  - type: ItemSlots
+    slots:
+      SoulVessel:
+        ejectOnBreak: true
+        whitelist:
+          components:
+          - RatvarSoulVessel
   - type: ContainerContainer
     containers:
       SoulVessel: !type:ContainerSlot
