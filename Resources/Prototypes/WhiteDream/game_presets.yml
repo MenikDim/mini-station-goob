@@ -3,8 +3,8 @@
   alias:
   - bloodcult
   name: blood-cult-title
-  showInVote: true
-  minPlayers: 20
+  showInVote: false
+  minPlayers: 15
   description: blood-cult-description
   rules:
   - BloodCult

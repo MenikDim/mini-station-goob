@@ -646,7 +646,7 @@ namespace Content.Server.Voting.Managers
                     continue;
                 if(preset.ModeTitle == "survivalplus-title" && _playerManager.PlayerCount<10)
                     continue;
-                if(preset.ModeTitle == "secretplus-mid-title" && _playerManager.PlayerCount<15)
+                if(preset.ModeTitle == "secretplus-mid-title" && _playerManager.PlayerCount<10)
                     continue;
                 if(preset.ModeTitle == "rev-title" && _playerManager.PlayerCount<25)
                     continue;
@@ -658,9 +658,9 @@ namespace Content.Server.Voting.Managers
                     continue;
                 if(preset.ModeTitle == "xenomorph-title" && _playerManager.PlayerCount<35)
                     continue;
-                if(preset.ModeTitle == "guide-title" && _playerManager.PlayerCount<25)
+                if(preset.ModeTitle == "guide-title" && _playerManager.PlayerCount<10)
                     continue;
-                if(preset.ModeTitle == "sleeper-title" && _playerManager.PlayerCount<25)
+                if(preset.ModeTitle == "sleeper-title" && _playerManager.PlayerCount<5)
                     continue;
                 if(preset.ModeTitle == "changeling-gamemode-title" && _playerManager.PlayerCount<30)
                     continue;

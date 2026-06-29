@@ -129,7 +129,7 @@
   - blab
   name: blob-title
   description: blob-description
-  showInVote: true
+  showInVote: false
   rules:
   - BlobGameMode
   - BasicStationEventScheduler
@@ -175,7 +175,7 @@
   name: guide-title
   description: guide-description
   showInVote: true
-  minPlayers: 15
+  minPlayers: 1
   rules:
     - CombatDynamic
     - SubGamemodesRule
@@ -237,7 +237,7 @@
   - ayyliens
   name: xenomorph-title
   description: xenomorph-description
-  showInVote: true
+  showInVote: false
   minPlayers: 1
   rules:
   - XenomorphsInfestationRoundstart
@@ -270,6 +270,6 @@
   name: secretplus-lowpop-title
   description: secretplus-lowpop-description
   showInVote: true
-  maxPlayers: 40
+  maxPlayers: 30
   rules:
     - SecretPlusLowpop

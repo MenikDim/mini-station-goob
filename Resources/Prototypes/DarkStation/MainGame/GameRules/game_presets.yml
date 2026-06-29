@@ -6,7 +6,7 @@
   - ratvarrighteous
   name: ratvar-righteous-title
   description: ratvar-righteous-description
-  showInVote: true
+  showInVote: false
   rules:
   - Ratvar
   - BasicStationEventScheduler
