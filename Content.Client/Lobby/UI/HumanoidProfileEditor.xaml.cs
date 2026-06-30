@@ -1185,6 +1185,11 @@ namespace Content.Client.Lobby.UI
         /// </summary>
         public void RefreshJobs()
         {
+            var expandedDepartments = _jobCategories
+                .Where(kv => kv.Value.BodyVisible)
+                .Select(kv => kv.Key)
+                .ToHashSet();
+
             JobList.DisposeAllChildren();
             _jobCategories.Clear();
             _jobPriorities.Clear();
@@ -1208,6 +1213,9 @@ namespace Content.Client.Lobby.UI
                     category = new DepartmentJobsSection(department, _prototypeManager, GetDepartmentIcon(department));
                     _jobCategories[department.ID] = category;
                     JobList.AddChild(category);
+
+                    if (expandedDepartments.Contains(department.ID))
+                        category.BodyVisible = true;
                 }
 
                 var jobs = department.Roles.Select(jobId => _prototypeManager.Index(jobId))
