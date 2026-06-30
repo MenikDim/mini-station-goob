@@ -864,23 +864,19 @@ namespace Content.Server.Administration.Systems
             string? iconPath = null;
             if (!bwoinkParams.FromWebhook)
             {
-                if (bwoinkParams.SenderName.StartsWith("localhost"))
-                {
-                    iconPath = "/Textures/_Mini/Interface/AdminIcons/host.png";
-                }
+                string? adminTitle = null;
+                if (_config.GetCVar(GoobCVars.UseDiscordRoleName) && bwoinkParams.RoleName is not null)
+                    adminTitle = bwoinkParams.RoleName;
                 else
-                {
-                    var adminTitle = bwoinkParams.SenderAdmin?.Title ?? bwoinkParams.RoleName;
-                    if (adminTitle != null && _rankIcons.TryGetValue(adminTitle, out var path))
-                    {
-                        iconPath = path;
-                    }
-                }
+                    adminTitle = bwoinkParams.SenderAdmin?.Title;
+
+                if (adminTitle != null && _rankIcons.TryGetValue(adminTitle, out var path))
+                    iconPath = path;
 
                 if (iconPath != null && adminPrefix.Length > 0)
-                {
                     adminPrefix = adminPrefix.Replace("[/bold] ", $"[/bold] [icon=\"{iconPath}\"] ");
-                }
+
+                _sawmill.Info($"adminPrefix={adminPrefix}, iconPath={iconPath}");
             }
 
             // If role color is enabled and exists, use it, otherwise use the discord reply color
