@@ -93,22 +93,32 @@ public sealed class TextureTag : BaseTextureTag, IMarkupTagHandler
     // Amour edit start
     /// <summary>
     ///     Проверяет, разрешён ли путь к текстуре.
-    ///     Сначала проверяет whitelist системных путей, затем прототипы стикеров.
+    ///     Стикеры в чате дополнительно фильтруются на сервере в StickerSanitizerSystem.
     /// </summary>
     private bool IsValidTexturePath(string path)
     {
-        // Проверяем whitelist системных путей
         if (AllowedTexturePaths.Contains(path))
             return true;
 
-        // Проверяем пути из прототипов стикеров
+        if (_prototypeManager.HasIndex<EntityPrototype>(path))
+            return true;
+
         foreach (var sticker in _prototypeManager.EnumeratePrototypes<StickerPrototype>())
         {
             if (sticker.TexturePath.ToString() == path)
                 return true;
         }
 
-        return false;
+        return IsGameTexturePath(path);
+    }
+
+    private static bool IsGameTexturePath(string path)
+    {
+        var normalized = path.StartsWith("/Textures/")
+            ? path
+            : $"/Textures/{path.TrimStart('/')}";
+
+        return normalized.StartsWith("/Textures/");
     }
     // Amour edit end
 }
