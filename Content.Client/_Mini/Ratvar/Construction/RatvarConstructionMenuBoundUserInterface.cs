@@ -1,0 +1,117 @@
+using Content.Client.Construction;
+using Content.Client.UserInterface.Controls;
+using Content.Shared._White.RadialSelector;
+using Content.Shared.Construction.Prototypes;
+using Content.Shared.RPSX.DarkForces.Ratvar.Construction;
+using JetBrains.Annotations;
+using Robust.Client.GameObjects;
+using Robust.Client.UserInterface;
+using Robust.Shared.GameObjects;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
+using System.Linq;
+using Content.Client.Construction;
+
+namespace Content.Client.RPSX.DarkForces.Ratvar.Construction;
+
+[UsedImplicitly]
+public sealed class RatvarConstructionMenuBoundUserInterface : BoundUserInterface
+{
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IComponentFactory _componentFactory = default!;
+
+    private readonly ConstructionSystem _constructionSystem;
+    private SimpleRadialMenu? _menu;
+
+    public RatvarConstructionMenuBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
+    {
+        IoCManager.InjectDependencies(this);
+        _constructionSystem = EntMan.System<ConstructionSystem>();
+    }
+
+    protected override void Open()
+    {
+        base.Open();
+
+        if (!EntMan.TryGetComponent<RatvarConstructionComponent>(Owner, out var construction))
+            return;
+
+        _menu = this.CreateWindow<SimpleRadialMenu>();
+        _menu.Track(Owner);
+        _menu.SetButtons(ConvertToButtons(construction.Entries));
+        _menu.OpenOverMouseScreenPosition();
+    }
+
+    private IEnumerable<RadialMenuOption> ConvertToButtons(IReadOnlyList<RadialSelectorEntry> entries)
+    {
+        foreach (var entry in entries)
+        {
+            if (entry.Category != null)
+            {
+                yield return new RadialMenuNestedLayerOption(ConvertToButtons(entry.Category.Entries).ToList())
+                {
+                    Sprite = entry.Category.Icon,
+                    ToolTip = entry.Category.Name,
+                };
+                continue;
+            }
+
+            if (entry.Prototype == null)
+                continue;
+
+            yield return new RadialMenuActionOption<string>(HandleMenuOptionClick, entry.Prototype)
+            {
+                Sprite = GetSprite(entry),
+                ToolTip = GetTooltip(entry),
+            };
+        }
+    }
+
+    private void HandleMenuOptionClick(string prototypeId)
+    {
+        SendPredictedMessage(new RatvarConstructionSelectedMessage(prototypeId));
+    }
+
+    private string GetTooltip(RadialSelectorEntry entry)
+    {
+        if (!string.IsNullOrEmpty(entry.Name))
+            return entry.Name;
+
+        if (entry.Prototype != null && _prototypeManager.TryIndex(entry.Prototype, out ConstructionPrototype? constructionPrototype))
+            return constructionPrototype.Name ?? entry.Prototype;
+
+        return entry.Prototype ?? string.Empty;
+    }
+
+    private SpriteSpecifier? GetSprite(RadialSelectorEntry entry)
+    {
+        if (entry.Icon != null)
+            return entry.Icon;
+
+        if (entry.Prototype == null)
+            return null;
+
+        if (_prototypeManager.TryIndex(entry.Prototype, out EntityPrototype? entityPrototype))
+            return GetEntityPrototypeIcon(entityPrototype);
+
+        if (!_prototypeManager.TryIndex(entry.Prototype, out ConstructionPrototype? constructionPrototype))
+            return null;
+
+        if (!_constructionSystem.TryGetRecipePrototype(constructionPrototype.ID, out var targetProtoId)
+            || !_prototypeManager.TryIndex(targetProtoId, out EntityPrototype? targetPrototype))
+            return null;
+
+        return GetEntityPrototypeIcon(targetPrototype);
+    }
+
+    private SpriteSpecifier? GetEntityPrototypeIcon(EntityPrototype prototype)
+    {
+        if (prototype.TryGetComponent(out IconComponent? icon, _componentFactory))
+            return icon.Icon;
+
+        if (prototype.Components.ContainsKey("Sprite"))
+            return new SpriteSpecifier.EntityPrototype(prototype.ID);
+
+        return null;
+    }
+}

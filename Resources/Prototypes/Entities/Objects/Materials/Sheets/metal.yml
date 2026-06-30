@@ -200,11 +200,11 @@
           Quantity: 6.7
   - type: UserInterface
     interfaces:
-      enum.RadialSelectorUiKey.Key:
-        type: RadialSelectorMenuBUI
+      enum.RatvarConstructionUiKey.Key:
+        type: RatvarConstructionMenuBoundUserInterface
   - type: ActivatableUI
     inHandsOnly: true
-    key: enum.RadialSelectorUiKey.Key
+    key: enum.RatvarConstructionUiKey.Key
   - type: RatvarConstruction
     entries:
     - prototype: RatvarBeaconConstruction

@@ -1,5 +1,4 @@
 using Content.Client.Construction;
-using Content.Shared._White.RadialSelector;
 using Content.Shared.Construction.Prototypes;
 using Content.Shared.RPSX.DarkForces.Ratvar.Construction;
 using Robust.Client.Placement;
@@ -20,10 +19,10 @@ public sealed class RatvarConstructionSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<RatvarConstructionComponent, RadialSelectorSelectedMessage>(OnItemReceived);
+        SubscribeLocalEvent<RatvarConstructionComponent, RatvarConstructionSelectedMessage>(OnItemReceived);
     }
 
-    private void OnItemReceived(Entity<RatvarConstructionComponent> ent, ref RadialSelectorSelectedMessage args)
+    private void OnItemReceived(Entity<RatvarConstructionComponent> ent, ref RatvarConstructionSelectedMessage args)
     {
         if (!_proto.TryIndex(args.SelectedItem, out ConstructionPrototype? prototype) ||
             !_gameTiming.IsFirstTimePredicted)
