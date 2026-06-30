@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using Content.Client.Resources;
 using System.Numerics;
 using Content.Client.Gameplay;
 using Content.Shared.Popups;
@@ -31,9 +32,9 @@ public sealed class PopupUIController : UIController, IOnStateEntered<GameplaySt
         base.Initialize();
         var cache = IoCManager.Resolve<IResourceCache>();
 
-        _smallFont = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Italic.ttf"), 10);
-        _mediumFont = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Italic.ttf"), 12);
-        _largeFont = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-BoldItalic.ttf"), 14);
+        _smallFont = cache.GetStack("Regular", 10);
+        _mediumFont = cache.GetStack("Regular", 12);
+        _largeFont = cache.GetStack("Bold", 14);
     }
 
     public void OnStateEntered(GameplayState state)

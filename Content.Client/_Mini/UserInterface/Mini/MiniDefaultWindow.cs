@@ -1,4 +1,5 @@
 using System.Numerics;
+using Content.Client.Resources;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
@@ -72,7 +73,7 @@ public class MiniDefaultWindow : MiniBaseWindow
     {
         var fontSize = 20;
         _titleFont = new VectorFont(
-            _resourceCache.GetResource<FontResource>("/Fonts/Bedstead/Bedstead.otf"),
+            _resourceCache.GetResource<FontResource>(MiniFonts.Regular),
             (int)(fontSize * UIScale));
     }
 

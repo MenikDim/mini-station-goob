@@ -167,8 +167,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 </BoxContainer>
                 <BoxContainer Orientation="Vertical" Margin="8">
                     <!-- Antags -->
-                    <ScrollContainer VerticalExpand="True">
-                        <BoxContainer Name="AntagList" Orientation="Vertical" />
+                    <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+                        <BoxContainer Name="AntagList" Orientation="Vertical" HorizontalExpand="True" />
                     </ScrollContainer>
                 </BoxContainer>
                 <BoxContainer Orientation="Vertical" Margin="8">

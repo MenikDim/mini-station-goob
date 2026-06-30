@@ -1,6 +1,7 @@
 
 
 using System.Numerics;
+using Content.Client.Resources;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
@@ -58,7 +59,7 @@ public sealed class MiniCategoryTab : Control
     private void UpdateFont()
     {
         _font = new VectorFont(
-            _resourceCache.GetResource<FontResource>("/Fonts/Bedstead/Bedstead.otf"),
+            _resourceCache.GetResource<FontResource>(MiniFonts.Regular),
             (int)(9 * UIScale));
     }
 

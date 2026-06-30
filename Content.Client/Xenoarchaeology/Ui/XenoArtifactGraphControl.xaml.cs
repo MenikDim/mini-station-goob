@@ -1,4 +1,5 @@
 using System.Linq;
+using Content.Client.Resources;
 using System.Numerics;
 using Content.Client.Xenoarchaeology.Artifact;
 using Content.Shared.Xenoarchaeology.Artifact.Components;
@@ -44,7 +45,7 @@ public sealed partial class XenoArtifactGraphControl : BoxContainer
         _artifactSystem = _entityManager.System<XenoArtifactSystem>();
 
         var fontResource = IoCManager.Resolve<IResourceCache>()
-                                     .GetResource<FontResource>("/EngineFonts/NotoSans/NotoSansMono-Regular.ttf");
+                                     .GetResource<FontResource>(MiniFonts.Mono);
         _font = new VectorFont(fontResource, 16);
     }
 

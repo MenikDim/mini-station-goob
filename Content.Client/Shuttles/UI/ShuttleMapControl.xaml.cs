@@ -12,6 +12,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
+using Content.Client.Resources;
 using Content.Client.Shuttles.Systems;
 using Content.Shared.Shuttles.Components;
 using Content.Shared.Shuttles.UI.MapObjects;
@@ -94,7 +95,7 @@ public sealed partial class ShuttleMapControl : BaseShuttleControl
 
         _physicsQuery = EntManager.GetEntityQuery<PhysicsComponent>();
 
-        _font = new VectorFont(cache.GetResource<FontResource>("/EngineFonts/NotoSans/NotoSans-Regular.ttf"), 10);
+        _font = new VectorFont(cache.GetResource<FontResource>(MiniFonts.Regular), 10);
     }
 
     public void SetMap(MapId mapId, Vector2 offset, bool recentering = false)

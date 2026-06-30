@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using Content.Client.Resources;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Shared.Enums;
@@ -25,7 +26,7 @@ public sealed class DrawLineOverlay : Overlay
         _ent = IoCManager.Resolve<IEntityManager>();
         _eye = IoCManager.Resolve<IEyeManager>();
         var cache = IoCManager.Resolve<IResourceCache>();
-        _font = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Regular.ttf"), 10);
+        _font = new VectorFont(cache.GetResource<FontResource>(MiniFonts.Regular), 10);
     }
 
     public void SetState(EntityUid grid, Vector2i origin, ushort tileSize)

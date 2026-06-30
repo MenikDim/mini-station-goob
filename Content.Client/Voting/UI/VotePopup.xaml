@@ -9,7 +9,9 @@ SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-<Control xmlns="https://spacestation14.io" MinWidth="300" MaxWidth="500">
+<Control xmlns="https://spacestation14.io"
+         xmlns:mini="clr-namespace:Content.Client.UserInterface"
+         MinWidth="300" MaxWidth="500">
     <PanelContainer StyleClasses="AngleRect" />
     <BoxContainer Margin="4" Orientation="Vertical">
         <Label Name="VoteCaller" />
@@ -17,9 +19,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
         <Button Margin="4 4" Name="FollowVoteTarget" Text="{Loc 'ui-vote-follow-button-popup'}" Visible="False"></Button>
 
         <GridContainer Columns="2" Name="VoteOptionsContainer"/>
-        <BoxContainer Orientation="Horizontal">
-            <ProgressBar Margin="4" HorizontalExpand="True" Name="TimeLeftBar" MinValue="0" MaxValue="1" />
-            <Label Name="TimeLeftText" />
+        <BoxContainer Orientation="Horizontal" VerticalAlignment="Center" Margin="4 6 4 2" HorizontalAlignment="Left">
+            <mini:PixelScrollProgressBar Name="TimeLeftBar" Access="Public" />
+            <Label Name="TimeLeftText" Margin="8 0 0 0" VerticalAlignment="Center" />
         </BoxContainer>
     </BoxContainer>
 </Control>

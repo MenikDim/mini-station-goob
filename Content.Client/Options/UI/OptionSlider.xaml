@@ -6,10 +6,20 @@ SPDX-FileCopyrightText: 2025 Aiden <28298836+Aidenkrz@users.noreply.github.com>
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-<Control xmlns="https://spacestation14.io">
-    <BoxContainer Orientation="Horizontal">
-        <Label Name="NameLabel" MinWidth="400" />
-        <Slider Name="Slider" Access="Public" HorizontalExpand="True" />
-        <Label Name="ValueLabel" Access="Public" Margin="8 0 4 0" MinWidth="48" Align="Right" />
-    </BoxContainer>
+<Control xmlns="https://spacestation14.io"
+         MinHeight="28">
+    <GridContainer Columns="3" HorizontalExpand="True">
+        <Label Name="NameLabel"
+               MinWidth="280" MaxWidth="280"
+               ClipText="True"
+               VerticalAlignment="Center" />
+        <Slider Name="Slider" Access="Public"
+                MinWidth="160" MaxWidth="160"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center" />
+        <Label Name="ValueLabel" Access="Public"
+               MinWidth="52" MaxWidth="52"
+               Align="Right"
+               VerticalAlignment="Center" />
+    </GridContainer>
 </Control>

@@ -84,19 +84,9 @@ public sealed class SecApartmentStyles
         new Thickness(4, 2, 4, 2)
     );
 
-    public Font GetBoldFont(int size = 12) => _resCache.GetFont(new[]
-    {
-        "/Fonts/NotoSans/NotoSans-Bold.ttf",
-        "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
-        "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf"
-    }, size);
+    public Font GetBoldFont(int size = 12) => _resCache.GetStack("Bold", size);
 
-    public Font GetRegularFont(int size = 12) => _resCache.GetFont(new[]
-    {
-        "/Fonts/NotoSans/NotoSans-Regular.ttf",
-        "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
-        "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf"
-    }, size);
+    public Font GetRegularFont(int size = 12) => _resCache.GetStack("Regular", size);
 
     public static StyleRule CreateButtonRedRule(StyleBox buttonRedStyle, Font font, Color fontColor, Color disabledColor)
     {

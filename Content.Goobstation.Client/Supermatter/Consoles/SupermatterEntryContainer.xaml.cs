@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Client.Resources;
 using System.Numerics;
 using Content.Client.Atmos.EntitySystems;
 using Content.Client.Stylesheets;
@@ -37,8 +38,8 @@ public sealed partial class SupermatterEntryContainer : BoxContainer
         NetEntity = uid;
 
         // Load fonts
-        var normalFont = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSansDisplay/NotoSansDisplay-Regular.ttf"), 11);
-        var monoFont = new VectorFont(cache.GetResource<FontResource>("/EngineFonts/NotoSans/NotoSansMono-Regular.ttf"), 10);
+        var normalFont = new VectorFont(cache.GetResource<FontResource>(MiniFonts.Regular), 11);
+        var monoFont = new VectorFont(cache.GetResource<FontResource>(MiniFonts.Mono), 10);
 
         // Set fonts
         //SupermatterNameLabel.FontOverride = headerFont;

@@ -20,7 +20,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
          xmlns:ui="clr-namespace:Content.Client.Options.UI">
     <BoxContainer Orientation="Vertical">
-        <BoxContainer Orientation="Vertical" Margin="8 8 8 8" VerticalExpand="True">
+        <ScrollContainer VerticalExpand="True" HScrollEnabled="False">
+        <BoxContainer Orientation="Vertical" Margin="8 8 8 8">
             <Label Text="{Loc 'ui-options-volume-label'}"
                    StyleClasses="LabelKeyText"/>
             <BoxContainer Orientation="Vertical" Margin="0 3 0 0">
@@ -56,6 +57,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 <CheckBox Name="BwoinkSoundCheckBox" Text="{Loc 'ui-options-bwoink-sound'}" />
             </BoxContainer>
         </BoxContainer>
+        </ScrollContainer>
         <ui:OptionsTabControlRow Name="Control" Access="Public" />
     </BoxContainer>
 </Control>
