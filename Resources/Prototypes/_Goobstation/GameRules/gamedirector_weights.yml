@@ -26,7 +26,7 @@
     Wizard: 0.001
     CosmicCult: 0.05
     Shadowling: 0.01
-    RatvarRighteous: 0.05
+    Ratvar: 0.05
     BloodCult: 0.02
 
 
@@ -42,7 +42,7 @@
   - Heretic
   - Changeling
   - Wizard
-  - RatvarRighteous
+  - Ratvar
   - BloodCult
 
 - type: incompatibleModes
@@ -133,7 +133,7 @@
   - Shadowling
 
 - type: incompatibleModes
-  id: RatvarRighteous
+  id: Ratvar
   modes:
   - Nukeops
   - Honkops
@@ -158,4 +158,4 @@
   - Heretic
   - Changeling
   - Wizard
-  - RatvarRighteous
+  - Ratvar

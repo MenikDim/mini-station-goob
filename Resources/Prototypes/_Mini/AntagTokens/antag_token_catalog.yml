@@ -226,8 +226,8 @@
       iconPath: /Textures/_Mini/Interface/Antags/ratvar_cult.png
       mode: LobbyDeposit
       antagId: RatvarRighteous
-      gameRuleId: RatvarRighteous
-      requiresPresetGameRuleId: RatvarRighteous
+      gameRuleId: Ratvar
+      requiresPresetGameRuleId: Ratvar
       tagLocKey: antag-token-window-tag-queue
       minimumPlayers: 20
       requiresPreRoundLobby: true

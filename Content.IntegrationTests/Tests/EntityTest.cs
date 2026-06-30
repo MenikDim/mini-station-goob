@@ -281,11 +281,13 @@ namespace Content.IntegrationTests.Tests
                 .Where(p => !p.Components.ContainsKey("MapGrid")) // This will smash stuff otherwise.
                 .Where(p => !p.Components.ContainsKey("MobReplacementRule")) // goob edit - fuck them mimics
                 .Where(p => !p.Components.ContainsKey("Supermatter")) // Goobstation - Supermatter eats everything, oh no!
+                .Where(p => !p.Components.ContainsKey("RoomFill")) // This comp can delete all entities, and spawn others
                 .Select(p => p.ID)
                 .ToList();
 
             // Goob start run this test in batches of 10k because fuck you. we got too much shit.
             const int batchSize = 10000;
+            const int spawnChunkSize = 100;
 
             for (var batchStart = 0; batchStart < protoIds.Count; batchStart += batchSize)
             {
@@ -294,19 +296,30 @@ namespace Content.IntegrationTests.Tests
                     .Take(batchSize)
                     .ToList();
 
-                await server.WaitPost(() =>
+                // Spawn in chunks so the server game loop can tick and keep the client connected.
+                for (var chunkStart = 0; chunkStart < batchProtoIds.Count; chunkStart += spawnChunkSize)
                 {
-                    foreach (var protoId in batchProtoIds) // goob Batchprotoids
+                    var chunk = batchProtoIds
+                        .Skip(chunkStart)
+                        .Take(spawnChunkSize)
+                        .ToList();
+
+                    await server.WaitPost(() =>
                     {
-                        mapSys.CreateMap(out var mapId);
-                        var grid = mapManager.CreateGridEntity(mapId);
-                        var ent = sEntMan.SpawnEntity(protoId, new EntityCoordinates(grid.Owner, 0.5f, 0.5f));
-                        foreach (var (_, component) in sEntMan.GetNetComponents(ent))
+                        foreach (var protoId in chunk)
                         {
-                            sEntMan.Dirty(ent, component);
+                            mapSys.CreateMap(out var mapId);
+                            var grid = mapManager.CreateGridEntity(mapId);
+                            var ent = sEntMan.SpawnEntity(protoId, new EntityCoordinates(grid.Owner, 0.5f, 0.5f));
+                            foreach (var (_, component) in sEntMan.GetNetComponents(ent))
+                            {
+                                sEntMan.Dirty(ent, component);
+                            }
                         }
-                    }
-                });
+                    });
+
+                    await pair.RunTicksSync(1);
+                }
 
                 // Goobstation Edit Start  (this test isn't even worth the effort tbh)
                 // Run up to 15 ticks, but stop early if memory usage exceeds 13 GB
@@ -317,13 +330,16 @@ namespace Content.IntegrationTests.Tests
                 // i mean yeah you could run the test in batches of entities but its not really a stress test then is it.
 
                 const int maxTicks = 15; // (default wizden)
+                const int minSyncTicks = 5;
                 const long memoryLimitBytes = 13L * 1024 * 1024 * 1024; // 13 GB
 
                 var warninglog = true; // if we stop caring about this test turn this off.
+                var syncTicks = 0;
 
                 for (var tick = 0; tick < maxTicks; tick++)
                 {
                     await pair.RunTicksSync(1);
+                    syncTicks++;
 
                     var memoryUsed = GC.GetTotalMemory(forceFullCollection: false);
 
@@ -342,11 +358,17 @@ namespace Content.IntegrationTests.Tests
 
                     break; // stop ticking early
                 }
+
+                if (syncTicks < minSyncTicks)
+                    await pair.RunTicksSync(minSyncTicks - syncTicks);
                 // Goobstation Edit End
 
                 // Make sure the client actually received the entities
                 // 500 is completely arbitrary. Note that the client & sever entity counts aren't expected to match.
-                Assert.That(client.ResolveDependency<IEntityManager>().EntityCount, Is.GreaterThan(500));
+                await client.WaitAssertion(() =>
+                {
+                    Assert.That(client.EntMan.EntityCount, Is.GreaterThan(500));
+                });
 
                 await server.WaitPost(() =>
                 {
@@ -371,6 +393,8 @@ namespace Content.IntegrationTests.Tests
                     // i can't believe you've done this.
                     Assert.That(sEntMan.EntityCount, Is.AtMost(1));
                 });
+
+                await pair.RunTicksSync(3);
             } // Goob end, yeah im putting the whole test in a for loop.
 
             await pair.CleanReturnAsync();
