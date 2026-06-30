@@ -109,6 +109,9 @@ public sealed class RatvarConstructionMenuBoundUserInterface : BoundUserInterfac
         if (prototype.TryGetComponent(out IconComponent? icon, _componentFactory))
             return icon.Icon;
 
+        if (prototype.Components.ContainsKey("Sprite"))
+            return new SpriteSpecifier.EntityPrototype(prototype.ID);
+
         return null;
     }
 }
