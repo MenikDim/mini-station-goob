@@ -4,6 +4,7 @@
 //
 // SPDX-License-Identifier: MIT
 
+using System;
 using Robust.Client.UserInterface;
 
 namespace Content.Client.Stylesheets
@@ -12,6 +13,8 @@ namespace Content.Client.Stylesheets
     {
         Stylesheet SheetNano { get; }
         Stylesheet SheetSpace { get; }
+
+        event Action? StylesheetsUpdated;
 
         void Initialize();
     }

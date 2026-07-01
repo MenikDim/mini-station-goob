@@ -8,39 +8,39 @@
 
 - type: font
   id: Default
-  path: /Fonts/_Mini/Pixeloid/PixeloidSans.ttf
+  path: /Fonts/_Mini/Cozette/CozetteVector.ttf
 
 - type: font
   id: DefaultItalic
-  path: /Fonts/_Mini/Pixeloid/PixeloidSans.ttf
+  path: /Fonts/_Mini/Cozette/CozetteVector.ttf
 
 - type: font
   id: DefaultBold
-  path: /Fonts/_Mini/Pixeloid/PixeloidSans-Bold.ttf
+  path: /Fonts/_Mini/Cozette/CozetteVectorBold.ttf
 
 - type: font
   id: DefaultBoldItalic
-  path: /Fonts/_Mini/Pixeloid/PixeloidSans-Bold.ttf
+  path: /Fonts/_Mini/Cozette/CozetteVectorBold.ttf
 
 - type: font
   id: NotoSansDisplay
-  path: /Fonts/_Mini/Pixeloid/PixeloidSans.ttf
+  path: /Fonts/_Mini/Cozette/CozetteVector.ttf
 
 - type: font
   id: NotoSansDisplayItalic
-  path: /Fonts/_Mini/Pixeloid/PixeloidSans.ttf
+  path: /Fonts/_Mini/Cozette/CozetteVector.ttf
 
 - type: font
   id: NotoSansDisplayBold
-  path: /Fonts/_Mini/Pixeloid/PixeloidSans-Bold.ttf
+  path: /Fonts/_Mini/Cozette/CozetteVectorBold.ttf
 
 - type: font
   id: NotoSansDisplayBoldItalic
-  path: /Fonts/_Mini/Pixeloid/PixeloidSans-Bold.ttf
+  path: /Fonts/_Mini/Cozette/CozetteVectorBold.ttf
 
 - type: font
   id: BoxRound
-  path: /Fonts/_Mini/Pixeloid/PixeloidSans.ttf
+  path: /Fonts/_Mini/Cozette/CozetteVector.ttf
 
 - type: font
   id: AnimalSilence
@@ -48,7 +48,7 @@
 
 - type: font
   id: Monospace
-  path: /Fonts/_Mini/Pixeloid/PixeloidMono.ttf
+  path: /Fonts/_Mini/Cozette/CozetteVector.ttf
 
 - type: font
   id: Emoji

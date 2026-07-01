@@ -17,6 +17,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Client.Stylesheets;
 using Content.Shared.Voting;
 using Robust.Client;
 using Robust.Client.Audio;
@@ -51,6 +52,7 @@ namespace Content.Client.Voting
         [Dependency] private readonly IClientNetManager _netManager = default!;
         [Dependency] private readonly IGameTiming _gameTiming = default!;
         [Dependency] private readonly IResourceCache _res = default!;
+        [Dependency] private readonly IStylesheetManager _stylesheetManager = default!;
 
         private readonly Dictionary<StandardVoteType, TimeSpan> _standardVoteTimeouts = new();
         private readonly Dictionary<int, ActiveVote> _votes = new();
@@ -77,6 +79,7 @@ namespace Content.Client.Voting
 
             _netManager.RegisterNetMessage<MsgVoteData>(ReceiveVoteData);
             _netManager.RegisterNetMessage<MsgVoteCanCall>(ReceiveVoteCanCall);
+            _stylesheetManager.StylesheetsUpdated += RefreshVotePopups;
 
             _client.RunLevelChanged += ClientOnRunLevelChanged;
         }
@@ -236,6 +239,14 @@ namespace Content.Client.Voting
             }
 
             CanCallStandardVotesChanged?.Invoke();
+        }
+
+        private void RefreshVotePopups()
+        {
+            foreach (var popup in _votePopups.Values)
+            {
+                popup.RefreshStylesheet();
+            }
         }
 
         public void SendCastVote(int voteId, int option)

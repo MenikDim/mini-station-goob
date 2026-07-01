@@ -44,6 +44,12 @@ public sealed partial class UiFontStylePrototype : IPrototype, IComparable<UiFon
     [DataField]
     public int Order;
 
+    /// <summary>
+    /// Extra pixels added to requested font sizes for this style (pixel fonts often need this).
+    /// </summary>
+    [DataField]
+    public int SizeOffset;
+
     public string ResolveItalic() => Italic ?? Regular;
 
     public string ResolveBold() => Bold ?? Regular;

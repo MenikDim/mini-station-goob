@@ -14,18 +14,30 @@
   order: 0
 
 - type: uiFontStyle
-  id: BoxRound
-  name: ui-options-font-style-boxround
-  regular: /Fonts/Boxfont-round/Boxfont Round.ttf
-  mono: /Fonts/Boxfont-round/Boxfont Round.ttf
+  id: EpilepsySans
+  name: ui-options-font-style-epilepsy-sans
+  regular: /Fonts/_Mini/Epilepsy Sans/EpilepsySans.ttf
+  bold: /Fonts/_Mini/Epilepsy Sans/EpilepsySansBold.ttf
+  mono: /Fonts/_Mini/Epilepsy Sans/EpilepsySans.ttf
+  sizeOffset: 3
   order: 1
+
+- type: uiFontStyle
+  id: Cozette
+  name: ui-options-font-style-cozette
+  regular: /Fonts/_Mini/Cozette/CozetteVector.ttf
+  bold: /Fonts/_Mini/Cozette/CozetteVectorBold.ttf
+  mono: /Fonts/_Mini/Cozette/CozetteVector.ttf
+  sizeOffset: 3
+  order: 2
 
 - type: uiFontStyle
   id: Bedstead
   name: ui-options-font-style-bedstead
   regular: /Fonts/Bedstead/Bedstead.otf
   mono: /Fonts/Bedstead/Bedstead.otf
-  order: 2
+  sizeOffset: 2
+  order: 3
 
 - type: uiFontStyle
   id: Pixeloid
@@ -33,4 +45,5 @@
   regular: /Fonts/_Mini/Pixeloid/PixeloidSans.ttf
   bold: /Fonts/_Mini/Pixeloid/PixeloidSans-Bold.ttf
   mono: /Fonts/_Mini/Pixeloid/PixeloidMono.ttf
-  order: 3
+  sizeOffset: 1
+  order: 4

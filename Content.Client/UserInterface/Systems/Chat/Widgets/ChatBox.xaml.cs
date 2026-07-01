@@ -177,6 +177,11 @@ public partial class ChatBox : UIWidget
         _controller.UpdateHighlights(highlighs);
     }
 
+    public void InvalidateFontLayout()
+    {
+        Contents.InvalidateLayout();
+    }
+
     public void AddLine(string message, Color color, int repeat = 0)
     {
         var formatted = new FormattedMessage(4); // WD EDIT // specifying size beforehand smells like a useless microoptimisation, but i'll give them the benefit of doubt

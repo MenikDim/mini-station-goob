@@ -145,6 +145,7 @@ using Content.Client.Replay;
 using Content.Client.Screenshot;
 using Content.Client.Stylesheets;
 using Content.Client.UserInterface;
+using Robust.Client.UserInterface.RichText;
 using Content.Client.Viewport;
 using Content.Client.Voting;
 using Content.Shared.Administration.Logs;
@@ -172,6 +173,7 @@ namespace Content.Client.IoC
             collection.Register<IClientPreferencesManager, ClientPreferencesManager>();
             collection.Register<IStylesheetManager, StylesheetManager>();
             collection.Register<IUiFontStackManager, UiFontStackManager>();
+            collection.Register<IMarkupFontResolver, UiMarkupFontResolver>();
             collection.Register<IScreenshotHook, ScreenshotHook>();
             collection.Register<FullscreenHook, FullscreenHook>();
             collection.Register<IClickMapManager, ClickMapManager>();

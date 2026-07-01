@@ -88,6 +88,7 @@ public sealed class UiFontStackManager : IUiFontStackManager
     public Font GetStack(IResourceCache cache, string variation = "Regular", int size = 10, bool display = false)
     {
         EnsureInitialized();
+        size = ApplySizeOffset(size);
 
         var primary = ResolvePrimaryPath(variation, display);
 
@@ -103,6 +104,7 @@ public sealed class UiFontStackManager : IUiFontStackManager
     public Font GetStackWithPrimary(IResourceCache cache, string path, int size = 10)
     {
         EnsureInitialized();
+        size = ApplySizeOffset(size);
 
         if (ActiveStyle.ID == DefaultStyleId && !ActiveStyle.NotoFallback)
             return cache.GetFont(NotoStackWithPrimary(path), size);
@@ -163,6 +165,12 @@ public sealed class UiFontStackManager : IUiFontStackManager
             "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf",
             "/Fonts/NotoSans/NotoSansSC-Regular.ttf",
         ], size);
+    }
+
+    private int ApplySizeOffset(int size)
+    {
+        var offset = ActiveStyle?.SizeOffset ?? 0;
+        return offset == 0 ? size : size + offset;
     }
 
     private static string[] NotoStackWithPrimary(string path)

@@ -29,6 +29,8 @@ namespace Content.Client.Stylesheets
         public Stylesheet SheetNano { get; private set; } = default!;
         public Stylesheet SheetSpace { get; private set; } = default!;
 
+        public event Action? StylesheetsUpdated;
+
         public void Initialize()
         {
             _uiFontStackManager.Initialize();
@@ -49,6 +51,7 @@ namespace Content.Client.Stylesheets
             SheetSpace = new StyleSpace(_resourceCache, accent).Stylesheet;
             _fontManager.ClearFontCache();
             _userInterfaceManager.Stylesheet = SheetNano;
+            StylesheetsUpdated?.Invoke();
         }
     }
 }
