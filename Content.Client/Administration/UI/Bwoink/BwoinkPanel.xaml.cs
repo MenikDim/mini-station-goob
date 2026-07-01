@@ -48,6 +48,12 @@ namespace Content.Client.Administration.UI.Bwoink
             UpdateTypingIndicator();
         }
 
+        public void AttachRatingPanel(AHelpRatingPanel panel)
+        {
+            RatingHost.DisposeAllChildren();
+            RatingHost.AddChild(panel);
+        }
+
         private void Input_OnTextEntered(LineEdit.LineEditEventArgs args)
         {
             if (string.IsNullOrWhiteSpace(args.Text))

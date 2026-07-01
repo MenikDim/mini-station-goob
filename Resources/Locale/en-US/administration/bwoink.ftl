@@ -49,3 +49,15 @@ bwoink-system-player-banned = has been banned for: {$banReason}
 
 bwoink-message-admin-only = (Admin Only)
 bwoink-message-silent = (S)
+
+admin-help-rating-prompt = Rate the administrator
+admin-help-rating-prompt-remaining = Rate the administrator ({$remaining} of {$max} left today)
+admin-help-rating-submit = Submit rating
+admin-help-rating-limit-reached = Daily rating limit reached
+admin-help-rating-cooldown = Next rating available in {$hours} h {$minutes} min
+admin-help-rating-thanks = Thank you for your feedback!
+admin-help-rating-already-rated = You have already submitted a rating today.
+admin-help-rating-chat = {$player} rated {$admin} {$stars} { $stars ->
+    [1] star
+   *[other] stars
+}
