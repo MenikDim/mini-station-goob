@@ -8,6 +8,11 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client.UserInterface;
 
+public interface IMarkupFontResolver
+{
+    Font ResolveFont(string fontId, int size);
+}
+
 public interface IUiFontStackManager
 {
     UiFontStylePrototype ActiveStyle { get; }
