@@ -30,6 +30,12 @@ public sealed partial class CCVars
         CVarDef.Create("ui.layout", "Default", CVar.CLIENTONLY | CVar.ARCHIVE);
 
     /// <summary>
+    /// The font style used for interface text.
+    /// </summary>
+    public static readonly CVarDef<string> UiFontStyle =
+        CVarDef.Create("ui.font_style", "Bedstead", CVar.CLIENTONLY | CVar.ARCHIVE);
+
+    /// <summary>
     /// Interface accent red channel (0-255) for glass styling.
     /// </summary>
     public static readonly CVarDef<int> InterfaceAccentRed =

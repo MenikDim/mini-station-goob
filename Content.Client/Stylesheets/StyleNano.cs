@@ -138,6 +138,7 @@ using Content.Client.ContextMenu.UI;
 using Content.Client.Examine;
 using Content.Client.PDA;
 using Content.Client.UserInterface;
+using Content.Client.UserInterface;
 using Content.Client.Resources;
 using Content.Client.Silicons.Laws.SiliconLawEditUi;
 using Content.Client.UserInterface.Controls;
@@ -149,6 +150,7 @@ using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
+using Robust.Shared.IoC;
 using static Robust.Client.UserInterface.StylesheetHelpers;
 using Content.Client.Stylesheets;
 
@@ -159,13 +161,12 @@ namespace Content.Client.Stylesheets
         // Goobstation - ZH text support start
         public static Font NotoStack(this IResourceCache resCache, string variation = "Regular", int size = 10, bool display = false)
         {
-            _ = display;
-            return resCache.GetStack(variation, size);
+            return IoCManager.Resolve<IUiFontStackManager>().GetStack(resCache, variation, size, display);
         }
 
         public static Font NotoStack2ElectricBoogaloo(this IResourceCache resCache, string path = MiniFonts.Regular, int size = 10)
         {
-            return resCache.GetFont(MiniFonts.StackWithPrimary(path), size);
+            return IoCManager.Resolve<IUiFontStackManager>().GetStackWithPrimary(resCache, path, size);
         }
         // Goobstation - ZH text support end
     }

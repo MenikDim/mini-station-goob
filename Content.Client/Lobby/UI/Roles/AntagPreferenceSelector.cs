@@ -133,14 +133,15 @@ public sealed class AntagPreferenceCard : PanelContainer
         {
             Orientation = LayoutOrientation.Vertical,
             SeparationOverride = 4,
-            HorizontalAlignment = HAlignment.Center,
+            HorizontalAlignment = HAlignment.Stretch,
+            HorizontalExpand = true,
             MinSize = new Vector2(0, 64),
         };
         root.AddChild(actions);
 
         var toggleHost = new CenterContainer
         {
-            MinSize = new Vector2(0, 28),
+            MinSize = new Vector2(0, 36),
             HorizontalAlignment = HAlignment.Center,
         };
         actions.AddChild(toggleHost);
@@ -167,11 +168,15 @@ public sealed class AntagPreferenceCard : PanelContainer
         {
             Text = Loc.GetString("loadout-window"),
             Visible = false,
-            HorizontalAlignment = HAlignment.Center,
+            HorizontalAlignment = HAlignment.Stretch,
+            HorizontalExpand = true,
+            MinWidth = 120,
+            MinHeight = 32,
+            ClipText = true,
             Margin = new Thickness(0, 4, 0, 0),
         };
         _loadoutButton.OnPressed += _ => _onLoadout?.Invoke();
-        root.AddChild(_loadoutButton);
+        actions.AddChild(_loadoutButton);
     }
 
     public void Setup(
@@ -253,7 +258,7 @@ public sealed class PixelAntagToggle : Control
     private const float NativePointerWidth = MiniSliderStyles.NativePointerWidth;
     private const float NativePointerHeight = MiniSliderStyles.NativePointerHeight;
 
-    private const float Scale = 2.5f * 1.1f;
+    private const float Scale = 2.5f * 1.35f;
     private const float ClickToggleThreshold = 4f;
     private const float SnapLerpSpeed = 18f;
 
@@ -272,6 +277,8 @@ public sealed class PixelAntagToggle : Control
     private readonly LayoutContainer _layout;
     private readonly TextureRect _track;
     private readonly TextureRect _pointer;
+    private readonly Label _yesLabel;
+    private readonly Label _noLabel;
 
     private float _displayValue;
     private float _targetValue;
@@ -312,16 +319,47 @@ public sealed class PixelAntagToggle : Control
 
         _layout.AddChild(_track);
         _layout.AddChild(_pointer);
+
+        _yesLabel = new Label
+        {
+            Text = Loc.GetString("humanoid-profile-editor-antag-preference-yes-button"),
+            Align = Label.AlignMode.Center,
+            VAlign = Label.VAlignMode.Center,
+            MouseFilter = MouseFilterMode.Ignore,
+            FontColorOverride = Color.FromHex("#D8F0DC"),
+        };
+        _noLabel = new Label
+        {
+            Text = Loc.GetString("humanoid-profile-editor-antag-preference-no-button"),
+            Align = Label.AlignMode.Center,
+            VAlign = Label.VAlignMode.Center,
+            MouseFilter = MouseFilterMode.Ignore,
+            FontColorOverride = Color.FromHex("#F5D0D0"),
+        };
+        _layout.AddChild(_yesLabel);
+        _layout.AddChild(_noLabel);
+
         AddChild(_layout);
 
         SetAnchorPreset(_track, LayoutPreset.TopLeft);
         SetAnchorPreset(_pointer, LayoutPreset.TopLeft);
+        SetAnchorPreset(_yesLabel, LayoutPreset.TopLeft);
+        SetAnchorPreset(_noLabel, LayoutPreset.TopLeft);
 
         var trackMarginTop = (ControlHeight - ScaledTrackHeight) / 2f;
         SetMarginTop(_track, trackMarginTop);
 
         var trackCenterY = trackMarginTop + ScaledTrackHeight / 2f;
         SetMarginTop(_pointer, trackCenterY - ScaledPointerHeight / 2f);
+
+        var labelWidth = ScaledTrackWidth / 2f;
+        _yesLabel.MinSize = new Vector2(labelWidth, ScaledTrackHeight);
+        _yesLabel.MaxSize = new Vector2(labelWidth, ScaledTrackHeight);
+        _noLabel.MinSize = new Vector2(labelWidth, ScaledTrackHeight);
+        _noLabel.MaxSize = new Vector2(labelWidth, ScaledTrackHeight);
+        SetMarginTop(_yesLabel, trackMarginTop);
+        SetMarginTop(_noLabel, trackMarginTop);
+        SetMarginLeft(_noLabel, labelWidth);
 
         _track.Texture = _cache.GetTexture(TrackTexturePath);
         _track.ModulateSelfOverride = TrackColor;

@@ -11,6 +11,7 @@
 
 using Content.Shared.CCVar;
 using Content.Shared.Chat.TypingIndicator;
+using Robust.Client;
 using Robust.Client.Player;
 using Robust.Shared.Configuration;
 using Robust.Shared.Timing;
@@ -23,6 +24,7 @@ public sealed class TypingIndicatorSystem : SharedTypingIndicatorSystem
     [Dependency] private readonly IGameTiming _time = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IBaseClient _client = default!;
 
     private readonly TimeSpan _typingTimeout = TimeSpan.FromSeconds(2);
     private TimeSpan _lastTextChange;
@@ -92,8 +94,11 @@ public sealed class TypingIndicatorSystem : SharedTypingIndicatorSystem
 
     private void ClientUpdateTyping()
     {
-        // check if player controls any pawn
         if (_playerManager.LocalEntity == null)
+            return;
+
+        if (_playerManager.LocalSession?.AttachedEntity == null
+            || _client.RunLevel is not (ClientRunLevel.InGame or ClientRunLevel.SinglePlayerGame))
             return;
 
         var state = TypingIndicatorState.None;

@@ -17,6 +17,12 @@ ui-options-value-percent = { TOSTRING($value, "P0") }
 
 ui-options-discordrich = Включить Discord Rich Presence
 ui-options-general-ui-style = Стиль UI
+ui-options-general-text-styles = Стили текста
+ui-options-font-style = Шрифт интерфейса:
+ui-options-font-style-default = Noto Sans
+ui-options-font-style-boxround = Boxfont (пиксельный)
+ui-options-font-style-bedstead = Bedstead (пиксельный)
+ui-options-font-style-pixeloid = Pixeloid Sans
 ui-options-general-discord = Discord
 ui-options-general-cursor = Курсор
 ui-options-general-speech = Речь
