@@ -34,6 +34,7 @@ antag-store-status-has-other-deposit = Выбрана другая роль
 antag-store-status-ghost-taken-by-other = Куплен другим игроком
 antag-store-status-unavailable = Роль временно недоступна
 antag-store-status-min-players = Недостаточно игроков
+antag-store-status-not-enough-playtime = Недостаточно времени
 antag-store-status-round-only = Недоступно в лобби
 antag-store-status-lobby-only = Недоступно в раунде
 antag-store-status-last-round-purchased = Недоступно

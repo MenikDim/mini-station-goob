@@ -137,6 +137,7 @@ using System.Numerics;
 using Content.Client.ContextMenu.UI;
 using Content.Client.Examine;
 using Content.Client.PDA;
+using Content.Client.UserInterface;
 using Content.Client.Resources;
 using Content.Client.Silicons.Laws.SiliconLawEditUi;
 using Content.Client.UserInterface.Controls;
@@ -158,46 +159,13 @@ namespace Content.Client.Stylesheets
         // Goobstation - ZH text support start
         public static Font NotoStack(this IResourceCache resCache, string variation = "Regular", int size = 10, bool display = false)
         {
-            var ds = "";
-            var sv = variation.StartsWith("Bold", StringComparison.Ordinal) ? "Bold" : "Regular";
-
-            if (variation == "Mono-Regular")
-            {
-                ds = "Mono";
-                sv = "Regular";
-            }
-            else
-            {
-                ds = display ? "Display" : "";
-            }
-
-            return resCache.GetFont
-            (
-                // Ew, but ok
-                new[]
-                {
-                    $"/Fonts/NotoSans{ds}/NotoSans{ds}-{sv}.ttf",
-                    $"/Fonts/NotoSans/NotoSansSymbols-{sv}.ttf",
-                    "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf",
-                    "/Fonts/NotoSans/NotoSansSC-Regular.ttf",
-                },
-                size
-            );
+            _ = display;
+            return resCache.GetStack(variation, size);
         }
-        public static Font NotoStack2ElectricBoogaloo(this IResourceCache resCache, string path = "/Fonts/NotoSans/NotoSans-Regular.ttf", int size = 10)
+
+        public static Font NotoStack2ElectricBoogaloo(this IResourceCache resCache, string path = MiniFonts.Regular, int size = 10)
         {
-            return resCache.GetFont
-            (
-                // Ew, but ok
-                new[]
-                {
-                    path,
-                    $"/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
-                    "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf",
-                    "/Fonts/NotoSans/NotoSansSC-Regular.ttf",
-                },
-                size
-            );
+            return resCache.GetFont(MiniFonts.StackWithPrimary(path), size);
         }
         // Goobstation - ZH text support end
     }
@@ -365,10 +333,10 @@ namespace Content.Client.Stylesheets
             var notoSansBold16 = resCache.NotoStack(variation: "Bold", size: 16);
             var notoSansBold18 = resCache.NotoStack(variation: "Bold", size: 18);
             var notoSansBold20 = resCache.NotoStack(variation: "Bold", size: 20);
-            var notoSansMono = resCache.NotoStack2ElectricBoogaloo("/EngineFonts/NotoSans/NotoSansMono-Regular.ttf", size: 12); // Goobstation - ZH text support
-            var robotoMonoBold11 = resCache.GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", size: 11);
-            var robotoMonoBold12 = resCache.GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", size: 12);
-            var robotoMonoBold14 = resCache.GetFont("/Fonts/RobotoMono/RobotoMono-Bold.ttf", size: 14);
+            var notoSansMono = resCache.GetStack("Mono-Regular", 12, mono: true); // Goobstation - ZH text support
+            var robotoMonoBold11 = resCache.GetStack("Bold", 11);
+            var robotoMonoBold12 = resCache.GetStack("Bold", 12);
+            var robotoMonoBold14 = resCache.GetStack("Bold", 14);
             var windowHeaderTex = resCache.GetTexture("/Textures/Interface/Nano/window_header.png");
             var windowHeader = new StyleBoxTexture
             {
@@ -736,45 +704,16 @@ namespace Content.Client.Stylesheets
                 Mode = StyleBoxTexture.StretchMode.Tile
             };
 
-            // Slider
-            var sliderOutlineTex = resCache.GetTexture("/Textures/Interface/Nano/slider_outline.svg.96dpi.png");
-            var sliderFillTex = resCache.GetTexture("/Textures/Interface/Nano/slider_fill.svg.96dpi.png");
-            var sliderGrabTex = resCache.GetTexture("/Textures/Interface/Nano/slider_grabber.svg.96dpi.png");
+            // Slider — pixel-art track + pointer (Mini)
+            var (sliderBackBox, sliderGrabBox, sliderInvisible) = MiniSliderStyles.CreateStandard(resCache);
+            var sliderForeBox = sliderInvisible;
+            var sliderFillBox = sliderInvisible;
+            var sliderFillGreen = sliderInvisible;
+            var sliderFillRed = sliderInvisible;
+            var sliderFillBlue = sliderInvisible;
+            var sliderFillWhite = sliderInvisible;
 
-            var sliderFillBox = new StyleBoxTexture
-            {
-                Texture = sliderFillTex,
-                Modulate = Color.FromHex("#3E6C45")
-            };
-
-            var sliderBackBox = new StyleBoxTexture
-            {
-                Texture = sliderFillTex,
-                Modulate = PanelDark,
-            };
-
-            var sliderForeBox = new StyleBoxTexture
-            {
-                Texture = sliderOutlineTex,
-                Modulate = Color.FromHex("#494949")
-            };
-
-            var sliderGrabBox = new StyleBoxTexture
-            {
-                Texture = sliderGrabTex,
-            };
-
-            sliderFillBox.SetPatchMargin(StyleBox.Margin.All, 12);
-            sliderBackBox.SetPatchMargin(StyleBox.Margin.All, 12);
-            sliderForeBox.SetPatchMargin(StyleBox.Margin.All, 12);
-            sliderGrabBox.SetPatchMargin(StyleBox.Margin.All, 12);
-
-            var sliderFillGreen = new StyleBoxTexture(sliderFillBox) { Modulate = Color.LimeGreen };
-            var sliderFillRed = new StyleBoxTexture(sliderFillBox) { Modulate = Color.Red };
-            var sliderFillBlue = new StyleBoxTexture(sliderFillBox) { Modulate = Color.Blue };
-            var sliderFillWhite = new StyleBoxTexture(sliderFillBox) { Modulate = Color.White };
-
-            var boxFont13 = resCache.NotoStack2ElectricBoogaloo("/Fonts/Boxfont-round/Boxfont Round.ttf", 13); // Goobstation - ZH text support
+            var boxFont13 = resCache.GetStack("Regular", 13); // Goobstation - ZH text support
 
             var insetBack = new StyleBoxTexture
             {
@@ -1805,6 +1744,9 @@ namespace Content.Client.Stylesheets
                     .Prop(nameof(Control.Margin), new Thickness(0, 0, 0, -6)),
 
                 // Slider
+                Element<Slider>()
+                    .Prop(nameof(Control.MinHeight), MiniSliderStyles.UiControlMinHeight),
+
                 new StyleRule(SelectorElement.Type(typeof(Slider)), new []
                 {
                     new StyleProperty(Slider.StylePropertyBackground, sliderBackBox),
@@ -1815,9 +1757,15 @@ namespace Content.Client.Stylesheets
 
                 new StyleRule(SelectorElement.Type(typeof(ColorableSlider)), new []
                 {
+                    new StyleProperty(Slider.StylePropertyBackground, sliderBackBox),
+                    new StyleProperty(Slider.StylePropertyForeground, sliderForeBox),
+                    new StyleProperty(Slider.StylePropertyGrabber, sliderGrabBox),
                     new StyleProperty(ColorableSlider.StylePropertyFillWhite, sliderFillWhite),
                     new StyleProperty(ColorableSlider.StylePropertyBackgroundWhite, sliderFillWhite),
                 }),
+
+                Element<ColorableSlider>()
+                    .Prop(nameof(Control.MinHeight), MiniSliderStyles.UiControlMinHeight),
 
                 new StyleRule(new SelectorElement(typeof(Slider), new []{StyleClassSliderRed}, null, null), new []
                 {

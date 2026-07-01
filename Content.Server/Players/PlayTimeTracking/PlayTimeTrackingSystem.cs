@@ -91,6 +91,7 @@ using Content.Server.GameTicking;
 using Content.Server.GameTicking.Events;
 using Content.Server.Preferences.Managers;
 using Content.Server.Station.Events;
+using Content.Server._Mini.AntagTokens;
 using Content.Shared.CCVar;
 using Content.Shared.GameTicking;
 using Content.Shared.Mobs;
@@ -325,6 +326,13 @@ public sealed class PlayTimeTrackingSystem : EntitySystem
         if (!_cfg.GetCVar(CCVars.GameRoleTimers))
             return true;
 
+        var tokens = EntityManager.System<AntagTokenSystem>();
+        if (tokens.GetEffectiveSponsorLevel(player.UserId) > 0)
+            return true;
+
+        if (tokens.HasJobUnlock(player.UserId, job))
+            return true;
+
         if (!_tracking.TryGetTrackerTimes(player, out var playTimes))
         {
             Log.Error($"Unable to check playtimes {Environment.StackTrace}");
@@ -351,6 +359,13 @@ public sealed class PlayTimeTrackingSystem : EntitySystem
     public bool IsAllowed(ICommonSession player, ProtoId<AntagPrototype> antag)
     {
         if (!_cfg.GetCVar(CCVars.GameRoleTimers))
+            return true;
+
+        var tokens = EntityManager.System<AntagTokenSystem>();
+        if (tokens.GetEffectiveSponsorLevel(player.UserId) > 0)
+            return true;
+
+        if (tokens.HasAntagUnlock(player.UserId, antag))
             return true;
 
         if (!_tracking.TryGetTrackerTimes(player, out var playTimes))
@@ -382,9 +397,16 @@ public sealed class PlayTimeTrackingSystem : EntitySystem
             playTimes = new Dictionary<string, TimeSpan>();
         }
 
+        var tokens = EntityManager.System<AntagTokenSystem>();
+        if (tokens.GetEffectiveSponsorLevel(player.UserId) > 0)
+            return roles;
+
         foreach (var job in _prototypes.EnumeratePrototypes<JobPrototype>())
         {
-            if (JobRequirements.TryRequirementsMet(job, playTimes, out _, EntityManager, _prototypes, (HumanoidCharacterProfile?) _preferencesManager.GetPreferences(player.UserId).SelectedCharacter))
+            if (tokens.HasJobUnlock(player.UserId, job.ID))
+                continue;
+
+            if (!JobRequirements.TryRequirementsMet(job, playTimes, out _, EntityManager, _prototypes, (HumanoidCharacterProfile?) _preferencesManager.GetPreferences(player.UserId).SelectedCharacter))
                 roles.Add(job.ID);
         }
 

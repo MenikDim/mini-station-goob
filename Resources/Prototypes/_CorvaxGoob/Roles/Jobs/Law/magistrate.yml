@@ -3,8 +3,10 @@
   name: job-name-magistrate
   description: job-description-magistrate
   playTimeTracker: JobMagistrate
-  whitelisted: true #No-Ki сказал, что договорился!
   requirements:
+  - !type:DepartmentTimeRequirement
+    department: Command
+    time: 14400 # 4 hours
   - !type:TraitsRequirement
     inverted: true
     traits:

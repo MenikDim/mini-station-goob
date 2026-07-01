@@ -15,6 +15,7 @@ SPDX-License-Identifier: MIT
     HorizontalExpand="True">
     <OutputPanel Name="TextOutput" VerticalExpand="True" />
     <RichTextLabel Name="TypingIndicator" Access="Public" />
+    <BoxContainer Name="RatingHost" Orientation="Vertical" HorizontalExpand="True" MaxHeight="88" />
     <!-- Amour edit start -->
     <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="4">
         <HistoryLineEdit Name="SenderLineEdit" HorizontalExpand="True"/>

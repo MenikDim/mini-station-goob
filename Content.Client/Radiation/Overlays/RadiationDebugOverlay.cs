@@ -7,6 +7,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Client.Resources;
 using System.Numerics;
 using Content.Client.Radiation.Systems;
 using Robust.Client.Graphics;
@@ -33,7 +34,7 @@ public sealed class RadiationDebugOverlay : Overlay
         _mapSystem = _entityManager.System<SharedMapSystem>();
 
         var cache = IoCManager.Resolve<IResourceCache>();
-        _font = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Regular.ttf"), 8);
+        _font = new VectorFont(cache.GetResource<FontResource>(MiniFonts.Regular), 8);
     }
 
     protected override void Draw(in OverlayDrawArgs args)

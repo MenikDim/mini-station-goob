@@ -3,9 +3,17 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Content.Client.Lobby;
+using Content.Client.Lobby.UI;
+using Content.Client.Lobby.UI.Roles;
+using Content.Client.Players.PlayTimeTracking;
 using Content.Client.Resources;
+using Content.Client.Stylesheets;
 using Content.Shared._Mini.AntagTokens;
+using Content.Shared.Preferences;
+using Content.Shared.Roles;
 using Robust.Client.Graphics;
+using Robust.Client.Player;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
@@ -14,8 +22,10 @@ using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
 using Robust.Shared.Localization;
 using Robust.Shared.Maths;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 using static Robust.Client.UserInterface.Controls.BoxContainer;
+using static Robust.Client.UserInterface.Controls.LayoutContainer;
 
 namespace Content.Client._Mini.AntagTokens;
 
@@ -47,6 +57,10 @@ public sealed class AntagTokenWindow : DefaultWindow
     public event Action? OnClearPressed;
 
     [Dependency] private readonly IEntitySystemManager _entitySystems = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IClientPreferencesManager _preferencesManager = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly JobRequirementsManager _requirements = default!;
 
     private readonly IResourceCache _resourceCache;
     private readonly Texture _coinTexture;
@@ -60,6 +74,7 @@ public sealed class AntagTokenWindow : DefaultWindow
     private Control? _loadingOverlay;
     private readonly Dictionary<string, RoleBuyButton> _roleBuyButtons = new();
     private readonly Dictionary<string, int> _lastServerCooldownRemaining = new();
+    private readonly Dictionary<string, bool> _playtimeBlockedByRole = new();
 
     private sealed class RoleBuyButton
     {
@@ -230,6 +245,7 @@ public sealed class AntagTokenWindow : DefaultWindow
         _clearButton.Disabled = state.ActiveDepositRoleId == null;
 
         _roleBuyButtons.Clear();
+        _playtimeBlockedByRole.Clear();
         _roleGrid.RemoveAllChildren();
         foreach (var roleEntry in state.Roles)
         {
@@ -455,6 +471,22 @@ public sealed class AntagTokenWindow : DefaultWindow
         };
         root.AddChild(imageBox);
 
+        var playtimeBlocked = false;
+        FormattedMessage? playtimeReason = null;
+        ProtoId<AntagPrototype>? linkedAntagId = null;
+        var profile = _preferencesManager.Preferences?.SelectedCharacter as HumanoidCharacterProfile;
+
+        if (roleDef?.AntagId != null &&
+            _prototypeManager.TryIndex<AntagPrototype>(roleDef.AntagId, out var antagProto))
+        {
+            linkedAntagId = antagProto.ID;
+            if (!_requirements.IsAllowed(antagProto, profile, out playtimeReason))
+            {
+                playtimeBlocked = true;
+                _playtimeBlockedByRole[entry.RoleId] = true;
+            }
+        }
+
         if (roleDef != null &&
             !string.IsNullOrWhiteSpace(roleDef.IconPath) &&
             _resourceCache.TryGetResource<TextureResource>(new ResPath(roleDef.IconPath), out var textureResource))
@@ -492,11 +524,15 @@ public sealed class AntagTokenWindow : DefaultWindow
             });
         }
 
-        if (entry.StatusLocKey != null)
+        var statusLocKey = playtimeBlocked
+            ? "antag-store-status-not-enough-playtime"
+            : entry.StatusLocKey;
+
+        if (statusLocKey != null)
         {
             root.AddChild(new Label
             {
-                Text = Loc.GetString(entry.StatusLocKey),
+                Text = Loc.GetString(statusLocKey),
                 Modulate = entry.Purchased ? PurchasedBorderColor : Color.FromHex("#e5534b"),
                 HorizontalAlignment = HAlignment.Center,
                 MaxWidth = 268
@@ -510,7 +546,7 @@ public sealed class AntagTokenWindow : DefaultWindow
             MinSize = new Vector2(268, 40),
             MaxSize = new Vector2(268, 40),
             Disabled = IsButtonDisabled(entry, null),
-            ToolTip = GetButtonTooltip(entry)
+            ToolTip = GetButtonTooltip(entry, playtimeReason)
         };
 
         var roleId = entry.RoleId;
@@ -524,7 +560,14 @@ public sealed class AntagTokenWindow : DefaultWindow
             VerticalAlignment = VAlignment.Center
         };
 
-        if (entry.Purchased)
+        if (playtimeBlocked && playtimeReason != null)
+        {
+            var lockIcon = new RoleLockIcon(24f);
+            lockIcon.SetRequirements(playtimeReason);
+            buttonContent.AddChild(lockIcon);
+            buyButton.Disabled = true;
+        }
+        else if (entry.Purchased)
         {
             buttonContent.AddChild(new Label
             {
@@ -599,14 +642,20 @@ public sealed class AntagTokenWindow : DefaultWindow
         if (entry.Purchased || !effectiveAvailable || !entry.CanAfford)
             return true;
 
+        if (_playtimeBlockedByRole.GetValueOrDefault(entry.RoleId))
+            return true;
+
         if (entry.StatusLocKey == "antag-store-status-has-other-deposit")
             return true;
 
         return entry.Mode == AntagPurchaseMode.LobbyDeposit && entry.Saturated;
     }
 
-    private static string GetButtonTooltip(AntagTokenRoleEntry entry)
+    private static string GetButtonTooltip(AntagTokenRoleEntry entry, FormattedMessage? playtimeReason = null)
     {
+        if (playtimeReason != null)
+            return playtimeReason.ToMarkup();
+
         if (entry.StatusLocKey != null)
             return Loc.GetString(entry.StatusLocKey);
 

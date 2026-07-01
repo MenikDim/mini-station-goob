@@ -77,6 +77,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
+using Content.Client.Resources;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Shared.Enums;
@@ -94,7 +95,7 @@ public sealed class HTNOverlay : Overlay
     public HTNOverlay(IEntityManager entManager, IResourceCache resourceCache)
     {
         _entManager = entManager;
-        _font = new VectorFont(resourceCache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Regular.ttf"), 10);
+        _font = new VectorFont(resourceCache.GetResource<FontResource>(MiniFonts.Regular), 10);
         _transformSystem = _entManager.System<SharedTransformSystem>();
     }
 

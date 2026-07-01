@@ -28,6 +28,14 @@ namespace Content.Server.Database.Migrations.Sqlite
                         .HasColumnType("INTEGER")
                         .HasColumnName("admin_rank_id");
 
+                    b.Property<decimal>("AhelpRating")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("ahelp_rating");
+
+                    b.Property<int>("AhelpRatingCount")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("ahelp_rating_count");
+
                     b.Property<bool>("Deadminned")
                         .HasColumnType("INTEGER")
                         .HasColumnName("deadminned");
@@ -79,6 +87,41 @@ namespace Content.Server.Database.Migrations.Sqlite
                         .IsUnique();
 
                     b.ToTable("admin_flag", (string)null);
+                });
+
+            modelBuilder.Entity("Content.Server.Database.AdminHelpRating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("admin_help_rating_id");
+
+                    b.Property<Guid>("AdminUserId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("admin_user_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("PlayerUserId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("player_user_id");
+
+                    b.Property<int?>("RoundId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("round_id");
+
+                    b.Property<byte>("Stars")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("stars");
+
+                    b.HasKey("Id")
+                        .HasName("PK_admin_help_rating");
+
+                    b.HasIndex("PlayerUserId", "CreatedAt");
+
+                    b.ToTable("admin_help_rating", (string)null);
                 });
 
             modelBuilder.Entity("Content.Server.Database.AdminLog", b =>

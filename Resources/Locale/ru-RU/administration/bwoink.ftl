@@ -25,3 +25,14 @@ bwoink-system-player-reconnecting = переподключился.
 bwoink-system-player-banned = был забанен за: { $banReason }
 bwoink-message-admin-only = (Только Админ)
 bwoink-message-silent = (S)
+admin-help-rating-prompt = Оцените работу администратора
+admin-help-rating-prompt-remaining = Оцените администратора (осталось {$remaining} из {$max})
+admin-help-rating-submit = Отправить оценку
+admin-help-rating-limit-reached = Лимит оценок на сегодня исчерпан
+admin-help-rating-cooldown = Следующая оценка будет доступна через {$hours} ч. {$minutes} мин.
+admin-help-rating-thanks = Спасибо за оценку!
+admin-help-rating-already-rated = Вы уже оставляли оценку сегодня.
+admin-help-rating-chat = {$player} поставил {$stars} { $stars ->
+    [1] звезду
+   *[other] звёзд
+} администратору {$admin}

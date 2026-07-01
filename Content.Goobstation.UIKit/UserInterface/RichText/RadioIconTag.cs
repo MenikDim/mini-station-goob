@@ -39,7 +39,7 @@ public sealed class RadioIconTag : BaseTextureTag, IMarkupTagHandler
 
         label.Text = text;
         label.FontColorOverride = Color.FromHex(color);
-        label.FontOverride = new VectorFont(_cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Bold.ttf"), 13);
+        label.FontOverride = new VectorFont(_cache.GetResource<FontResource>("/Fonts/_Mini/Pixeloid/PixeloidSans-Bold.ttf"), 13);
 
         return label;
     }

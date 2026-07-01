@@ -1,0 +1,126 @@
+# SPDX-FileCopyrightText: 2026 Casha
+# Мини-станция/Freaky-station, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/ministation/mini-station-goob/master/LICENSE.TXT
+#
+# Досрочное открытие профессий за монетки антаг-меню.
+# Цена: ceil(оставшееся_время_ч / hoursPerCoinStep) * coinsPerStep, не ниже minCost и не выше maxCost тира.
+# command: true — commandCoinsPerStep (4 монетки за 4 часа), иначе regularCoinsPerStep (2 монетки за 4 часа).
+
+- type: jobUnlockCatalog
+  id: Default
+  pricing:
+    hoursPerCoinStep: 4
+    minCost: 1
+    regularCoinsPerStep: 2
+    commandCoinsPerStep: 4
+  defaultTier:
+    maxCost: 15
+    command: false
+  tiers:
+    # --- Командование ---
+    - jobs: [Captain]
+      maxCost: 55
+      command: true
+    - jobs:
+        - HeadOfSecurity
+        - ChiefMedicalOfficer
+        - ChiefEngineer
+        - ResearchDirector
+        - Quartermaster
+        - HeadOfPersonnel
+        - NanotrasenRepresentative
+      maxCost: 45
+      command: true
+    - jobs: [BlueshieldOfficer]
+      maxCost: 100
+      command: true
+    - jobs: [NanotrasenCareerTrainer]
+      maxCost: 35
+      command: true
+
+    # --- Юридический / особые ---
+    - jobs: [Magistrate]
+      maxCost: 30
+      command: true
+    - jobs: [Lawyer]
+      maxCost: 25
+      command: false
+  # ОТК — руководитель техобеспечения (Typan)
+    - jobs: [TypanTechnicalOperationsSupervisor]
+      maxCost: 50
+      command: true
+
+    # --- Служба безопасности ---
+    - jobs:
+        - SecurityOfficer
+        - Warden
+        - Detective
+        - Brigmedic
+        - Pilot
+        - WardenHelper
+        - SecurityCadet
+      maxCost: 28
+      command: false
+
+    # --- Инженерия / атмос ---
+    - jobs:
+        - StationEngineer
+        - AtmosphericTechnician
+        - TechnicalAssistant
+      maxCost: 22
+      command: false
+
+    # --- Медицина ---
+    - jobs:
+        - MedicalDoctor
+        - Chemist
+        - Paramedic
+        - Surgeon
+        - Virologist
+        - Psychologist
+        - MedicalIntern
+      maxCost: 22
+      command: false
+
+    # --- Наука ---
+    - jobs:
+        - Scientist
+        - Roboticist
+        - ResearchAssistant
+      maxCost: 22
+      command: false
+
+    # --- Снабжение ---
+    - jobs:
+        - CargoTechnician
+        - SalvageSpecialist
+        - ShaftMiner
+        - Bitrunner
+      maxCost: 20
+      command: false
+
+    # --- Синдикат (Typan) ---
+    - jobs: [TypanCommander]
+      maxCost: 40
+      command: true
+    - jobs:
+        - TypanResearchDirector
+        - TypanMedic
+        - TypanPatrol
+      maxCost: 30
+      command: false
+    - jobs:
+        - TypanAtmosTech
+        - TypanBotanist
+        - TypanCargotech
+        - TypanChef
+        - TypanScience
+      maxCost: 18
+      command: false
+
+    # --- По весу (остальные гражданские) ---
+    - maxCost: 20
+      minWeight: 15
+      command: false
+    - maxCost: 18
+      minWeight: 5
+      command: false

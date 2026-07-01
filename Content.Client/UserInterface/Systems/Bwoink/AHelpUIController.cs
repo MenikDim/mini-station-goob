@@ -60,6 +60,7 @@ public sealed class AHelpUIController: UIController, IOnSystemChanged<BwoinkSyst
     [Dependency] private readonly IClyde _clyde = default!;
     [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
     [UISystemDependency] private readonly AudioSystem _audio = default!;
+    [UISystemDependency] private readonly AdminHelpRatingClientSystem _ratingSystem = default!;
 
     private BwoinkSystem? _bwoinkSystem;
     private MenuButton? GameAHelpButton => UIManager.GetActiveUIWidgetOrNull<GameTopMenuBar>()?.AHelpButton;
@@ -197,6 +198,8 @@ public sealed class AHelpUIController: UIController, IOnSystemChanged<BwoinkSyst
         UIHelper?.Dispose();
         var ownerUserId = _playerManager.LocalUser!.Value;
         UIHelper = isAdmin ? new AdminAHelpUIHandler(ownerUserId) : new UserAHelpUIHandler(ownerUserId);
+        if (UIHelper is UserAHelpUIHandler userHandler)
+            userHandler.BindRating(_ratingSystem);
         UIHelper.DiscordRelayChanged(_discordRelayActive);
 
         UIHelper.SendMessageAction = (userId, textMessage, playSound, adminOnly) => _bwoinkSystem?.Send(userId, textMessage, playSound, adminOnly);
@@ -515,14 +518,43 @@ public sealed class AdminAHelpUIHandler : IAHelpUIHandler
 public sealed class UserAHelpUIHandler : IAHelpUIHandler
 {
     private readonly NetUserId _ownerId;
+    private AdminHelpRatingClientSystem? _ratingSystem;
+
+    public AHelpRatingPanel? RatingPanel => _ratingPanel;
+
     public UserAHelpUIHandler(NetUserId owner)
     {
         _ownerId = owner;
     }
+
+    public void BindRating(AdminHelpRatingClientSystem ratingSystem)
+    {
+        _ratingSystem = ratingSystem;
+        ratingSystem.StateUpdated -= OnRatingStateUpdated;
+        ratingSystem.StateUpdated += OnRatingStateUpdated;
+
+        if (_ratingPanel == null)
+            return;
+
+        _ratingPanel.OnRequestState -= RequestRatingState;
+        _ratingPanel.OnSubmit -= SubmitRating;
+        _ratingPanel.OnRequestState += RequestRatingState;
+        _ratingPanel.OnSubmit += SubmitRating;
+    }
+
+    private void OnRatingStateUpdated(AdminHelpRatingStateEvent state)
+    {
+        _ratingPanel?.UpdateState(state);
+    }
+
+    private void RequestRatingState() => _ratingSystem?.RequestState();
+
+    private void SubmitRating(NetUserId adminUserId, byte stars) => _ratingSystem?.Submit(adminUserId, stars);
     public bool IsAdmin => false;
     public bool IsOpen => _window is { Disposed: false, IsOpen: true };
     private DefaultWindow? _window;
     private BwoinkPanel? _chatPanel;
+    private AHelpRatingPanel? _ratingPanel;
     private bool _discordRelayActive;
 
     public void Receive(SharedBwoinkSystem.BwoinkTextMessage message)
@@ -531,6 +563,9 @@ public sealed class UserAHelpUIHandler : IAHelpUIHandler
         EnsureInit(_discordRelayActive);
         _chatPanel!.ReceiveLine(message);
         _window!.OpenCentered();
+
+        if (message.TrueSender != SharedBwoinkSystem.SystemUserId && message.TrueSender != _ownerId)
+            _ratingPanel?.RequestRefresh();
     }
 
     public void Close()
@@ -588,6 +623,13 @@ public sealed class UserAHelpUIHandler : IAHelpUIHandler
         _chatPanel = new BwoinkPanel(text => SendMessageAction?.Invoke(_ownerId, text, true, false));
         _chatPanel.InputTextChanged += text => InputTextChanged?.Invoke(_ownerId, text);
         _chatPanel.RelayedToDiscordLabel.Visible = relayActive;
+
+        _ratingPanel = new AHelpRatingPanel();
+        if (_ratingSystem != null)
+            BindRating(_ratingSystem);
+
+        _chatPanel.AttachRatingPanel(_ratingPanel);
+
         _window = new DefaultWindow()
         {
             TitleClass="windowTitleAlert",
@@ -596,7 +638,11 @@ public sealed class UserAHelpUIHandler : IAHelpUIHandler
             MinSize = new Vector2(500, 300),
         };
         _window.OnClose += () => { OnClose?.Invoke(); };
-        _window.OnOpen += () => { OnOpen?.Invoke(); };
+        _window.OnOpen += () =>
+        {
+            OnOpen?.Invoke();
+            _ratingPanel.RequestRefresh();
+        };
         _window.Contents.AddChild(_chatPanel);
 
         var introText = Loc.GetString("bwoink-system-introductory-message");
@@ -606,8 +652,12 @@ public sealed class UserAHelpUIHandler : IAHelpUIHandler
 
     public void Dispose()
     {
+        if (_ratingSystem != null)
+            _ratingSystem.StateUpdated -= OnRatingStateUpdated;
+
         _window?.Dispose();
         _window = null;
         _chatPanel = null;
+        _ratingPanel = null;
     }
 }

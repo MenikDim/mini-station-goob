@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: MIT
 
 using System.Numerics;
+using Content.Client.Resources;
 using System.Text;
 using Content.Shared.Parallax.Biomes;
 using Robust.Client.Graphics;
@@ -37,7 +38,7 @@ public sealed class BiomeDebugOverlay : Overlay
         _biomes = _entManager.System<BiomeSystem>();
         _maps = _entManager.System<SharedMapSystem>();
 
-        _font = new VectorFont(_cache.GetResource<FontResource>("/EngineFonts/NotoSans/NotoSans-Regular.ttf"), 12);
+        _font = new VectorFont(_cache.GetResource<FontResource>(MiniFonts.Regular), 12);
     }
 
     protected override bool BeforeDraw(in OverlayDrawArgs args)

@@ -47,6 +47,7 @@ namespace Content.Server.Database
         public DbSet<PlayerAntagToken> PlayerAntagTokens { get; set; } = default!;
         public DbSet<PlayerAntagTokenSelection> PlayerAntagTokenSelections { get; set; } = default!;
         public DbSet<PlayerGhostRoleTickets> PlayerGhostRoleTickets { get; set; } = default!;
+        public DbSet<AdminHelpRating> AdminHelpRatings { get; set; } = default!;
         public DbSet<UploadedResourceLog> UploadedResourceLog { get; set; } = default!;
         public DbSet<AdminNote> AdminNotes { get; set; } = null!;
         public DbSet<AdminWatchlist> AdminWatchlists { get; set; } = null!;
@@ -151,6 +152,9 @@ namespace Content.Server.Database
             modelBuilder.Entity<PlayerAntagTokenSelection>()
                 .HasIndex(v => v.PlayerId)
                 .IsUnique();
+
+            modelBuilder.Entity<AdminHelpRating>()
+                .HasIndex(v => new { v.PlayerUserId, v.CreatedAt });
 
             modelBuilder.Entity<AdminLogPlayer>()
                 .HasOne(player => player.Player)
@@ -574,6 +578,17 @@ namespace Content.Server.Database
 
         public int? AdminRankId { get; set; }
         public AdminRank? AdminRank { get; set; }
+
+        /// <summary>
+        /// Average AHelp rating from players (1.00–5.00), recalculated after each review.
+        /// </summary>
+        public decimal AhelpRating { get; set; }
+
+        /// <summary>
+        /// Number of AHelp ratings received.
+        /// </summary>
+        public int AhelpRatingCount { get; set; }
+
         public List<AdminFlag> Flags { get; set; } = default!;
     }
 
@@ -879,6 +894,26 @@ namespace Content.Server.Database
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    }
+
+    [Table("admin_help_rating")]
+    public sealed class AdminHelpRating
+    {
+        [Required, Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
+        [Required]
+        public Guid PlayerUserId { get; set; }
+
+        [Required]
+        public Guid AdminUserId { get; set; }
+
+        public int? RoundId { get; set; }
+
+        [Required]
+        public byte Stars { get; set; }
+
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 
     [Table("uploaded_resource_log")]

@@ -81,6 +81,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Numerics;
+using Content.Client.Resources;
 using Content.Goobstation.Maths.FixedPoint;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
@@ -110,7 +111,7 @@ public sealed class PuddleOverlay : Overlay
         IoCManager.InjectDependencies(this);
         _debugOverlaySystem = _entitySystemManager.GetEntitySystem<PuddleDebugOverlaySystem>();
         var cache = IoCManager.Resolve<IResourceCache>();
-        _font = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Regular.ttf"), 8);
+        _font = new VectorFont(cache.GetResource<FontResource>(MiniFonts.Regular), 8);
         _transformSystem = _entityManager.System<SharedTransformSystem>();
     }
 

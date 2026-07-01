@@ -56,26 +56,8 @@ namespace Content.Client.Stylesheets
                 return Color.InterpolateBetween(original, tonedAccent, tonedMix).WithAlpha(alpha);
             }
 
-            var notoSans10 = resCache.GetFont
-            (
-                new []
-                {
-                    "/Fonts/NotoSans/NotoSans-Regular.ttf",
-                    "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
-                    "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf"
-                },
-                10
-            );
-            var notoSansBold16 = resCache.GetFont
-            (
-                new []
-                {
-                    "/Fonts/NotoSans/NotoSans-Bold.ttf",
-                    "/Fonts/NotoSans/NotoSansSymbols-Regular.ttf",
-                    "/Fonts/NotoSans/NotoSansSymbols2-Regular.ttf"
-                },
-                16
-            );
+            var notoSans10 = resCache.GetStack("Regular", 10);
+            var notoSansBold16 = resCache.GetStack("Bold", 16);
 
             var progressBarBackground = new StyleBoxFlat
             {

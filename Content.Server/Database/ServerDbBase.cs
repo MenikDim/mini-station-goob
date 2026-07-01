@@ -755,6 +755,81 @@ namespace Content.Server.Database
             await db.DbContext.SaveChangesAsync();
         }
 
+        public async Task<bool> HasAdminHelpRatingSince(Guid playerUserId, DateTime sinceUtc, CancellationToken cancel = default)
+        {
+            await using var db = await GetDb(cancel);
+
+            return await db.DbContext.AdminHelpRatings
+                .AnyAsync(r => r.PlayerUserId == playerUserId && r.CreatedAt >= sinceUtc, cancel);
+        }
+
+        public async Task<int> GetAdminHelpRatingCountSince(Guid playerUserId, DateTime sinceUtc, CancellationToken cancel = default)
+        {
+            await using var db = await GetDb(cancel);
+
+            return await db.DbContext.AdminHelpRatings
+                .CountAsync(r => r.PlayerUserId == playerUserId && r.CreatedAt >= sinceUtc, cancel);
+        }
+
+        public async Task<bool> HasPlayerRatedAdminToday(Guid playerUserId, Guid adminUserId, DateTime sinceUtc, CancellationToken cancel = default)
+        {
+            await using var db = await GetDb(cancel);
+
+            return await db.DbContext.AdminHelpRatings
+                .AnyAsync(
+                    r => r.PlayerUserId == playerUserId &&
+                         r.AdminUserId == adminUserId &&
+                         r.CreatedAt >= sinceUtc,
+                    cancel);
+        }
+
+        public async Task<HashSet<Guid>> GetRatedAdminUserIdsSince(Guid playerUserId, DateTime sinceUtc, CancellationToken cancel = default)
+        {
+            await using var db = await GetDb(cancel);
+
+            var ids = await db.DbContext.AdminHelpRatings
+                .Where(r => r.PlayerUserId == playerUserId && r.CreatedAt >= sinceUtc)
+                .Select(r => r.AdminUserId)
+                .ToListAsync(cancel);
+
+            return ids.ToHashSet();
+        }
+
+        public async Task<bool> TryAddAdminHelpRating(AdminHelpRating rating)
+        {
+            await using var db = await GetDb();
+
+            db.DbContext.AdminHelpRatings.Add(new AdminHelpRating
+            {
+                PlayerUserId = rating.PlayerUserId,
+                AdminUserId = rating.AdminUserId,
+                RoundId = rating.RoundId,
+                Stars = rating.Stars,
+                CreatedAt = rating.CreatedAt
+            });
+
+            await db.DbContext.SaveChangesAsync();
+
+            var admin = await db.DbContext.Admin
+                .SingleOrDefaultAsync(a => a.UserId == rating.AdminUserId);
+
+            if (admin == null)
+                return true;
+
+            var ratings = await db.DbContext.AdminHelpRatings
+                .Where(r => r.AdminUserId == rating.AdminUserId)
+                .Select(r => r.Stars)
+                .ToListAsync();
+
+            admin.AhelpRatingCount = ratings.Count;
+            admin.AhelpRating = ratings.Count == 0
+                ? 0m
+                : Math.Round((decimal) ratings.Average(s => s), 2, MidpointRounding.AwayFromZero);
+
+            await db.DbContext.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<List<PlayerAntagToken>> GetPlayerAntagTokens(Guid playerId, CancellationToken cancel)
         {
             await using var db = await GetDb(cancel);

@@ -919,6 +919,12 @@ namespace Content.Server.Administration.Systems
 
             LogBwoink(msg);
 
+            if (bwoinkParams.SenderAdmin != null && !bwoinkParams.FromWebhook && !bwoinkParams.Message.AdminOnly)
+            {
+                var plainName = bwoinkParams.SenderChannel?.UserName ?? "Admin";
+                EntitySystem.Get<AdminHelpRatingSystem>().RecordParticipant(bwoinkParams.Message.UserId, bwoinkParams.SenderId, plainName);
+            }
+
             var admins = GetTargetAdmins();
 
             if (!bwoinkParams.UserOnly)
@@ -998,6 +1004,20 @@ namespace Content.Server.Administration.Systems
             }
         }
         // End Frontier:
+
+        /// <summary>
+        /// Relays a system message on a player's AHelp channel to the player and all ahelp admins.
+        /// </summary>
+        public void SendPlayerChannelSystemMessage(NetUserId channelUserId, string text)
+        {
+            var msg = new BwoinkTextMessage(channelUserId, SystemUserId, text, playSound: false);
+
+            if (_playerManager.TryGetSessionById(channelUserId, out var session))
+                RaiseNetworkEvent(msg, session.Channel);
+
+            foreach (var channel in GetTargetAdmins())
+                RaiseNetworkEvent(msg, channel);
+        }
 
         private IList<INetChannel> GetNonAfkAdmins()
         {

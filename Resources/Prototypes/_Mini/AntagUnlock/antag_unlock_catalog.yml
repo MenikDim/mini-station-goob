@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: 2026 Casha
+# Мини-станция/Freaky-station, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/ministation/mini-station-goob/master/LICENSE.TXT
+#
+# Досрочное открытие антагов в лобби и магазине токенов.
+# Для ролей из магазина maxCost не ниже shopCost * shopCostMultiplier.
+
+- type: antagUnlockCatalog
+  id: Default
+  pricing:
+    hoursPerCoinStep: 4
+    minCost: 1
+    regularCoinsPerStep: 2
+    commandCoinsPerStep: 4
+  useShopCostMultiplier: true
+  shopCostMultiplier: 5
+  defaultTier:
+    maxCost: 15
+    command: false
+  tiers: []

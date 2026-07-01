@@ -30,6 +30,7 @@ public sealed partial class RequirementsSelector : BoxContainer
 {
     private readonly RadioOptions<int> _options;
     private readonly StripeBack _lockStripe;
+    private readonly RoleLockIcon _lockIcon;
     private readonly List<(Button Button, Color Color)> _coloredButtons = [];
     private Dictionary<int, Color>? _buttonColors;
     private List<ProtoId<GuideEntryPrototype>>? _guides;
@@ -58,12 +59,9 @@ public sealed partial class RequirementsSelector : BoxContainer
             OnSelected?.Invoke(args.Id);
         };
 
-        var requirementsLabel = new Label()
+        var requirementsLabel = new RoleLockIcon
         {
-            Text = Loc.GetString("role-timer-locked"),
             Visible = true,
-            HorizontalAlignment = HAlignment.Center,
-            StyleClasses = {StyleBase.StyleClassLabelSubText},
         };
 
         _lockStripe = new StripeBack()
@@ -74,9 +72,13 @@ public sealed partial class RequirementsSelector : BoxContainer
             MouseFilter = MouseFilterMode.Stop,
             Children =
             {
-                requirementsLabel
+                new CenterContainer
+                {
+                    Children = { requirementsLabel },
+                },
             }
         };
+        _lockIcon = requirementsLabel;
 
         Help.OnPressed += _ =>
         {
@@ -121,9 +123,7 @@ public sealed partial class RequirementsSelector : BoxContainer
 
     public void LockRequirements(FormattedMessage requirements)
     {
-        var tooltip = new Tooltip();
-        tooltip.SetMessage(requirements);
-        _lockStripe.TooltipSupplier = _ => tooltip;
+        _lockIcon.SetRequirements(requirements);
         _lockStripe.Visible = true;
         _options.Visible = false;
     }

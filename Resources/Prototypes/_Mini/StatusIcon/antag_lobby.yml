@@ -1,0 +1,97 @@
+# Lobby icons for antagonist preferences (new JobIcon prototypes only).
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconChangeling
+  icon:
+    sprite: /Textures/Interface/Misc/job_icons.rsi
+    state: Changeling
+  jobName: roles-antag-changeling-name
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconHeadRevolutionary
+  icon:
+    sprite: /Textures/Interface/Misc/job_icons.rsi
+    state: HeadRevolutionary
+  jobName: roles-antag-rev-head-name
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconInitialInfected
+  icon:
+    sprite: /Textures/Interface/Misc/job_icons.rsi
+    state: InitialInfected
+  jobName: roles-antag-initial-infected-name
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconHeretic
+  icon:
+    sprite: /Textures/_Goobstation/Interface/Misc/job_icons.rsi
+    state: HereticMaster
+  jobName: roles-antag-heretic-name
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconBlobAntag
+  icon:
+    sprite: /Textures/_Goobstation/Blob/Interface/Misc/antag_icon.rsi
+    state: blob
+  jobName: roles-antag-blob-name
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconShadowling
+  icon:
+    sprite: /Textures/_EinsteinEngines/Interface/Misc/job_icons.rsi
+    state: Shadowling
+  jobName: roles-antag-shadowling-name
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconBloodCultist
+  icon:
+    sprite: /Textures/WhiteDream/BloodCult/cult_hud.rsi
+    state: cult_member
+  jobName: roles-antag-blood-cultist-name
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconRatvarCultist
+  icon:
+    sprite: /Textures/_Mini/Interface/Misc/ratvar_cult_icons.rsi
+    state: Cultist
+  jobName: antag-name-RatvarRighteous
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconCosmicCult
+  icon:
+    sprite: /Textures/_DV/CosmicCult/Icons/antag_icons.rsi
+    state: CosmicCult
+  jobName: roles-antag-cosmiccult-name
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconDevil
+  icon:
+    sprite: /Textures/_Goobstation/Interface/Misc/faction_icons.rsi
+    state: soulless
+  jobName: roles-antag-devil-name
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconWizard
+  icon:
+    sprite: /Textures/Clothing/Head/Hats/wizardhat.rsi
+    state: icon
+  jobName: roles-antag-wizard-name
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconXenomorph
+  icon:
+    sprite: /Textures/_White/Interface/Actions/xenomorph.rsi
+    state: evolve
+  jobName: roles-antag-xenomorph-name

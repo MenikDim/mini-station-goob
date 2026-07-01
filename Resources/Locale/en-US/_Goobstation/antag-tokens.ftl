@@ -34,6 +34,7 @@ antag-store-status-has-other-deposit = You already have another active deposit.
 antag-store-status-ghost-taken-by-other = Purchased by another player
 antag-store-status-unavailable = This role is temporarily unavailable.
 antag-store-status-min-players = There are not enough players online for this role.
+antag-store-status-not-enough-playtime = Not enough playtime.
 antag-store-status-round-only = This role can only be purchased while a round is in progress.
 antag-store-status-lobby-only = This role can only be queued from the preround lobby.
 antag-store-status-last-round-purchased = Already purchased last round

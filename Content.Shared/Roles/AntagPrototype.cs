@@ -21,6 +21,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.Guidebook;
+using Content.Shared.StatusIcon;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
@@ -78,4 +79,10 @@ public sealed partial class AntagPrototype : IPrototype
     /// </summary>
     [DataField]
     public List<ProtoId<GuideEntryPrototype>>? Guides;
+
+    /// <summary>
+    /// Lobby preference menu icon, same format as <see cref="JobPrototype.Icon"/>.
+    /// </summary>
+    [DataField]
+    public ProtoId<JobIconPrototype> Icon { get; private set; } = "JobIconUnknown";
 }

@@ -13,6 +13,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Client.Resources;
 using System.Numerics;
 using System.Text;
 using Content.Shared.NPC;
@@ -179,7 +180,7 @@ namespace Content.Client.NPC
             _system = system;
             _mapSystem = mapSystem;
             _transformSystem = transformSystem;
-            _font = new VectorFont(cache.GetResource<FontResource>("/Fonts/NotoSans/NotoSans-Regular.ttf"), 10);
+            _font = new VectorFont(cache.GetResource<FontResource>(MiniFonts.Regular), 10);
         }
 
         protected override void Draw(in OverlayDrawArgs args)

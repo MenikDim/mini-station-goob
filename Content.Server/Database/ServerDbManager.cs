@@ -235,6 +235,11 @@ namespace Content.Server.Database
         Task<PlayerGhostRoleTickets?> GetPlayerGhostRoleTickets(Guid playerId, CancellationToken cancel = default);
         Task UpsertPlayerGhostRoleTickets(PlayerGhostRoleTickets tickets);
         Task ClearPlayerAntagTokenSelection(Guid playerId);
+        Task<bool> HasAdminHelpRatingSince(Guid playerUserId, DateTime sinceUtc, CancellationToken cancel = default);
+        Task<int> GetAdminHelpRatingCountSince(Guid playerUserId, DateTime sinceUtc, CancellationToken cancel = default);
+        Task<bool> HasPlayerRatedAdminToday(Guid playerUserId, Guid adminUserId, DateTime sinceUtc, CancellationToken cancel = default);
+        Task<HashSet<Guid>> GetRatedAdminUserIdsSince(Guid playerUserId, DateTime sinceUtc, CancellationToken cancel = default);
+        Task<bool> TryAddAdminHelpRating(AdminHelpRating rating);
 
         #endregion
 
@@ -712,6 +717,36 @@ namespace Content.Server.Database
         {
             DbWriteOpsMetric.Inc();
             return RunDbCommand(() => _db.ClearPlayerAntagTokenSelection(playerId));
+        }
+
+        public Task<bool> HasAdminHelpRatingSince(Guid playerUserId, DateTime sinceUtc, CancellationToken cancel = default)
+        {
+            DbReadOpsMetric.Inc();
+            return RunDbCommand(() => _db.HasAdminHelpRatingSince(playerUserId, sinceUtc, cancel));
+        }
+
+        public Task<int> GetAdminHelpRatingCountSince(Guid playerUserId, DateTime sinceUtc, CancellationToken cancel = default)
+        {
+            DbReadOpsMetric.Inc();
+            return RunDbCommand(() => _db.GetAdminHelpRatingCountSince(playerUserId, sinceUtc, cancel));
+        }
+
+        public Task<bool> HasPlayerRatedAdminToday(Guid playerUserId, Guid adminUserId, DateTime sinceUtc, CancellationToken cancel = default)
+        {
+            DbReadOpsMetric.Inc();
+            return RunDbCommand(() => _db.HasPlayerRatedAdminToday(playerUserId, adminUserId, sinceUtc, cancel));
+        }
+
+        public Task<HashSet<Guid>> GetRatedAdminUserIdsSince(Guid playerUserId, DateTime sinceUtc, CancellationToken cancel = default)
+        {
+            DbReadOpsMetric.Inc();
+            return RunDbCommand(() => _db.GetRatedAdminUserIdsSince(playerUserId, sinceUtc, cancel));
+        }
+
+        public Task<bool> TryAddAdminHelpRating(AdminHelpRating rating)
+        {
+            DbWriteOpsMetric.Inc();
+            return RunDbCommand(() => _db.TryAddAdminHelpRating(rating));
         }
 
         #endregion

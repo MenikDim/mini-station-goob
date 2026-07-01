@@ -37,6 +37,14 @@ namespace Content.Server.Database.Migrations.Postgres
                         .HasColumnType("integer")
                         .HasColumnName("admin_rank_id");
 
+                    b.Property<decimal>("AhelpRating")
+                        .HasColumnType("numeric")
+                        .HasColumnName("ahelp_rating");
+
+                    b.Property<int>("AhelpRatingCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("ahelp_rating_count");
+
                     b.Property<bool>("Deadminned")
                         .HasColumnType("boolean")
                         .HasColumnName("deadminned");
@@ -90,6 +98,43 @@ namespace Content.Server.Database.Migrations.Postgres
                         .IsUnique();
 
                     b.ToTable("admin_flag", (string)null);
+                });
+
+            modelBuilder.Entity("Content.Server.Database.AdminHelpRating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("admin_help_rating_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("AdminUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("admin_user_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("PlayerUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("player_user_id");
+
+                    b.Property<int?>("RoundId")
+                        .HasColumnType("integer")
+                        .HasColumnName("round_id");
+
+                    b.Property<byte>("Stars")
+                        .HasColumnType("smallint")
+                        .HasColumnName("stars");
+
+                    b.HasKey("Id")
+                        .HasName("PK_admin_help_rating");
+
+                    b.HasIndex("PlayerUserId", "CreatedAt");
+
+                    b.ToTable("admin_help_rating", (string)null);
                 });
 
             modelBuilder.Entity("Content.Server.Database.AdminLog", b =>
