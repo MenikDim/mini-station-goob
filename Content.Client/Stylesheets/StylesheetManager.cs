@@ -7,11 +7,14 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Client.UserInterface;
+using Content.Shared.CCVar;
+using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Shared.Configuration;
+using Robust.Shared.IoC;
 using Robust.Shared.Maths;
-using Content.Shared.CCVar;
 
 namespace Content.Client.Stylesheets
 {
@@ -20,18 +23,25 @@ namespace Content.Client.Stylesheets
         [Dependency] private readonly IUserInterfaceManager _userInterfaceManager = default!;
         [Dependency] private readonly IResourceCache _resourceCache = default!;
         [Dependency] private readonly IConfigurationManager _configurationManager = default!;
+        [Dependency] private readonly IUiFontStackManager _uiFontStackManager = default!;
+        [Dependency] private readonly IFontManager _fontManager = default!;
 
         public Stylesheet SheetNano { get; private set; } = default!;
         public Stylesheet SheetSpace { get; private set; } = default!;
 
+        public event Action? StylesheetsUpdated;
+
         public void Initialize()
         {
-            _configurationManager.OnValueChanged(CCVars.InterfaceAccentRed, _ => UpdateAccentStyles(), true);
-            _configurationManager.OnValueChanged(CCVars.InterfaceAccentGreen, _ => UpdateAccentStyles(), true);
-            _configurationManager.OnValueChanged(CCVars.InterfaceAccentBlue, _ => UpdateAccentStyles(), true);
+            _uiFontStackManager.Initialize();
+
+            _configurationManager.OnValueChanged(CCVars.InterfaceAccentRed, _ => UpdateStyles(), true);
+            _configurationManager.OnValueChanged(CCVars.InterfaceAccentGreen, _ => UpdateStyles(), true);
+            _configurationManager.OnValueChanged(CCVars.InterfaceAccentBlue, _ => UpdateStyles(), true);
+            _configurationManager.OnValueChanged(CCVars.UiFontStyle, _ => UpdateStyles(), true);
         }
 
-        private void UpdateAccentStyles()
+        private void UpdateStyles()
         {
             var accent = new Color(
                 (byte) _configurationManager.GetCVar(CCVars.InterfaceAccentRed),
@@ -39,7 +49,9 @@ namespace Content.Client.Stylesheets
                 (byte) _configurationManager.GetCVar(CCVars.InterfaceAccentBlue));
             SheetNano = new StyleNano(_resourceCache, accent).Stylesheet;
             SheetSpace = new StyleSpace(_resourceCache, accent).Stylesheet;
+            _fontManager.ClearFontCache();
             _userInterfaceManager.Stylesheet = SheetNano;
+            StylesheetsUpdated?.Invoke();
         }
     }
 }

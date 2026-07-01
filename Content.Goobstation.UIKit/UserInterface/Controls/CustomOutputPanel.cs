@@ -224,6 +224,8 @@ public sealed class CustomOutputPanel : Control
         }
     }
 
+    public void InvalidateLayout() => _invalidateEntries();
+
     [System.Diagnostics.Contracts.Pure]
     private Font _getFont()
     {

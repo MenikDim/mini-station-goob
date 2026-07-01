@@ -143,12 +143,14 @@ using Content.Client.Silicons.Laws.SiliconLawEditUi;
 using Content.Client.UserInterface.Controls;
 using Content.Client.UserInterface.Controls.FancyTree;
 using Content.Client.Verbs.UI;
+using Content.Goobstation.UIKit.UserInterface.Controls;
 using Content.Shared.Verbs;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
+using Robust.Shared.IoC;
 using static Robust.Client.UserInterface.StylesheetHelpers;
 using Content.Client.Stylesheets;
 
@@ -159,13 +161,12 @@ namespace Content.Client.Stylesheets
         // Goobstation - ZH text support start
         public static Font NotoStack(this IResourceCache resCache, string variation = "Regular", int size = 10, bool display = false)
         {
-            _ = display;
-            return resCache.GetStack(variation, size);
+            return IoCManager.Resolve<IUiFontStackManager>().GetStack(resCache, variation, size, display);
         }
 
         public static Font NotoStack2ElectricBoogaloo(this IResourceCache resCache, string path = MiniFonts.Regular, int size = 10)
         {
-            return resCache.GetFont(MiniFonts.StackWithPrimary(path), size);
+            return IoCManager.Resolve<IUiFontStackManager>().GetStackWithPrimary(resCache, path, size);
         }
         // Goobstation - ZH text support end
     }
@@ -321,6 +322,7 @@ namespace Content.Client.Stylesheets
             var notoSans10 = resCache.NotoStack(size: 10);
             var notoSansItalic10 = resCache.NotoStack(variation: "Italic", size: 10);
             var notoSans12 = resCache.NotoStack(size: 12);
+            var chatFont = resCache.NotoStack(size: 13);
             var notoSansItalic12 = resCache.NotoStack(variation: "Italic", size: 12);
             var notoSansBold12 = resCache.NotoStack(variation: "Bold", size: 12);
             var notoSansBoldItalic12 = resCache.NotoStack(variation: "BoldItalic", size: 12);
@@ -1269,6 +1271,15 @@ namespace Content.Client.Stylesheets
                     {
                         new StyleProperty(PanelContainer.StylePropertyPanel, chatBg),
                     }),
+
+                Element<CustomOutputPanel>()
+                    .Prop("font", chatFont),
+
+                Element<OutputPanel>()
+                    .Prop("font", chatFont),
+
+                Element<RichTextLabel>()
+                    .Prop("font", notoSans12),
 
                 // Chat lineedit - we don't actually draw a stylebox around the lineedit itself, we put it around the
                 // input + other buttons, so we must clear the default stylebox

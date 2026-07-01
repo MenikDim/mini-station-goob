@@ -64,8 +64,8 @@ namespace Content.Client.Stylesheets
         // Goobstation - ZH text support
         protected StyleBase(IResourceCache resCache)
         {
-            var notoSans12 = resCache.GetStack("Regular", 12);
-            var notoSans12Italic = resCache.GetStack("Italic", 12);
+            var notoSans12 = resCache.GetStack("Regular", 13);
+            var notoSans12Italic = resCache.GetStack("Italic", 13);
             var textureCloseButton = resCache.GetTexture("/Textures/Interface/Nano/cross.svg.png");
 
             // Button styles.

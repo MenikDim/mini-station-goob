@@ -34,6 +34,8 @@ public sealed partial class RequirementsSelector : BoxContainer
     private readonly List<(Button Button, Color Color)> _coloredButtons = [];
     private Dictionary<int, Color>? _buttonColors;
     private List<ProtoId<GuideEntryPrototype>>? _guides;
+    private float _optionButtonMinWidth = 90;
+    private float _optionButtonMinHeight;
 
     public event Action<int>? OnSelected;
     public event Action<List<ProtoId<GuideEntryPrototype>>>? OnOpenGuidebook;
@@ -94,10 +96,15 @@ public sealed partial class RequirementsSelector : BoxContainer
         string? description,
         TextureRect? icon = null,
         List<ProtoId<GuideEntryPrototype>>? guides = null,
-        Dictionary<int, Color>? buttonColors = null)
+        Dictionary<int, Color>? buttonColors = null,
+        float optionButtonMinWidth = 90,
+        float optionButtonMinHeight = 0,
+        float? optionsContainerWidth = null)
     {
         _buttonColors = buttonColors;
         _coloredButtons.Clear();
+        _optionButtonMinWidth = optionButtonMinWidth;
+        _optionButtonMinHeight = optionButtonMinHeight;
 
         foreach (var (text, value) in items)
             _options.AddItem(Loc.GetString(text), value);
@@ -109,7 +116,20 @@ public sealed partial class RequirementsSelector : BoxContainer
 
         TitleLabel.Text = title;
         TitleLabel.MinSize = new Vector2(titleSize, 0f);
+        TitleLabel.MaxSize = new Vector2(titleSize, 0f);
+        TitleLabel.ClipText = true;
         TitleLabel.ToolTip = description;
+
+        if (optionsContainerWidth is float width)
+        {
+            OptionsContainer.MinWidth = width;
+            OptionsContainer.MaxSize = new Vector2(width, 0f);
+        }
+        else
+        {
+            OptionsContainer.MinWidth = 0;
+            OptionsContainer.MaxSize = Vector2.Zero;
+        }
 
         if (icon != null)
         {
@@ -139,8 +159,10 @@ public sealed partial class RequirementsSelector : BoxContainer
         var button = new Button
         {
             Text = text,
-            MinWidth = 90,
+            MinWidth = _optionButtonMinWidth,
+            MinHeight = _optionButtonMinHeight,
             HorizontalExpand = true,
+            ClipText = true,
         };
 
         if (_buttonColors != null && _buttonColors.TryGetValue(value, out var color))

@@ -79,6 +79,13 @@ ui-options-value-percent = { TOSTRING($value, "P0") }
 
 ui-options-discordrich = Enable Discord Rich Presence
 ui-options-general-ui-style = UI Style
+ui-options-general-text-styles = Text Styles
+ui-options-font-style = Interface font:
+ui-options-font-style-default = Noto Sans
+ui-options-font-style-epilepsy-sans = Epilepsy Sans (pixel)
+ui-options-font-style-cozette = Cozette (pixel)
+ui-options-font-style-bedstead = Bedstead (pixel)
+ui-options-font-style-pixeloid = Pixeloid Sans
 ui-options-general-discord = Discord
 ui-options-general-cursor = Cursor
 ui-options-general-speech = Speech

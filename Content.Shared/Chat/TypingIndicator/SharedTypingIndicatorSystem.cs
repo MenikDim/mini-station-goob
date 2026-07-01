@@ -77,10 +77,7 @@ public abstract class SharedTypingIndicatorSystem : EntitySystem
     {
         var uid = args.SenderSession.AttachedEntity;
         if (!Exists(uid))
-        {
-            Log.Warning($"Client {args.SenderSession} sent TypingChangedEvent without an attached entity.");
             return;
-        }
 
         // check if this entity can speak or emote
         if (!_actionBlocker.CanEmote(uid.Value) && !_actionBlocker.CanSpeak(uid.Value))

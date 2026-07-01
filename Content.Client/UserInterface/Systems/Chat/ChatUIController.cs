@@ -95,6 +95,7 @@ public sealed partial class ChatUIController : UIController
     [Dependency] private readonly IClientAdminManager _admin = default!;
     [Dependency] private readonly IChatManager _manager = default!;
     [Dependency] private readonly IConfigurationManager _config = default!;
+    [Dependency] private readonly IStylesheetManager _stylesheetManager = default!;
     [Dependency] private readonly IEyeManager _eye = default!;
     [Dependency] private readonly IEntityManager _ent = default!;
     [Dependency] private readonly IInputManager _input = default!;
@@ -246,6 +247,7 @@ public sealed partial class ChatUIController : UIController
         SubscribeNetworkEvent<DamageForceSayEvent>(OnDamageForceSay);
         _config.OnValueChanged(CCVars.ChatEnableColorName, (value) => { _chatNameColorsEnabled = value; });
         _chatNameColorsEnabled = _config.GetCVar(CCVars.ChatEnableColorName);
+        _stylesheetManager.StylesheetsUpdated += OnStylesheetsUpdated;
 
         _speechBubbleRoot = new LayoutContainer();
 
@@ -1067,6 +1069,14 @@ public sealed partial class ChatUIController : UIController
         foreach (var chat in _chats)
         {
             chat.Repopulate();
+        }
+    }
+
+    private void OnStylesheetsUpdated()
+    {
+        foreach (var chat in _chats)
+        {
+            chat.InvalidateFontLayout();
         }
     }
 

@@ -1,7 +1,9 @@
 using System;
+using Content.Client.UserInterface;
 using JetBrains.Annotations;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
+using Robust.Shared.IoC;
 
 namespace Content.Client.Resources;
 
@@ -68,16 +70,17 @@ public static class MiniFonts
 
     public static Font GetStack(this IResourceCache cache, string variation = "Regular", int size = 10, bool mono = false)
     {
+        if (IoCManager.Instance is { } ioc)
+            return ioc.Resolve<IUiFontStackManager>().GetStack(cache, mono ? "Mono-Regular" : variation, size);
+
         return cache.GetFont(Stack(variation, mono), size);
     }
 
-    public static Font GetStack(this IResourceCache cache, int size, params string[] primaryPaths)
+    public static Font GetStackWithPrimary(this IResourceCache cache, string path, int size = 10)
     {
-        var paths = new string[primaryPaths.Length + 3];
-        primaryPaths.CopyTo(paths, 0);
-        paths[^3] = NotoRegular;
-        paths[^2] = Symbols;
-        paths[^1] = Cjk;
-        return cache.GetFont(paths, size);
+        if (IoCManager.Instance is { } ioc)
+            return ioc.Resolve<IUiFontStackManager>().GetStackWithPrimary(cache, path, size);
+
+        return cache.GetFont(StackWithPrimary(path), size);
     }
 }

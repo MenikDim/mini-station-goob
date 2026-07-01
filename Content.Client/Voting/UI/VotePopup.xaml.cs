@@ -62,6 +62,13 @@ namespace Content.Client.Voting.UI
             }
         }
 
+        public void RefreshStylesheet()
+        {
+            Stylesheet = IoCManager.Resolve<IStylesheetManager>().SheetSpace;
+            VoteTitle.InvalidateMeasure();
+            VoteCaller.InvalidateMeasure();
+        }
+
         public void UpdateData()
         {
             VoteTitle.SetMessage(FormattedMessage.FromUnformatted(_vote.Title));
