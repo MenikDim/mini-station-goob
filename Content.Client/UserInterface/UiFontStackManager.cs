@@ -8,11 +8,6 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client.UserInterface;
 
-public interface IMarkupFontResolver
-{
-    Font ResolveFont(string fontId, int size);
-}
-
 public interface IUiFontStackManager
 {
     UiFontStylePrototype ActiveStyle { get; }
@@ -20,6 +15,13 @@ public interface IUiFontStackManager
     void Initialize();
 
     Font GetStack(IResourceCache cache, string variation = "Regular", int size = 10, bool display = false);
+
+    /// <summary>
+    /// Chat/output font at an exact pixel size — no <see cref="UiFontStylePrototype.SizeOffset"/>.
+    /// </summary>
+    Font GetChatStack(IResourceCache cache, string variation = "Regular", int size = 12, bool display = false);
+
+    int GetChatFontSize(int baseSize = 12);
 
     Font GetStackWithPrimary(IResourceCache cache, string path, int size = 10);
 }
@@ -93,17 +95,20 @@ public sealed class UiFontStackManager : IUiFontStackManager
     public Font GetStack(IResourceCache cache, string variation = "Regular", int size = 10, bool display = false)
     {
         EnsureInitialized();
-        size = ApplySizeOffset(size);
+        return BuildStackInternal(cache, variation, ApplySizeOffset(size), display);
+    }
 
-        var primary = ResolvePrimaryPath(variation, display);
+    public Font GetChatStack(IResourceCache cache, string variation = "Regular", int size = 12, bool display = false)
+    {
+        EnsureInitialized();
+        return BuildStackInternal(cache, variation, size, display);
+    }
 
-        if (ActiveStyle.ID == DefaultStyleId && !ActiveStyle.NotoFallback)
-            return BuildDefaultStack(cache, primary, variation, size);
-
-        if (!ActiveStyle.NotoFallback)
-            return cache.GetFont(primary, size);
-
-        return BuildStack(cache, primary, variation, size);
+    public int GetChatFontSize(int baseSize = 12)
+    {
+        EnsureInitialized();
+        var offset = ActiveStyle?.ChatSizeOffset ?? 0;
+        return offset == 0 ? baseSize : baseSize + offset;
     }
 
     public Font GetStackWithPrimary(IResourceCache cache, string path, int size = 10)
@@ -115,6 +120,19 @@ public sealed class UiFontStackManager : IUiFontStackManager
             return cache.GetFont(NotoStackWithPrimary(path), size);
 
         return BuildStack(cache, path, "Regular", size);
+    }
+
+    private Font BuildStackInternal(IResourceCache cache, string variation, int size, bool display)
+    {
+        var primary = ResolvePrimaryPath(variation, display);
+
+        if (ActiveStyle.ID == DefaultStyleId && !ActiveStyle.NotoFallback)
+            return BuildDefaultStack(cache, primary, variation, size);
+
+        if (!ActiveStyle.NotoFallback)
+            return cache.GetFont(primary, size);
+
+        return BuildStack(cache, primary, variation, size);
     }
 
     private string ResolvePrimaryPath(string variation, bool display)

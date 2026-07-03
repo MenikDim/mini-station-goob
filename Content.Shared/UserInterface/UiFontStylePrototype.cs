@@ -50,6 +50,13 @@ public sealed partial class UiFontStylePrototype : IPrototype, IComparable<UiFon
     [DataField]
     public int SizeOffset;
 
+    /// <summary>
+    /// Extra pixels added to chat font size (pixel fonts look smaller at the same point size).
+    /// Does not stack with <see cref="SizeOffset"/> — chat uses this instead.
+    /// </summary>
+    [DataField]
+    public int ChatSizeOffset;
+
     public string ResolveItalic() => Italic ?? Regular;
 
     public string ResolveBold() => Bold ?? Regular;

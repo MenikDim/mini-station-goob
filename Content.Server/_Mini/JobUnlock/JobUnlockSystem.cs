@@ -7,11 +7,13 @@ using Content.Server.Players.PlayTimeTracking;
 using Content.Server.Popups;
 using Content.Server.Preferences.Managers;
 using Content.Shared._Mini.JobUnlock;
+using Content.Shared._Mini.MiniCCVars;
 using Content.Shared._Mini.RoleUnlock;
 using Content.Shared.Players.PlayTimeTracking;
 using Content.Shared.Preferences;
 using Content.Shared.Roles;
 using Robust.Server.Player;
+using Robust.Shared.Configuration;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
@@ -29,6 +31,7 @@ public sealed class JobUnlockSystem : EntitySystem
     [Dependency] private readonly IServerNetManager _net = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly IServerPreferencesManager _preferences = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
 
     public override void Initialize()
     {
@@ -43,6 +46,12 @@ public sealed class JobUnlockSystem : EntitySystem
     {
         if (args.SenderSession is not { } session)
             return;
+
+        if (!_cfg.GetCVar(MiniCCVars.RoleUnlockEarlyPurchaseEnabled))
+        {
+            ShowPopup(session, Loc.GetString("job-unlock-error-unavailable"));
+            return;
+        }
 
         if (!_listings.TryGetListing(msg.JobId, out _))
         {

@@ -20,6 +20,7 @@
   bold: /Fonts/_Mini/Epilepsy Sans/EpilepsySansBold.ttf
   mono: /Fonts/_Mini/Epilepsy Sans/EpilepsySans.ttf
   sizeOffset: 3
+  chatSizeOffset: 3
   order: 1
 
 - type: uiFontStyle
@@ -28,7 +29,8 @@
   regular: /Fonts/_Mini/Cozette/CozetteVector.ttf
   bold: /Fonts/_Mini/Cozette/CozetteVectorBold.ttf
   mono: /Fonts/_Mini/Cozette/CozetteVector.ttf
-  sizeOffset: 3
+  sizeOffset: 4
+  chatSizeOffset: 3
   order: 2
 
 - type: uiFontStyle
@@ -37,6 +39,7 @@
   regular: /Fonts/Bedstead/Bedstead.otf
   mono: /Fonts/Bedstead/Bedstead.otf
   sizeOffset: 2
+  chatSizeOffset: 2
   order: 3
 
 - type: uiFontStyle
@@ -46,4 +49,5 @@
   bold: /Fonts/_Mini/Pixeloid/PixeloidSans-Bold.ttf
   mono: /Fonts/_Mini/Pixeloid/PixeloidMono.ttf
   sizeOffset: 1
+  chatSizeOffset: 1
   order: 4

@@ -30,6 +30,13 @@ public sealed class CustomOutputPanel : Control
 
     public bool ScrollFollowing { get; set; } = true;
 
+    public Font? FontOverride { get; set; }
+
+    /// <summary>
+    /// Multiplier for line spacing between chat messages.
+    /// </summary>
+    public float LineHeightScale { get; set; } = 1f;
+
     private bool _invalidOnVisible;
 
     public CustomOutputPanel()
@@ -88,7 +95,7 @@ public sealed class CustomOutputPanel : Control
         _entries.RemoveAt(index.GetOffset(_entries.Count));
 
         var font = _getFont();
-        _totalContentHeight -= entry.Height + font.GetLineSeparation(UIScale);
+        _totalContentHeight -= entry.Height + GetLineSeparation(font);
         if (_entries.Count == 0)
         {
             Clear();
@@ -119,7 +126,7 @@ public sealed class CustomOutputPanel : Control
         }
         else
         {
-            _totalContentHeight += font.GetLineSeparation(UIScale);
+            _totalContentHeight += GetLineSeparation(font);
         }
 
         _scrollBar.MaxValue = Math.Max(_scrollBar.Page, _totalContentHeight);
@@ -141,7 +148,7 @@ public sealed class CustomOutputPanel : Control
 
         var style = _getStyleBox();
         var font = _getFont();
-        var lineSeparation = font.GetLineSeparation(UIScale);
+        var lineSeparation = GetLineSeparation(font);
         style?.Draw(handle, PixelSizeBox, UIScale);
         var contentBox = _getContentBox();
 
@@ -214,7 +221,7 @@ public sealed class CustomOutputPanel : Control
         foreach (ref var entry in _entries)
         {
             entry.Update(_tagManager, font, sizeX, UIScale);
-            _totalContentHeight += entry.Height + font.GetLineSeparation(UIScale);
+            _totalContentHeight += entry.Height + GetLineSeparation(font);
         }
 
         _scrollBar.MaxValue = Math.Max(_scrollBar.Page, _totalContentHeight);
@@ -229,6 +236,9 @@ public sealed class CustomOutputPanel : Control
     [System.Diagnostics.Contracts.Pure]
     private Font _getFont()
     {
+        if (FontOverride != null)
+            return FontOverride;
+
         if (TryGetStyleProperty<Font>("font", out var font))
         {
             return font;
@@ -236,6 +246,9 @@ public sealed class CustomOutputPanel : Control
 
         return UserInterfaceManager.ThemeDefaults.DefaultFont;
     }
+
+    private int GetLineSeparation(Font font) =>
+        (int) MathF.Ceiling(font.GetLineSeparation(UIScale) * LineHeightScale);
 
     [System.Diagnostics.Contracts.Pure]
     private StyleBox? _getStyleBox()

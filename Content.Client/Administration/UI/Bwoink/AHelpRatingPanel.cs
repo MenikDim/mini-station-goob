@@ -1,10 +1,11 @@
+using System.Linq;
 using System.Numerics;
 using Content.Client.Resources;
 using Content.Shared.Administration;
+using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
-using Robust.Shared.IoC;
 using Robust.Shared.Maths;
 using Robust.Shared.Network;
 using Robust.Shared.Timing;
@@ -12,21 +13,24 @@ using Robust.Shared.Timing;
 namespace Content.Client.Administration.UI.Bwoink;
 
 /// <summary>
-/// Admin rating widget in AHelp: stars + submit, or cooldown clock when daily limit is reached.
+/// Admin rating widget in AHelp: collapsible stars + submit, or cooldown when daily limit is reached.
 /// </summary>
 public sealed class AHelpRatingPanel : BoxContainer
 {
     public const string StarTexturePath = AdminHelpRatingPaths.StarIconPath;
 
-    private const float StarScale = 2f;
-    private const float StarSlotSize = 24f;
+    private const float StarDisplaySize = 22f;
 
     private static readonly Color StarActiveColor = Color.White;
-    private static readonly Color StarInactiveColor = Color.FromHex("#5A5868").WithAlpha(0.45f);
+    private static readonly Color StarInactiveColor = Color.FromHex("#8A8898");
 
-    private readonly Label _title;
+    private readonly Collapsible _collapsible;
+    private readonly CollapsibleBody _ratingBody;
+    private readonly Label _promptLabel;
+    private readonly Label _remainingLabel;
+    private readonly BoxContainer _adminRow;
+    private readonly Label _adminLabel;
     private readonly OptionButton _adminSelect;
-    private readonly BoxContainer _ratingRow;
     private readonly BoxContainer _starsRow;
     private readonly TextureButton[] _starButtons = new TextureButton[5];
     private readonly Button _submitButton;
@@ -35,8 +39,8 @@ public sealed class AHelpRatingPanel : BoxContainer
     private readonly Label _cooldownLabel;
 
     private readonly List<AdminHelpRatingParticipant> _participants = [];
+    private NetUserId? _selectedAdminId;
     private int _selectedStars = 5;
-    private bool _pendingSubmit;
     private DateTime _resetAtUtc = DateTime.UtcNow.Date.AddDays(1);
 
     public event Action? OnRequestState;
@@ -49,22 +53,48 @@ public sealed class AHelpRatingPanel : BoxContainer
         var starTexture = cache.GetTexture(StarTexturePath);
 
         Orientation = LayoutOrientation.Vertical;
-        SeparationOverride = 3;
+        SeparationOverride = 4;
         Margin = new Thickness(0, 2, 0, 2);
-        MaxHeight = 84;
         Visible = false;
+        VerticalExpand = false;
 
-        _title = new Label
+        _promptLabel = new Label
         {
-            StyleClasses = { "LabelSubText" },
+            Text = Loc.GetString("admin-help-rating-prompt"),
             HorizontalAlignment = HAlignment.Center,
+            HorizontalExpand = true,
+            StyleClasses = { "LabelSubText" },
+        };
+
+        _remainingLabel = new Label
+        {
+            HorizontalAlignment = HAlignment.Center,
+            HorizontalExpand = true,
+            StyleClasses = { "LabelSubText" },
+        };
+
+        _adminLabel = new Label
+        {
+            Text = Loc.GetString("admin-help-rating-select-admin"),
+            StyleClasses = { "LabelSubText" },
+            VerticalAlignment = VAlignment.Center,
         };
 
         _adminSelect = new OptionButton
         {
             HorizontalExpand = true,
+        };
+        _adminSelect.OnItemSelected += args => OnAdminSelected(args.Id);
+
+        _adminRow = new BoxContainer
+        {
+            Orientation = LayoutOrientation.Horizontal,
+            SeparationOverride = 6,
+            HorizontalExpand = true,
             Visible = false,
         };
+        _adminRow.AddChild(_adminLabel);
+        _adminRow.AddChild(_adminSelect);
 
         _starsRow = new BoxContainer
         {
@@ -79,9 +109,7 @@ public sealed class AHelpRatingPanel : BoxContainer
             var button = new TextureButton
             {
                 TextureNormal = starTexture,
-                Scale = new Vector2(StarScale, StarScale),
-                MinSize = new Vector2(StarSlotSize, StarSlotSize),
-                MaxSize = new Vector2(StarSlotSize, StarSlotSize),
+                MinSize = new Vector2(StarDisplaySize, StarDisplaySize),
                 VerticalAlignment = VAlignment.Center,
             };
             button.OnPressed += _ => SelectStars(starIndex);
@@ -93,16 +121,30 @@ public sealed class AHelpRatingPanel : BoxContainer
         {
             Text = Loc.GetString("admin-help-rating-submit"),
             HorizontalAlignment = HAlignment.Center,
+            Margin = new Thickness(0, 2, 0, 0),
         };
         _submitButton.OnPressed += _ => TrySubmit();
 
-        _ratingRow = new BoxContainer
+        _ratingBody = new CollapsibleBody();
+        var ratingContent = new BoxContainer
         {
             Orientation = LayoutOrientation.Vertical,
-            SeparationOverride = 3,
+            SeparationOverride = 8,
+            HorizontalExpand = true,
+            Margin = new Thickness(4, 2, 4, 4),
         };
-        _ratingRow.AddChild(_starsRow);
-        _ratingRow.AddChild(_submitButton);
+        ratingContent.AddChild(_promptLabel);
+        ratingContent.AddChild(_remainingLabel);
+        ratingContent.AddChild(_adminRow);
+        ratingContent.AddChild(_starsRow);
+        ratingContent.AddChild(_submitButton);
+        _ratingBody.AddChild(ratingContent);
+
+        var heading = new CollapsibleHeading(Loc.GetString("admin-help-rating-collapsible-title"));
+        _collapsible = new Collapsible(heading, _ratingBody)
+        {
+            BodyVisible = true,
+        };
 
         _clock = new SpinningClockControl();
         _cooldownLabel = new Label
@@ -123,9 +165,7 @@ public sealed class AHelpRatingPanel : BoxContainer
         _cooldownRow.AddChild(_clock);
         _cooldownRow.AddChild(_cooldownLabel);
 
-        AddChild(_title);
-        AddChild(_adminSelect);
-        AddChild(_ratingRow);
+        AddChild(_collapsible);
         AddChild(_cooldownRow);
 
         SelectStars(5);
@@ -144,18 +184,6 @@ public sealed class AHelpRatingPanel : BoxContainer
             ShowCooldown();
             return;
         }
-
-        if (_pendingSubmit && state.RatingsToday > 0)
-        {
-            _pendingSubmit = false;
-            if (_participants.Count == 0)
-            {
-                Visible = false;
-                return;
-            }
-        }
-
-        _pendingSubmit = false;
 
         if (_participants.Count == 0)
         {
@@ -179,20 +207,13 @@ public sealed class AHelpRatingPanel : BoxContainer
     private void ShowRating(int ratingsToday, int maxRatings)
     {
         Visible = true;
+        _collapsible.Visible = true;
         _cooldownRow.Visible = false;
-        _ratingRow.Visible = true;
-        _title.Text = Loc.GetString("admin-help-rating-prompt-remaining",
+        _remainingLabel.Text = Loc.GetString("admin-help-rating-prompt-remaining",
             ("remaining", maxRatings - ratingsToday),
             ("max", maxRatings));
-        _adminSelect.Visible = _participants.Count > 1;
-        _adminSelect.Clear();
 
-        for (var i = 0; i < _participants.Count; i++)
-            _adminSelect.AddItem(_participants[i].DisplayName, i);
-
-        if (_adminSelect.ItemCount > 0)
-            _adminSelect.SelectId(0);
-
+        RefreshAdminSelect();
         SelectStars(_selectedStars);
         UpdateInteractable();
     }
@@ -200,11 +221,47 @@ public sealed class AHelpRatingPanel : BoxContainer
     private void ShowCooldown()
     {
         Visible = true;
-        _ratingRow.Visible = false;
-        _adminSelect.Visible = false;
+        _collapsible.Visible = false;
         _cooldownRow.Visible = true;
-        _title.Text = Loc.GetString("admin-help-rating-limit-reached");
         UpdateCooldownLabel();
+    }
+
+    private void RefreshAdminSelect()
+    {
+        _adminRow.Visible = _participants.Count > 1;
+        _adminSelect.Clear();
+
+        if (_participants.Count == 0)
+            return;
+
+        var selectedIndex = 0;
+
+        if (_participants.Count == 1)
+        {
+            _selectedAdminId = _participants[0].UserId;
+        }
+        else if (_selectedAdminId == null || _participants.All(p => p.UserId != _selectedAdminId))
+        {
+            _selectedAdminId = _participants[0].UserId;
+        }
+
+        for (var i = 0; i < _participants.Count; i++)
+        {
+            _adminSelect.AddItem(_participants[i].DisplayName, i);
+            if (_participants[i].UserId == _selectedAdminId)
+                selectedIndex = i;
+        }
+
+        if (_adminSelect.ItemCount > 0)
+            _adminSelect.SelectId(selectedIndex);
+    }
+
+    private void OnAdminSelected(int id)
+    {
+        if (id < 0 || id >= _participants.Count)
+            return;
+
+        _selectedAdminId = _participants[id].UserId;
     }
 
     private void UpdateCooldownLabel()
@@ -215,7 +272,8 @@ public sealed class AHelpRatingPanel : BoxContainer
 
         var hours = (int) remaining.TotalHours;
         var minutes = remaining.Minutes;
-        _cooldownLabel.Text = Loc.GetString("admin-help-rating-cooldown", ("hours", hours), ("minutes", minutes));
+        _cooldownLabel.Text = Loc.GetString("admin-help-rating-limit-reached") + " — "
+            + Loc.GetString("admin-help-rating-cooldown", ("hours", hours), ("minutes", minutes));
     }
 
     private void SelectStars(int stars)
@@ -228,14 +286,10 @@ public sealed class AHelpRatingPanel : BoxContainer
 
     private void TrySubmit()
     {
-        if (_participants.Count == 0 || _selectedStars is < 1 or > 5)
-            return;
-
         var participant = GetSelectedParticipant();
-        if (participant == null)
+        if (participant == null || _selectedStars is < 1 or > 5)
             return;
 
-        _pendingSubmit = true;
         OnSubmit?.Invoke(participant.UserId, (byte) _selectedStars);
     }
 
@@ -244,14 +298,16 @@ public sealed class AHelpRatingPanel : BoxContainer
         if (_participants.Count == 0)
             return null;
 
-        if (!_adminSelect.Visible)
-            return _participants[0];
+        if (_selectedAdminId != null)
+        {
+            foreach (var participant in _participants)
+            {
+                if (participant.UserId == _selectedAdminId)
+                    return participant;
+            }
+        }
 
-        var selectedId = _adminSelect.SelectedId;
-        if (selectedId < 0 || selectedId >= _participants.Count)
-            return null;
-
-        return _participants[selectedId];
+        return _participants[0];
     }
 
     private void UpdateInteractable()

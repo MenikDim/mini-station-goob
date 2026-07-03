@@ -193,6 +193,7 @@ namespace Content.Client.Stylesheets
         public const string StyleClassActionSearchBox = "actionSearchBox";
         public const string StyleClassActionMenuItemRevoked = "actionMenuItemRevoked";
         public const string StyleClassChatLineEdit = "chatLineEdit";
+        public const string StyleClassAhelpLineEdit = "ahelpLineEdit";
         public const string StyleClassChatChannelSelectorButton = "chatSelectorOptionButton";
         public const string StyleClassChatFilterOptionButton = "chatFilterOptionButton";
         public const string StyleClassStorageButton = "storageButton";
@@ -223,7 +224,9 @@ namespace Content.Client.Stylesheets
         public const string StyleClassPopupMessageLarge = "PopupMessageLarge";
         public const string StyleClassPopupMessageLargeCaution = "PopupMessageLargeCaution";
         public const string StyleClassLobbyBackground = "LobbyBackground";
-        public static readonly Color PanelDark = Color.FromHex("#1E1E22");
+        public const string StyleClassChatOutput = "ChatOutputPanel";
+
+    public static readonly Color PanelDark = Color.FromHex("#1E1E22");
 
         public static readonly Color NanoGold = Color.FromHex("#A88B5E");
         public static readonly Color GoodGreenFore = Color.FromHex("#31843E");
@@ -322,7 +325,7 @@ namespace Content.Client.Stylesheets
             var notoSans10 = resCache.NotoStack(size: 10);
             var notoSansItalic10 = resCache.NotoStack(variation: "Italic", size: 10);
             var notoSans12 = resCache.NotoStack(size: 12);
-            var chatFont = resCache.NotoStack(size: 13);
+            var chatFont = resCache.GetChatStack(size: IoCManager.Resolve<IUiFontStackManager>().GetChatFontSize(UiChatFonts.BaseSize));
             var notoSansItalic12 = resCache.NotoStack(variation: "Italic", size: 12);
             var notoSansBold12 = resCache.NotoStack(variation: "Bold", size: 12);
             var notoSansBoldItalic12 = resCache.NotoStack(variation: "BoldItalic", size: 12);
@@ -1272,10 +1275,16 @@ namespace Content.Client.Stylesheets
                         new StyleProperty(PanelContainer.StylePropertyPanel, chatBg),
                     }),
 
-                Element<CustomOutputPanel>()
+                new StyleRule(new SelectorElement(typeof(PanelContainer), new[] {StyleClassChatSubPanel}, null, null),
+                    new[]
+                    {
+                        new StyleProperty(PanelContainer.StylePropertyPanel, chatSubBg),
+                    }),
+
+                Element<CustomOutputPanel>().Class(StyleClassChatOutput)
                     .Prop("font", chatFont),
 
-                Element<OutputPanel>()
+                Element<OutputPanel>().Class(StyleClassChatOutput)
                     .Prop("font", chatFont),
 
                 Element<RichTextLabel>()
@@ -1287,6 +1296,12 @@ namespace Content.Client.Stylesheets
                     new[]
                     {
                         new StyleProperty(LineEdit.StylePropertyStyleBox, new StyleBoxEmpty()),
+                    }),
+
+                new StyleRule(new SelectorElement(typeof(LineEdit), new[] {StyleClassAhelpLineEdit}, null, null),
+                    new[]
+                    {
+                        new StyleProperty(LineEdit.StylePropertyStyleBox, lineEdit),
                     }),
 
                 // Action searchbox lineedit

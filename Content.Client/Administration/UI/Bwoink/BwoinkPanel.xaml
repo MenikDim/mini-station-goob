@@ -13,14 +13,16 @@ SPDX-License-Identifier: MIT
     xmlns:amour="clr-namespace:Content.Client._Amour.Stickers.UI"
     Orientation="Vertical"
     HorizontalExpand="True">
-    <OutputPanel Name="TextOutput" VerticalExpand="True" />
+    <OutputPanel Name="TextOutput" StyleClasses="StyleNano.StyleClassChatOutput" VerticalExpand="True" />
     <RichTextLabel Name="TypingIndicator" Access="Public" />
-    <BoxContainer Name="RatingHost" Orientation="Vertical" HorizontalExpand="True" MaxHeight="88" />
+    <BoxContainer Name="RatingHost" Orientation="Vertical" HorizontalExpand="True" />
     <!-- Amour edit start -->
-    <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="4">
-        <HistoryLineEdit Name="SenderLineEdit" HorizontalExpand="True"/>
-        <amour:StickerButton Name="StickerBtn" />
-    </BoxContainer>
+    <PanelContainer StyleClasses="StyleNano.StyleClassChatSubPanel" HorizontalExpand="True" Margin="0 6 0 0">
+        <BoxContainer Orientation="Horizontal" HorizontalExpand="True" SeparationOverride="4" Margin="4">
+            <HistoryLineEdit Name="SenderLineEdit" StyleClasses="StyleNano.StyleClassAhelpLineEdit" HorizontalExpand="True" MinHeight="32"/>
+            <amour:StickerButton Name="StickerBtn" />
+        </BoxContainer>
+    </PanelContainer>
     <!-- Amour edit end -->
     <RichTextLabel Name="RelayedToDiscordLabel" Access="Public" Visible="False" />
 </BoxContainer>

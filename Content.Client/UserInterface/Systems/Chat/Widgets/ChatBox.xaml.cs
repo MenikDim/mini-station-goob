@@ -29,6 +29,7 @@
 using System.Linq;
 using Content.Client.UserInterface.Systems.Chat.Controls;
 using Content.Goobstation.Common.CCVar; // Goobstation Change
+using Content.Client.UserInterface;
 using Content.Shared.Chat;
 using Content.Shared.Input;
 using Robust.Client.Audio;
@@ -84,6 +85,8 @@ public partial class ChatBox : UIWidget
         _controller.MessageAdded += OnMessageAdded;
         _controller.HighlightsUpdated += OnHighlightsUpdated;
         _controller.RegisterChat(this);
+
+        RefreshChatFont();
 
         // WD EDIT START
         _cfg = IoCManager.Resolve<IConfigurationManager>();
@@ -177,10 +180,13 @@ public partial class ChatBox : UIWidget
         _controller.UpdateHighlights(highlighs);
     }
 
-    public void InvalidateFontLayout()
+    public void RefreshChatFont()
     {
-        Contents.InvalidateLayout();
+        UiChatFonts.ApplyToOutput(Contents);
+        Repopulate();
     }
+
+    public void InvalidateFontLayout() => RefreshChatFont();
 
     public void AddLine(string message, Color color, int repeat = 0)
     {

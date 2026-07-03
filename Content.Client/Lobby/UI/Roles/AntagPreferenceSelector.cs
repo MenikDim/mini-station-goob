@@ -1,6 +1,5 @@
 using System.Numerics;
 using Content.Client.Lobby.UI;
-using Content.Client.Message;
 using Content.Client.Resources;
 using Content.Client.Stylesheets;
 using Content.Client.UserInterface;
@@ -10,7 +9,6 @@ using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
-using Robust.Client.UserInterface.CustomControls;
 using Robust.Shared.Input;
 using Robust.Shared.IoC;
 using Robust.Shared.Maths;
@@ -23,23 +21,21 @@ using static Robust.Client.UserInterface.Controls.LayoutContainer;
 namespace Content.Client.Lobby.UI.Roles;
 
 /// <summary>
-/// Antagonist preference card for the lobby grid (styled like the antag token shop).
+/// Compact antagonist preference row for the lobby list.
 /// </summary>
 public sealed class AntagPreferenceCard : PanelContainer
 {
-    private static readonly Color CardBackgroundColor = Color.FromHex("#1e1a26").WithAlpha(0.8f);
+    private const float IconSize = 36f;
+    private const float RowHeight = 58f;
 
-    private const float CardIconSize = 52f;
-    private const float CardMinWidth = 96f;
-    private const float TitleMaxHeight = 28f;
+    private static readonly Color RowBackground = Color.FromHex("#1e1a26").WithAlpha(0.65f);
 
-    private readonly RichTextLabel _title;
+    private readonly Label _title;
     private readonly PixelAntagToggle _toggle;
     private readonly RoleLockIcon _lockIcon;
     private readonly Button _unlockButton;
     private readonly TextureButton _help;
     private readonly Button _loadoutButton;
-    private readonly Control _imageSlot;
 
     private List<ProtoId<GuideEntryPrototype>>? _guides;
     private Action? _onLoadout;
@@ -56,39 +52,89 @@ public sealed class AntagPreferenceCard : PanelContainer
         IoCManager.InjectDependencies(this);
 
         HorizontalExpand = true;
-        VerticalExpand = true;
-        MinSize = new Vector2(CardMinWidth, 160);
+        MinSize = new Vector2(0, RowHeight);
         PanelOverride = new StyleBoxFlat
         {
-            BackgroundColor = CardBackgroundColor,
+            BackgroundColor = RowBackground,
             BorderThickness = new Thickness(1),
+            BorderColor = Color.FromHex("#3A3648").WithAlpha(0.5f),
             ContentMarginLeftOverride = 8,
-            ContentMarginTopOverride = 8,
+            ContentMarginTopOverride = 4,
             ContentMarginRightOverride = 8,
-            ContentMarginBottomOverride = 8,
+            ContentMarginBottomOverride = 4,
         };
 
-        var root = new BoxContainer
+        var row = new BoxContainer
         {
-            Orientation = LayoutOrientation.Vertical,
-            SeparationOverride = 6,
+            Orientation = LayoutOrientation.Horizontal,
+            SeparationOverride = 8,
             VerticalExpand = true,
             HorizontalExpand = true,
         };
-        AddChild(root);
+        AddChild(row);
 
-        var header = new BoxContainer
+        var iconHost = new Control
+        {
+            MinSize = new Vector2(IconSize, IconSize),
+            MaxSize = new Vector2(IconSize, IconSize),
+            VerticalAlignment = VAlignment.Center,
+        };
+        row.AddChild(iconHost);
+        _imageSlot = iconHost;
+
+        _title = new Label
+        {
+            HorizontalExpand = true,
+            VerticalAlignment = VAlignment.Center,
+            ClipText = true,
+            StyleClasses = { StyleNano.StyleClassLabelBig },
+            FontColorOverride = LobbyUiStyles.HeaderText,
+        };
+        row.AddChild(_title);
+
+        var controls = new BoxContainer
         {
             Orientation = LayoutOrientation.Horizontal,
+            SeparationOverride = 6,
+            VerticalAlignment = VAlignment.Center,
         };
-        root.AddChild(header);
+        row.AddChild(controls);
 
-        header.AddChild(new Control { HorizontalExpand = true });
+        _toggle = new PixelAntagToggle();
+        _toggle.OnSelected += value => OnSelected?.Invoke(value);
+        controls.AddChild(_toggle);
+
+        _lockIcon = new RoleLockIcon
+        {
+            Visible = false,
+            VerticalAlignment = VAlignment.Center,
+        };
+        controls.AddChild(_lockIcon);
+
+        _unlockButton = new Button
+        {
+            Visible = false,
+            VerticalAlignment = VAlignment.Center,
+        };
+        _unlockButton.OnPressed += _ => _onUnlock?.Invoke();
+        controls.AddChild(_unlockButton);
+
+        _loadoutButton = new Button
+        {
+            Text = Loc.GetString("loadout-window"),
+            Visible = false,
+            VerticalAlignment = VAlignment.Center,
+            MinWidth = 88,
+            MinHeight = 26,
+        };
+        _loadoutButton.OnPressed += _ => _onLoadout?.Invoke();
+        controls.AddChild(_loadoutButton);
 
         _help = new TextureButton
         {
             StyleClasses = { "HelpButton" },
             Visible = false,
+            VerticalAlignment = VAlignment.Center,
         };
         _help.OnPressed += _ =>
         {
@@ -96,88 +142,17 @@ public sealed class AntagPreferenceCard : PanelContainer
                 OnOpenGuidebook?.Invoke(_guides);
         };
 
-        header.AddChild(new Control
+        var helpWrapper = new Control
         {
             MinSize = new Vector2(21, 21),
             MaxSize = new Vector2(21, 21),
+            VerticalAlignment = VAlignment.Center,
             Children = { _help },
-        });
-
-        var imageBox = new BoxContainer
-        {
-            Orientation = LayoutOrientation.Vertical,
-            HorizontalAlignment = HAlignment.Center,
-            MinSize = new Vector2(0, CardIconSize + 4),
         };
-        root.AddChild(imageBox);
-
-        _imageSlot = new Control
-        {
-            MinSize = new Vector2(CardIconSize, CardIconSize),
-            MaxSize = new Vector2(CardIconSize, CardIconSize),
-            HorizontalAlignment = HAlignment.Center,
-        };
-        imageBox.AddChild(_imageSlot);
-
-        _title = new RichTextLabel
-        {
-            HorizontalAlignment = HAlignment.Center,
-            HorizontalExpand = true,
-            MaxHeight = TitleMaxHeight,
-            RectClipContent = true,
-            StyleClasses = { StyleNano.StyleClassLabelSubText },
-        };
-        root.AddChild(_title);
-
-        var actions = new BoxContainer
-        {
-            Orientation = LayoutOrientation.Vertical,
-            SeparationOverride = 4,
-            HorizontalAlignment = HAlignment.Stretch,
-            HorizontalExpand = true,
-            MinSize = new Vector2(0, 64),
-        };
-        root.AddChild(actions);
-
-        var toggleHost = new CenterContainer
-        {
-            MinSize = new Vector2(0, 36),
-            HorizontalAlignment = HAlignment.Center,
-        };
-        actions.AddChild(toggleHost);
-
-        _toggle = new PixelAntagToggle();
-        _toggle.OnSelected += value => OnSelected?.Invoke(value);
-        toggleHost.AddChild(_toggle);
-
-        _lockIcon = new RoleLockIcon
-        {
-            Visible = false,
-        };
-        toggleHost.AddChild(_lockIcon);
-
-        _unlockButton = new Button
-        {
-            Visible = false,
-            HorizontalAlignment = HAlignment.Center,
-        };
-        _unlockButton.OnPressed += _ => _onUnlock?.Invoke();
-        actions.AddChild(_unlockButton);
-
-        _loadoutButton = new Button
-        {
-            Text = Loc.GetString("loadout-window"),
-            Visible = false,
-            HorizontalAlignment = HAlignment.Stretch,
-            HorizontalExpand = true,
-            MinWidth = 120,
-            MinHeight = 32,
-            ClipText = true,
-            Margin = new Thickness(0, 4, 0, 0),
-        };
-        _loadoutButton.OnPressed += _ => _onLoadout?.Invoke();
-        actions.AddChild(_loadoutButton);
+        controls.AddChild(helpWrapper);
     }
+
+    private readonly Control _imageSlot;
 
     public void Setup(
         string title,
@@ -187,8 +162,8 @@ public sealed class AntagPreferenceCard : PanelContainer
         Action? onLoadout = null,
         bool loadoutAvailable = false)
     {
-        _title.SetMessage(title, defaultColor: LobbyUiStyles.HeaderText);
-        _title.ToolTip = title;
+        _title.Text = title;
+        _title.ToolTip = description;
         ToolTip = description;
         _guides = guides;
         _help.Visible = guides != null;
@@ -203,8 +178,8 @@ public sealed class AntagPreferenceCard : PanelContainer
             _imageSlot.AddChild(new TextureRect
             {
                 Texture = icon,
-                MinSize = new Vector2(CardIconSize, CardIconSize),
-                MaxSize = new Vector2(CardIconSize, CardIconSize),
+                MinSize = new Vector2(IconSize, IconSize),
+                MaxSize = new Vector2(IconSize, IconSize),
                 Stretch = TextureRect.StretchMode.KeepAspectCentered,
             });
         }
@@ -258,8 +233,8 @@ public sealed class PixelAntagToggle : Control
     private const float NativePointerWidth = MiniSliderStyles.NativePointerWidth;
     private const float NativePointerHeight = MiniSliderStyles.NativePointerHeight;
 
-    private const float Scale = 2.5f * 1.35f;
-    private const float ClickToggleThreshold = 4f;
+    private const float Scale = MiniSliderStyles.LobbyScale;
+    private const float ClickToggleThreshold = 6f;
     private const float SnapLerpSpeed = 18f;
 
     private static readonly Color TrackColor = Color.FromHex("#B5B3BD");
@@ -299,6 +274,7 @@ public sealed class PixelAntagToggle : Control
         MouseFilter = MouseFilterMode.Stop;
         MinSize = new Vector2(ScaledTrackWidth, ControlHeight);
         MaxSize = new Vector2(ScaledTrackWidth, ControlHeight);
+        VerticalAlignment = VAlignment.Center;
 
         _layout = new LayoutContainer
         {

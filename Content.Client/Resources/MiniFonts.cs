@@ -76,6 +76,14 @@ public static class MiniFonts
         return cache.GetFont(Stack(variation, mono), size);
     }
 
+    public static Font GetChatStack(this IResourceCache cache, string variation = "Regular", int size = 12)
+    {
+        if (IoCManager.Instance is { } ioc)
+            return ioc.Resolve<IUiFontStackManager>().GetChatStack(cache, variation, size);
+
+        return cache.GetFont(Stack(variation), size);
+    }
+
     public static Font GetStackWithPrimary(this IResourceCache cache, string path, int size = 10)
     {
         if (IoCManager.Instance is { } ioc)

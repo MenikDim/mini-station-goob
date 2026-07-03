@@ -1,5 +1,4 @@
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Content.Server.Database;
 using Content.Server.GameTicking;
@@ -140,17 +139,13 @@ public sealed class AdminHelpRatingSystem : EntitySystem
 
     private void SendRatingChatMessage(ICommonSession session, string adminName, byte stars)
     {
-        var iconMarkup = new StringBuilder();
-        for (var i = 0; i < stars; i++)
-            iconMarkup.Append($"[icon=\"{AdminHelpRatingPaths.StarIconPath}\"] ");
-
         var text = Loc.GetString(
             "admin-help-rating-chat",
             ("player", session.Name),
             ("stars", stars),
             ("admin", adminName));
 
-        _bwoink.SendPlayerChannelSystemMessage(session.UserId, $"[color=#B5B3BD]{text} {iconMarkup}[/color]");
+        _bwoink.SendPlayerChannelSystemMessage(session.UserId, $"[color=#B5B3BD]{text}[/color]");
     }
 
     private bool TryResolveParticipant(

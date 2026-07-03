@@ -169,6 +169,7 @@ using Content.Client.UserInterface;
 using Content.Client.UserInterface.Systems.Guidebook;
 using Content.Shared._CorvaxGoob.CCCVars;
 using Content.Corvax.Interfaces.Shared;
+using Content.Shared._Mini.MiniCCVars;
 using Content.Shared.CCVar;
 using Content.Shared.Clothing;
 using Content.Shared.GameTicking;
@@ -948,14 +949,13 @@ namespace Content.Client.Lobby.UI
                 }
             });
 
-            var grid = new GridContainer
+            var list = new BoxContainer
             {
-                Columns = 3,
-                HSeparationOverride = 8,
-                VSeparationOverride = 8,
+                Orientation = LayoutOrientation.Vertical,
+                SeparationOverride = 4,
                 HorizontalExpand = true,
             };
-            AntagList.AddChild(grid);
+            AntagList.AddChild(list);
 
             var resourceCache = IoCManager.Resolve<IResourceCache>();
 
@@ -1024,6 +1024,7 @@ namespace Content.Client.Lobby.UI
                     SetDirty();
 
                     if (!_requirements.HasAntagUnlock(antag.ID) &&
+                        _cfgManager.GetCVar(MiniCCVars.RoleUnlockEarlyPurchaseEnabled) &&
                         _requirements.TryGetAntagUnlockCost(
                             antag.ID,
                             (HumanoidCharacterProfile?) _preferencesManager.Preferences?.SelectedCharacter,
@@ -1044,7 +1045,7 @@ namespace Content.Client.Lobby.UI
                     SetDirty();
                 };
 
-                grid.AddChild(card);
+                list.AddChild(card);
             }
         }
 
@@ -1272,6 +1273,7 @@ namespace Content.Client.Lobby.UI
                         selector.LockRequirements(reason);
 
                         if (!_requirements.HasJobUnlock(job.ID) &&
+                            _cfgManager.GetCVar(MiniCCVars.RoleUnlockEarlyPurchaseEnabled) &&
                             _requirements.TryGetJobUnlockCost(
                                 job.ID,
                                 (HumanoidCharacterProfile?) _preferencesManager.Preferences?.SelectedCharacter,

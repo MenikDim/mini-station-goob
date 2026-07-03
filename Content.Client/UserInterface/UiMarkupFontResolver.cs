@@ -24,6 +24,6 @@ public sealed class UiMarkupFontResolver : IMarkupFontResolver
         };
 
         var display = fontId.Contains("Display", StringComparison.Ordinal);
-        return _fonts.GetStack(_cache, variation, size, display);
+        return _fonts.GetChatStack(_cache, variation, size, display);
     }
 }

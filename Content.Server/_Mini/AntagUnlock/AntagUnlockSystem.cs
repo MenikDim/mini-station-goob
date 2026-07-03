@@ -6,11 +6,13 @@ using Content.Server.Players.PlayTimeTracking;
 using Content.Server.Popups;
 using Content.Server.Preferences.Managers;
 using Content.Shared._Mini.AntagUnlock;
+using Content.Shared._Mini.MiniCCVars;
 using Content.Shared._Mini.RoleUnlock;
 using Content.Shared.Players.PlayTimeTracking;
 using Content.Shared.Preferences;
 using Content.Shared.Roles;
 using Robust.Server.Player;
+using Robust.Shared.Configuration;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
@@ -28,6 +30,7 @@ public sealed class AntagUnlockSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _prototypes = default!;
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly IServerPreferencesManager _preferences = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
 
     public override void Initialize()
     {
@@ -42,6 +45,12 @@ public sealed class AntagUnlockSystem : EntitySystem
     {
         if (args.SenderSession is not { } session)
             return;
+
+        if (!_cfg.GetCVar(MiniCCVars.RoleUnlockEarlyPurchaseEnabled))
+        {
+            ShowPopup(session, Loc.GetString("antag-unlock-error-unavailable"));
+            return;
+        }
 
         if (!_prototypes.TryIndex<AntagPrototype>(msg.AntagId, out var antag))
         {

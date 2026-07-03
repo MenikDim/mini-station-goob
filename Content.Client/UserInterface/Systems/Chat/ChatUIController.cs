@@ -1076,7 +1076,7 @@ public sealed partial class ChatUIController : UIController
     {
         foreach (var chat in _chats)
         {
-            chat.InvalidateFontLayout();
+            chat.RefreshChatFont();
         }
     }
 

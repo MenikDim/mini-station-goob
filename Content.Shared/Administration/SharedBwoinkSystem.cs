@@ -53,6 +53,9 @@ namespace Content.Shared.Administration
     }
 
     [Serializable, NetSerializable]
+    public sealed class BwoinkAHelpOpenRequestEvent : EntityEventArgs;
+
+    [Serializable, NetSerializable]
     public sealed class BwoinkDiscordRelayUpdated : EntityEventArgs
     {
         public bool DiscordRelayEnabled { get; }

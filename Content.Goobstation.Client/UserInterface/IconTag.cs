@@ -27,13 +27,24 @@ public sealed class IconTag : IMarkupTag
     {
         control = null;
 
-        if (node.Value.StringValue is { } path && path.StartsWith(AdminIconsPrefix, StringComparison.Ordinal))
+        if (node.Value.StringValue is { } path)
         {
-            if (!_resourceCache.TryGetResource<TextureResource>(path, out var texture))
-                return false;
+            if (path.StartsWith(AdminIconsPrefix, StringComparison.Ordinal))
+            {
+                if (!_resourceCache.TryGetResource<TextureResource>(path, out var texture))
+                    return false;
 
-            control = CreateIcon(texture.Texture);
-            return true;
+                control = CreateIcon(texture.Texture);
+                return true;
+            }
+
+            var texturePath = path.StartsWith('/') ? path : $"/{path}";
+            if (texturePath.StartsWith("/Textures/", StringComparison.Ordinal)
+                && _resourceCache.TryGetResource<TextureResource>(texturePath, out var directTexture))
+            {
+                control = CreateIcon(directTexture.Texture);
+                return true;
+            }
         }
 
         if (!node.Attributes.TryGetValue("src", out var id) || id.StringValue == null)
