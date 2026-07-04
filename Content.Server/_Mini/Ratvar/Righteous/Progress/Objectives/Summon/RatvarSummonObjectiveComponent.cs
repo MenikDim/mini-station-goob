@@ -24,5 +24,5 @@ public sealed partial class RatvarSummonObjectiveComponent : Component
     public TimeSpan UpdateCoordinatesPeriod = TimeSpan.FromSeconds(10);
 
     [DataField]
-    public float SummonRange = 12f;
+    public float SummonRange = 30f;
 }
