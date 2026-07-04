@@ -193,7 +193,6 @@ namespace Content.Client.Stylesheets
         public const string StyleClassActionSearchBox = "actionSearchBox";
         public const string StyleClassActionMenuItemRevoked = "actionMenuItemRevoked";
         public const string StyleClassChatLineEdit = "chatLineEdit";
-        public const string StyleClassAhelpLineEdit = "ahelpLineEdit";
         public const string StyleClassChatChannelSelectorButton = "chatSelectorOptionButton";
         public const string StyleClassChatFilterOptionButton = "chatFilterOptionButton";
         public const string StyleClassStorageButton = "storageButton";
@@ -1296,12 +1295,6 @@ namespace Content.Client.Stylesheets
                     new[]
                     {
                         new StyleProperty(LineEdit.StylePropertyStyleBox, new StyleBoxEmpty()),
-                    }),
-
-                new StyleRule(new SelectorElement(typeof(LineEdit), new[] {StyleClassAhelpLineEdit}, null, null),
-                    new[]
-                    {
-                        new StyleProperty(LineEdit.StylePropertyStyleBox, lineEdit),
                     }),
 
                 // Action searchbox lineedit

@@ -1,0 +1,5 @@
+# Mini Station - Mars lobby background (space-hole is defined in _OS/Lobby/lobby.yml)
+
+- type: animatedLobbyScreen
+  id: MiniMarsLobbyScreen
+  path: /Textures/_Mini/Lobby/mars.rsi

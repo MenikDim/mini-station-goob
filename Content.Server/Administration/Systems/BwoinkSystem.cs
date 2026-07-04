@@ -1018,11 +1018,15 @@ namespace Content.Server.Administration.Systems
         {
             var msg = new BwoinkTextMessage(channelUserId, SystemUserId, text, playSound: false);
 
-            if (_playerManager.TryGetSessionById(channelUserId, out var session))
-                RaiseNetworkEvent(msg, session.Channel);
-
-            foreach (var channel in GetTargetAdmins())
+            var admins = GetTargetAdmins();
+            foreach (var channel in admins)
                 RaiseNetworkEvent(msg, channel);
+
+            if (_playerManager.TryGetSessionById(channelUserId, out var session)
+                && !admins.Contains(session.Channel))
+            {
+                RaiseNetworkEvent(msg, session.Channel);
+            }
 
             EnqueueSystemWebhookMessage(channelUserId, text);
         }

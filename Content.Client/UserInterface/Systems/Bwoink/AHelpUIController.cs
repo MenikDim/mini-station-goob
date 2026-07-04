@@ -216,7 +216,8 @@ public sealed class AHelpUIController: UIController, IOnSystemChanged<BwoinkSyst
         UIHelper.OnOpen +=  () =>
         {
             SetAHelpPressed(true);
-            _bwoinkSystem?.NotifyAHelpOpened();
+            if (UIHelper is UserAHelpUIHandler userHandler)
+                userHandler.NotifyOpened(_bwoinkSystem);
         };
         SetAHelpPressed(UIHelper.IsOpen);
     }
@@ -565,22 +566,38 @@ public sealed class UserAHelpUIHandler : IAHelpUIHandler
 
     public void RefreshChatFont() => _chatPanel?.RefreshOutputFont();
 
+    public void NotifyOpened(BwoinkSystem? bwoinkSystem)
+    {
+        if (_introRequested)
+            return;
+
+        _introRequested = true;
+        bwoinkSystem?.NotifyAHelpOpened();
+    }
+
     public bool IsAdmin => false;
     public bool IsOpen => _window is { Disposed: false, IsOpen: true };
     private DefaultWindow? _window;
     private BwoinkPanel? _chatPanel;
     private AHelpRatingPanel? _ratingPanel;
     private bool _discordRelayActive;
+    private bool _introRequested;
+    private bool _adminHasReplied;
 
     public void Receive(SharedBwoinkSystem.BwoinkTextMessage message)
     {
         DebugTools.Assert(message.UserId == _ownerId);
         EnsureInit(_discordRelayActive);
         _chatPanel!.ReceiveLine(message);
-        _window!.OpenCentered();
 
-        if (message.TrueSender != SharedBwoinkSystem.SystemUserId && message.TrueSender != _ownerId)
-            _ratingPanel?.RequestRefresh();
+        if (!_window!.IsOpen)
+            _window.OpenCentered();
+
+        if (message.TrueSender == SharedBwoinkSystem.SystemUserId || message.TrueSender == _ownerId)
+            return;
+
+        _adminHasReplied = true;
+        _ratingPanel?.RequestRefresh();
     }
 
     public void Close()
@@ -656,7 +673,9 @@ public sealed class UserAHelpUIHandler : IAHelpUIHandler
         _window.OnOpen += () =>
         {
             OnOpen?.Invoke();
-            _ratingPanel.RequestRefresh();
+
+            if (_adminHasReplied)
+                _ratingPanel.RequestRefresh();
         };
         _window.Contents.AddChild(_chatPanel);
     }

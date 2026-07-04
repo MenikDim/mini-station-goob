@@ -10,35 +10,33 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Shared.GameTicking.Prototypes;
-using Robust.Shared.Random;
-using System.Linq;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Random;
-using System.Linq;
-using Content.Shared._OS;
 
 namespace Content.Server.GameTicking;
 
-// Goobstation - this file is heavily modified to add credits for lobby backgrounds
+// Mini Station - alternating lobby backgrounds (Mars / space hole)
 public sealed partial class GameTicker
 {
+    private static readonly string[] MiniLobbyBackgroundPaths =
+    [
+        "/Textures/_Mini/Lobby/mars.rsi",
+        "/Textures/_OS/Lobby/space-hole.rsi",
+    ];
+
+    private int _lobbyBackgroundIndex;
+
     [ViewVariables]
     public ProtoId<LobbyBackgroundPrototype>? LobbyBackground { get; private set; }
 
-    [ViewVariables]
-    private List<string>? _lobbyBackgrounds; // OpenSpace edit
-
     private void InitializeLobbyBackground()
     {
-        _lobbyBackgrounds = _prototypeManager.EnumeratePrototypes<AnimatedLobbyScreenPrototype>() // OpenSpace edit
-            .Select(x => x.Path) // OpenSpace edit
-            .ToList();
-
-        RandomizeLobbyBackground();
+        _lobbyBackgroundIndex = 0;
+        LobbyBackground = MiniLobbyBackgroundPaths[_lobbyBackgroundIndex];
     }
 
     private void RandomizeLobbyBackground()
     {
-        LobbyBackground = _lobbyBackgrounds!.Any() ? _robustRandom.Pick(_lobbyBackgrounds!) : null; // OpenSpace edit
+        _lobbyBackgroundIndex = (_lobbyBackgroundIndex + 1) % MiniLobbyBackgroundPaths.Length;
+        LobbyBackground = MiniLobbyBackgroundPaths[_lobbyBackgroundIndex];
     }
 }

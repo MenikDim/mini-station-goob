@@ -226,6 +226,8 @@ namespace Content.Client.Lobby
             {
                 Lobby!.ServerInfo.SetInfoBlob(_gameTicker.ServerInfoBlob);
             }
+
+            UpdateLobbyBackground();
         }
 
             // UpdatePlayerBalance(); // Goobstation - Goob Coin
