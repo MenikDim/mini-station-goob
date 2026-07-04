@@ -36,10 +36,7 @@ public static class UiChatFonts
                 custom.InvalidateLayout();
                 break;
             case OutputPanel panel:
-                panel.FontOverride = font;
-                panel.LineHeightScale = LineHeightScale;
                 panel.InvalidateStyleSheet();
-                panel.InvalidateLayout();
                 break;
         }
     }
