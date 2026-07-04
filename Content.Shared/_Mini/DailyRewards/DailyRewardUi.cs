@@ -2,6 +2,7 @@
 // Мини-станция/Freaky-station, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/ministation/mini-station-goob/master/LICENSE.TXT
 using System;
 using System.Collections.Generic;
+using Content.Shared._Mini.DailyQuests;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Mini.DailyRewards;
@@ -25,7 +26,8 @@ public sealed class DailyRewardUpdateMessage(
     TimeSpan requiredActiveTime,
     List<DailyRewardEntry> rewards,
     TimeSpan onlineElapsed,
-    List<TimeSpan> onlineGrantedThresholds) : BoundUserInterfaceState
+    List<TimeSpan> onlineGrantedThresholds,
+    List<DailyQuestEntry> dailyQuests) : BoundUserInterfaceState
 {
     public int CurrentStreak { get; } = currentStreak;
     public int NextRewardDay { get; } = nextRewardDay;
@@ -39,6 +41,7 @@ public sealed class DailyRewardUpdateMessage(
     public List<DailyRewardEntry> Rewards { get; } = rewards;
     public TimeSpan OnlineElapsed { get; } = onlineElapsed;
     public List<TimeSpan> OnlineGrantedThresholds { get; } = onlineGrantedThresholds;
+    public List<DailyQuestEntry> DailyQuests { get; } = dailyQuests;
 }
 
 [Serializable, NetSerializable]
@@ -54,6 +57,44 @@ public sealed class DailyRewardOpenRequestEvent : EntityEventArgs
 [Serializable, NetSerializable]
 public sealed class DailyRewardClaimRequestEvent : EntityEventArgs
 {
+}
+
+[Serializable, NetSerializable]
+public sealed class DailyQuestReplaceRequestEvent : EntityEventArgs
+{
+    public string QuestId;
+    public int SlotIndex;
+
+    public DailyQuestReplaceRequestEvent()
+    {
+        QuestId = string.Empty;
+        SlotIndex = -1;
+    }
+
+    public DailyQuestReplaceRequestEvent(string questId, int slotIndex)
+    {
+        QuestId = questId;
+        SlotIndex = slotIndex;
+    }
+}
+
+[Serializable, NetSerializable]
+public sealed class DailyQuestReplaceDeniedEvent : EntityEventArgs
+{
+    public string QuestId;
+    public string Reason;
+
+    public DailyQuestReplaceDeniedEvent()
+    {
+        QuestId = string.Empty;
+        Reason = string.Empty;
+    }
+
+    public DailyQuestReplaceDeniedEvent(string questId, string reason)
+    {
+        QuestId = questId;
+        Reason = reason;
+    }
 }
 
 [Serializable, NetSerializable]

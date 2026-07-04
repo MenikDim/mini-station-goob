@@ -22,6 +22,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Mini.DailyQuests;
 using Content.Server.Power.EntitySystems;
 using Content.Server.Research.Components;
 using Content.Shared.UserInterface;
@@ -83,6 +84,9 @@ public sealed partial class ResearchSystem
 
         if (!UnlockTechnology(uid, args.Id, act))
             return;
+
+        var unlockEv = new TechnologyUnlockedEvent(act);
+        RaiseLocalEvent(ref unlockEv);
 
         if (!_emag.CheckFlag(uid, EmagType.Interaction))
         {

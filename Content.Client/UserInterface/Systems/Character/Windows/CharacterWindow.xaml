@@ -30,6 +30,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
             </BoxContainer>
             <Label Name="ObjectivesLabel" Access="Public" Text="{Loc 'character-info-objectives-label'}" HorizontalAlignment="Center"/>
             <BoxContainer Orientation="Vertical" Name="Objectives" Access="Public"/>
+            <Label Name="DailyQuestsLabel" Access="Public" Text="{Loc 'daily-quest-section-title'}" HorizontalAlignment="Center" Visible="False"/>
+            <BoxContainer Orientation="Vertical" Name="DailyQuests" Access="Public" SeparationOverride="8" HorizontalExpand="True"/>
             <cc:Placeholder Name="RolePlaceholder" Access="Public" PlaceholderText="{Loc 'character-info-roles-antagonist-text'}"/>
         </BoxContainer>
     </ScrollContainer>

@@ -30,4 +30,7 @@ public sealed partial class ActiveMicrowaveComponent : Component
 
     [ViewVariables]
     public (FoodRecipePrototype?, int) PortionedRecipe;
+
+    [ViewVariables]
+    public EntityUid? CookUser;
 }

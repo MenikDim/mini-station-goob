@@ -1,0 +1,66 @@
+// SPDX-FileCopyrightText: 2026 Casha
+// Мини-станция/Freaky-station, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/ministation/mini-station-goob/master/LICENSE.TXT
+using Robust.Shared.Serialization;
+
+namespace Content.Shared._Mini.DailyQuests;
+
+[Serializable, NetSerializable]
+public sealed class DailyQuestEntry
+{
+    public string QuestId { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public int CurrentProgress { get; set; }
+    public int TargetProgress { get; set; }
+    public int RewardCoins { get; set; }
+    public bool IsCompleted { get; set; }
+    public bool IsClaimed { get; set; }
+    public string? RoleHint { get; set; }
+    public string? IconId { get; set; }
+    public string? IconSprite { get; set; }
+    public string? IconState { get; set; }
+    public bool IsTimeBased { get; set; }
+    public bool CanReplace { get; set; }
+
+    public DailyQuestEntry()
+    {
+    }
+
+    public DailyQuestEntry(
+        string questId,
+        string title,
+        string description,
+        int currentProgress,
+        int targetProgress,
+        int rewardCoins,
+        bool isCompleted,
+        bool isClaimed,
+        string? roleHint,
+        string? iconId,
+        string? iconSprite,
+        string? iconState,
+        bool isTimeBased,
+        bool canReplace)
+    {
+        QuestId = questId;
+        Title = title;
+        Description = description;
+        CurrentProgress = currentProgress;
+        TargetProgress = targetProgress;
+        RewardCoins = rewardCoins;
+        IsCompleted = isCompleted;
+        IsClaimed = isClaimed;
+        RoleHint = roleHint;
+        IconId = iconId;
+        IconSprite = iconSprite;
+        IconState = iconState;
+        IsTimeBased = isTimeBased;
+        CanReplace = canReplace;
+    }
+}
+
+[Serializable, NetSerializable]
+public sealed class DailyQuestClaimRequestEvent(string questId) : EntityEventArgs
+{
+    public string QuestId { get; } = questId;
+}

@@ -84,6 +84,7 @@ using Content.Server.Materials;
 using Content.Server.Popups;
 using Content.Server.Power.EntitySystems;
 using Content.Server.Stack;
+using Content.Shared._Mini.DailyQuests;
 using Content.Shared.Atmos;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
@@ -321,6 +322,10 @@ namespace Content.Server.Lathe
                     {
                         var result = Spawn(resultProto, Transform(uid).Coordinates);
                         RaiseLocalEvent(uid, new LatheGetResultEvent(result)); // CorvaxGoob-Prefilled-Printers
+
+                        var latheEv = new LatheItemProducedEvent(uid, comp.LastQuestActor);
+                        RaiseLocalEvent(ref latheEv);
+
                         _stack.TryMergeToContacts(result);
                         if (TryComp<ScannableForPointsComponent>(result, out var scannable)) // Goobstation
                             scannable.Points = 0; // Goobstation, this thing is to prevent ntr duping points via an emagged lathe
@@ -503,6 +508,7 @@ namespace Content.Server.Lathe
                 }
                 if (count > 0)
                 {
+                    component.LastQuestActor = args.Actor;
                     _adminLogger.Add(LogType.Action,
                         LogImpact.Low,
                         $"{ToPrettyString(args.Actor):player} queued {count} {GetRecipeName(recipe)} at {ToPrettyString(uid):lathe}");

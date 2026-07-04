@@ -48,6 +48,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Mini.DailyQuests;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
@@ -213,6 +214,12 @@ public sealed class HealingSystem : EntitySystem
         // Logic to determine the whether or not to repeat the healing action
         args.Repeat = HasDamage((args.Used.Value, healing), target) && !dontRepeat;
         args.Handled = true;
+
+        if (target.Owner != args.User)
+        {
+            var healEv = new MedicalHealAppliedEvent(args.User, target.Owner);
+            RaiseLocalEvent(ref healEv);
+        }
 
         if (!args.Repeat)
         {
@@ -511,6 +518,12 @@ public sealed class HealingSystem : EntitySystem
         // Logic to determine whether or not to repeat the healing action
         args.Repeat = IsAnythingToHeal(args.User, ent, (args.Used.Value, healing)); // GOOBEDIT
         args.Handled = true;
+
+        if (ent != args.User)
+        {
+            var healEv = new MedicalHealAppliedEvent(args.User, ent);
+            RaiseLocalEvent(ref healEv);
+        }
 
         if (args.Repeat || dontRepeat)
             return;

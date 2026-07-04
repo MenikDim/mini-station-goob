@@ -755,6 +755,44 @@ namespace Content.Server.Database
             await db.DbContext.SaveChangesAsync();
         }
 
+        public async Task<DailyQuestProgress?> GetDailyQuestProgress(Guid playerId, DateTime questDate, CancellationToken cancel)
+        {
+            await using var db = await GetDb(cancel);
+            var date = questDate.Date;
+
+            return await db.DbContext.DailyQuestProgresses
+                .SingleOrDefaultAsync(p => p.PlayerId == playerId && p.QuestDate == date, cancel);
+        }
+
+        public async Task UpsertDailyQuestProgress(DailyQuestProgress progress)
+        {
+            await using var db = await GetDb();
+            progress.QuestDate = progress.QuestDate.Date;
+
+            var existing = await db.DbContext.DailyQuestProgresses
+                .SingleOrDefaultAsync(p => p.PlayerId == progress.PlayerId && p.QuestDate == progress.QuestDate);
+
+            if (existing == null)
+            {
+                db.DbContext.DailyQuestProgresses.Add(new DailyQuestProgress
+                {
+                    PlayerId = progress.PlayerId,
+                    QuestDate = progress.QuestDate,
+                    AssignedQuestIds = progress.AssignedQuestIds,
+                    ProgressValues = progress.ProgressValues,
+                    StatusFlags = progress.StatusFlags,
+                });
+            }
+            else
+            {
+                existing.AssignedQuestIds = progress.AssignedQuestIds;
+                existing.ProgressValues = progress.ProgressValues;
+                existing.StatusFlags = progress.StatusFlags;
+            }
+
+            await db.DbContext.SaveChangesAsync();
+        }
+
         public async Task<bool> HasAdminHelpRatingSince(Guid playerUserId, DateTime sinceUtc, CancellationToken cancel = default)
         {
             await using var db = await GetDb(cancel);

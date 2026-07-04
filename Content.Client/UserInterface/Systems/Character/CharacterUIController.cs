@@ -24,8 +24,12 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using Content.Client._Mini.DailyQuests;
 using Content.Client.CharacterInfo;
+using Content.Shared._Mini.DailyQuests;
 using Content.Client.Gameplay;
 using Content.Client.Stylesheets;
 using Content.Client.UserInterface.Controls;
@@ -51,13 +55,14 @@ using static Robust.Client.UserInterface.Controls.BaseButton;
 namespace Content.Client.UserInterface.Systems.Character;
 
 [UsedImplicitly]
-public sealed class CharacterUIController : UIController, IOnStateEntered<GameplayState>, IOnStateExited<GameplayState>, IOnSystemChanged<CharacterInfoSystem>
+public sealed class CharacterUIController : UIController, IOnStateEntered<GameplayState>, IOnStateExited<GameplayState>, IOnSystemChanged<CharacterInfoSystem>, IOnSystemChanged<DailyQuestUiSystem>
 {
     [Dependency] private readonly IEntityManager _ent = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
     [UISystemDependency] private readonly CharacterInfoSystem _characterInfo = default!;
+    [UISystemDependency] private readonly DailyQuestUiSystem _dailyQuests = default!;
     [UISystemDependency] private readonly SpriteSystem _sprite = default!;
 
     public override void Initialize()
@@ -69,6 +74,9 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
 
     private CharacterWindow? _window;
     private MenuButton? CharacterButton => UIManager.GetActiveUIWidgetOrNull<MenuBar.Widgets.GameTopMenuBar>()?.CharacterButton;
+    private readonly List<PanelContainer> _dailyQuestSlots = new();
+    private readonly List<DailyQuestCardControl> _dailyQuestCards = new();
+    private readonly List<DailyQuestEntry> _dailyQuestLayoutCache = new();
 
     public void OnStateEntered(GameplayState state)
     {
@@ -107,6 +115,17 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
     {
         system.OnCharacterUpdate -= CharacterUpdated;
         _player.LocalPlayerDetached -= CharacterDetached;
+    }
+
+    public void OnSystemLoaded(DailyQuestUiSystem system)
+    {
+        system.QuestsUpdated += OnDailyQuestsUpdated;
+        RefreshDailyQuests(system.Quests, system.TimeInterpSeconds);
+    }
+
+    public void OnSystemUnloaded(DailyQuestUiSystem system)
+    {
+        system.QuestsUpdated -= OnDailyQuestsUpdated;
     }
 
     public void UnloadButton()
@@ -222,7 +241,103 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
             _window.Objectives.AddChild(control);
         }
 
-        _window.RolePlaceholder.Visible = briefing == null && !controls.Any() && !objectives.Any();
+        _window.RolePlaceholder.Visible = briefing == null && !controls.Any() && !objectives.Any() && !_dailyQuests.Quests.Any();
+        RefreshDailyQuests(_dailyQuests.Quests, _dailyQuests.TimeInterpSeconds);
+    }
+
+    private void OnDailyQuestsUpdated(IReadOnlyList<DailyQuestEntry> quests, float smoothTimeExtra)
+    {
+        RefreshDailyQuests(quests, smoothTimeExtra);
+    }
+
+    private void RefreshDailyQuests(IReadOnlyList<DailyQuestEntry> quests, float smoothTimeExtra = 0f)
+    {
+        if (_window == null)
+            return;
+
+        _window.DailyQuestsLabel.Visible = quests.Count > 0;
+
+        if (quests.Count == 0)
+        {
+            _window.DailyQuests.RemoveAllChildren();
+            _dailyQuestSlots.Clear();
+            _dailyQuestCards.Clear();
+            _dailyQuestLayoutCache.Clear();
+            _window.RolePlaceholder.Visible = _window.Objectives.ChildCount == 0
+                && string.IsNullOrWhiteSpace(_window.SubText.Text);
+            return;
+        }
+
+        var rebuildLayout = NeedsDailyQuestLayoutRebuild(quests);
+        EnsureDailyQuestSlots(quests.Count);
+
+        if (rebuildLayout)
+        {
+            _window.DailyQuests.RemoveAllChildren();
+            for (var i = 0; i < quests.Count; i++)
+            {
+                _dailyQuestSlots[i].HorizontalExpand = true;
+                _dailyQuestSlots[i].VerticalExpand = false;
+                _window.DailyQuests.AddChild(_dailyQuestSlots[i]);
+            }
+
+            _dailyQuestLayoutCache.Clear();
+            _dailyQuestLayoutCache.AddRange(quests);
+        }
+
+        for (var i = 0; i < quests.Count; i++)
+            _dailyQuestCards[i].SetQuest(quests[i], smoothTimeExtra);
+
+        while (_dailyQuestSlots.Count > quests.Count)
+        {
+            _dailyQuestSlots.RemoveAt(_dailyQuestSlots.Count - 1);
+            _dailyQuestCards.RemoveAt(_dailyQuestCards.Count - 1);
+        }
+
+        _window.RolePlaceholder.Visible = false;
+    }
+
+    private bool NeedsDailyQuestLayoutRebuild(IReadOnlyList<DailyQuestEntry> quests)
+    {
+        if (_dailyQuestLayoutCache.Count != quests.Count)
+            return true;
+
+        for (var i = 0; i < quests.Count; i++)
+        {
+            var a = _dailyQuestLayoutCache[i];
+            var b = quests[i];
+            if (a.QuestId != b.QuestId
+                || a.IsClaimed != b.IsClaimed
+                || a.IsCompleted != b.IsCompleted)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void EnsureDailyQuestSlots(int count)
+    {
+        while (_dailyQuestSlots.Count < count)
+        {
+            var slot = new PanelContainer
+            {
+                HorizontalExpand = true,
+                VerticalExpand = false,
+                RectClipContent = true,
+                MinSize = new Vector2(0, DailyQuestCardControl.CompactQuestCardHeight),
+            };
+
+            var card = new DailyQuestCardControl(compact: true)
+            {
+                HorizontalExpand = true,
+                VerticalExpand = false,
+            };
+            slot.AddChild(card);
+            _dailyQuestSlots.Add(slot);
+            _dailyQuestCards.Add(card);
+        }
     }
 
     private void OnRoleTypeChanged(MindRoleTypeChangedEvent ev, EntitySessionEventArgs _)

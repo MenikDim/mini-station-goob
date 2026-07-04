@@ -108,6 +108,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Shared._Mini.DailyQuests;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Administration.Components;
 using Content.Shared.Administration.Logs;
@@ -487,6 +488,9 @@ namespace Content.Shared.Cuffs
                     _adminLog.Add(LogType.Action, LogImpact.High,
                         $"{ToPrettyString(user):player} has cuffed {ToPrettyString(target):player}");
                 }
+
+                var cuffEv = new PlayerCuffedEvent(user);
+                RaiseLocalEvent(ref cuffEv);
             }
             else
             {

@@ -1,0 +1,1228 @@
+// SPDX-FileCopyrightText: 2026 Casha
+// Мини-станция/Freaky-station, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/ministation/mini-station-goob/master/LICENSE.TXT
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Content.Goobstation.Shared.FloorCleaner;
+using Content.Goobstation.Shared.Harvestable;
+using Content.Server._CorvaxGoob.Document;
+using Content.Server.Cargo.Systems;
+using Content.Server.Chat.Systems;
+using Content.Server.Database;
+using Content.Server.Ghost;
+using Content.Server.Mind;
+using Content.Server.Players.PlayTimeTracking;
+using Content.Server.Popups;
+using Content.Server.Preferences.Managers;
+using Content.Server.Research.Components;
+using Content.Server.Salvage.Magnet;
+using Content.Server._Mini.AntagTokens;
+using Content.Server._Mini.DailyRewards;
+using Content.Shared._DV.Salvage;
+using Content.Shared._DV.Salvage.Components;
+using Content.Shared._DV.Salvage.Systems;
+using Content.Shared._Mini.DailyQuests;
+using Content.Shared._Mini.DailyRewards;
+using Content.Shared.Cargo;
+using Content.Shared.Cargo.Components;
+using Content.Shared.Chemistry.Components;
+using Content.Shared.Chemistry.EntitySystems.Hypospray;
+using Content.Shared.Cuffs;
+using Content.Shared.Cuffs.Components;
+using Content.Shared.Damage;
+using Content.Shared.Damage.Components;
+using Content.Shared.Forensics;
+using Content.Shared.GameTicking;
+using Content.Shared.Kitchen.Components;
+using Content.Shared.Lathe;
+using Content.Shared.Mind;
+using Content.Shared.Mobs;
+using Content.Shared.Mobs.Components;
+using Content.Shared.Mobs.Systems;
+using Content.Shared.Paper;
+using Content.Shared.Players;
+using Content.Shared.Research.Components;
+using Content.Shared.Repairable;
+using Content.Shared.Roles;
+using Content.Shared.Roles.Jobs;
+using Content.Shared.Salvage.Magnet;
+using Content.Shared.Speech.Components;
+using Content.Shared.Tools.Components;
+using Content.Shared.Tools.Systems;
+using Content.Shared.Weapons.Melee.Events;
+using Robust.Server.Player;
+using Robust.Shared.Enums;
+using Robust.Shared.Network;
+using Robust.Shared.Player;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Timing;
+using Robust.Shared.Utility;
+
+namespace Content.Server._Mini.DailyQuests;
+
+public sealed class DailyQuestSystem : EntitySystem
+{
+    private const int DailyQuestCount = 2;
+    private const float UiRefreshInterval = 1f;
+
+    private float _uiRefreshAccumulator;
+
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly IServerDbManager _db = default!;
+    [Dependency] private readonly UserDbDataManager _userDb = default!;
+    [Dependency] private readonly IPrototypeManager _prototypes = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedJobSystem _jobs = default!;
+    [Dependency] private readonly SharedRoleSystem _roles = default!;
+    [Dependency] private readonly MindSystem _minds = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly MiningPointsSystem _miningPoints = default!;
+    [Dependency] private readonly AntagTokenSystem _antagTokens = default!;
+    [Dependency] private readonly PopupSystem _popup = default!;
+    [Dependency] private readonly PlayTimeTrackingSystem _playTime = default!;
+    [Dependency] private readonly IServerPreferencesManager _preferences = default!;
+
+    private readonly Dictionary<NetUserId, PlayerDailyQuestState> _states = new();
+
+    private EntityQuery<MindComponent> _mindQuery;
+    private EntityQuery<MobStateComponent> _mobQuery;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        _mindQuery = GetEntityQuery<MindComponent>();
+        _mobQuery = GetEntityQuery<MobStateComponent>();
+
+        SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawnComplete);
+        SubscribeLocalEvent<RoundEndMessageEvent>(OnRoundEnd);
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestartCleanup);
+
+        SubscribeLocalEvent<MedicalHealAppliedEvent>(OnMedicalHealApplied);
+        SubscribeLocalEvent<PaperComponent, PaperStampedEvent>(OnPaperStamped);
+        SubscribeLocalEvent<HyposprayPatientInjectedEvent>(OnHyposprayPatientInjected);
+        SubscribeLocalEvent<PlayerCuffedEvent>(OnPlayerCuffed);
+        SubscribeLocalEvent<SalvageMagnetClaimedEvent>(OnSalvageMagnetClaimed);
+        SubscribeLocalEvent<ForensicScanCompletedEvent>(OnForensicScanCompleted);
+        SubscribeLocalEvent<PlantHarvestedEvent>(OnPlantHarvested);
+        SubscribeLocalEvent<FloorCleanedEvent>(OnFloorCleaned);
+        SubscribeLocalEvent<TechnologyUnlockedEvent>(OnTechnologyUnlocked);
+        SubscribeLocalEvent<MicrowaveMealProducedEvent>(OnMicrowaveMeal);
+        SubscribeLocalEvent<LatheItemProducedEvent>(OnLatheItemProduced);
+        SubscribeLocalEvent<RepairableComponent, RepairedEvent>(OnRepaired);
+        SubscribeLocalEvent<MobStateChangedEvent>(OnMobStateChanged);
+        SubscribeLocalEvent<DamageableComponent, DamageChangedEvent>(OnDamageChanged);
+        SubscribeLocalEvent<MeleeHitEvent>(OnMeleeHit);
+        SubscribeLocalEvent<EmotePerformedEvent>(OnEmotePerformed);
+        SubscribeLocalEvent<CargoBountyLabelPrintedEvent>(OnCargoBountyLabelPrinted);
+        SubscribeLocalEvent<StructureWeldedEvent>(OnStructureWelded);
+        SubscribeLocalEvent<MiningPointsClaimedEvent>(OnMiningPointsClaimed);
+
+        _userDb.AddOnLoadPlayer(LoadPlayerData);
+        _userDb.AddOnFinishLoad(OnPlayerDataLoaded);
+        _userDb.AddOnPlayerDisconnect(OnPlayerDisconnect);
+    }
+
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+
+        _uiRefreshAccumulator += frameTime;
+        if (_uiRefreshAccumulator < UiRefreshInterval)
+            return;
+
+        _uiRefreshAccumulator = 0f;
+
+        foreach (var session in _playerManager.Sessions)
+        {
+            if (session.Status == SessionStatus.Disconnected)
+                continue;
+
+            if (!_states.TryGetValue(session.UserId, out var state) || !state.Round.WasActivePlayer)
+                continue;
+
+            FlushPlaytime(state);
+            var changed = UpdateLiveQuestProgress(session, state);
+            if (changed || HasActiveTimeQuest(state))
+                EntityManager.System<DailyRewardSystem>().RefreshUi(session.UserId);
+        }
+    }
+
+    private bool HasActiveTimeQuest(PlayerDailyQuestState state)
+    {
+        foreach (var slot in state.Slots)
+        {
+            if (slot.Status != DailyQuestStatus.Active)
+                continue;
+
+            if (!_prototypes.TryIndex(slot.QuestId, out DailyQuestPrototype? proto))
+                continue;
+
+            if (IsTimeBasedQuest(proto))
+                return true;
+        }
+
+        return false;
+    }
+
+    public List<DailyQuestEntry> BuildQuestEntries(ICommonSession session)
+    {
+        var state = EnsureState(session.UserId);
+        if (state.LoadedFromDb && ArePreferencesReady(session))
+            EnsureDailyAssignmentsIfNeeded(session, state);
+
+        var entries = new List<DailyQuestEntry>(state.Slots.Count);
+
+        foreach (var slot in state.Slots)
+        {
+            if (!_prototypes.TryIndex(slot.QuestId, out DailyQuestPrototype? proto))
+                continue;
+
+            entries.Add(BuildQuestEntry(session, state, slot, proto));
+        }
+
+        return entries;
+    }
+
+    private DailyQuestEntry BuildQuestEntry(
+        ICommonSession session,
+        PlayerDailyQuestState state,
+        DailyQuestSlot slot,
+        DailyQuestPrototype proto,
+        bool preview = false)
+    {
+        var roleHint = proto.RequiredJob == null
+            ? null
+            : _prototypes.TryIndex(proto.RequiredJob.Value, out var job)
+                ? job.LocalizedName
+                : null;
+
+        ResolveQuestIcon(proto, out var iconId, out var iconSprite, out var iconState);
+        var isTimeBased = IsTimeBasedQuest(proto);
+        var (currentProgress, targetProgress) = preview
+            ? (0, IsTimeBasedQuest(proto)
+                ? Math.Max(1, (int)proto.MinRoundPlaytime.TotalSeconds)
+                : proto.TargetCount)
+            : GetQuestProgressDisplay(state, slot, proto);
+
+        var canReplace = !preview
+            && slot.Status == DailyQuestStatus.Active
+            && !state.DailyReplaceUsed
+            && CanReplaceSlot(state, slot, proto);
+
+        return new DailyQuestEntry(
+            slot.QuestId,
+            Loc.GetString(proto.Name),
+            Loc.GetString(proto.Description, ("count", proto.TargetCount)),
+            currentProgress,
+            targetProgress,
+            proto.RewardCoins,
+            preview ? false : slot.Status >= DailyQuestStatus.Completed,
+            preview ? false : slot.Status == DailyQuestStatus.Claimed,
+            roleHint,
+            iconId,
+            iconSprite,
+            iconState,
+            isTimeBased,
+            canReplace);
+    }
+
+    public void TryReplaceQuest(ICommonSession session, string questId, int slotIndex = -1)
+    {
+        if (string.IsNullOrWhiteSpace(questId))
+        {
+            DenyQuestReplace(session, questId, Loc.GetString("daily-quest-replace-denied"), "empty-quest-id");
+            return;
+        }
+
+        var state = EnsureState(session.UserId);
+        if (!state.LoadedFromDb)
+        {
+            DenyQuestReplace(session, questId, Loc.GetString("daily-quest-replace-denied-loading"), "not-loaded-from-db");
+            return;
+        }
+
+        if (slotIndex < 0 || slotIndex >= state.Slots.Count
+            || state.Slots[slotIndex].QuestId != questId)
+        {
+            slotIndex = state.Slots.FindIndex(s => s.QuestId == questId);
+        }
+
+        if (slotIndex < 0)
+        {
+            var assigned = string.Join(", ", state.Slots.Select(s => s.QuestId));
+            DenyQuestReplace(session, questId, Loc.GetString("daily-quest-replace-denied"),
+                $"slot-not-found (requested={questId}, assigned=[{assigned}])");
+            return;
+        }
+
+        var slot = state.Slots[slotIndex];
+
+        if (!_prototypes.TryIndex(slot.QuestId, out DailyQuestPrototype? proto))
+        {
+            DenyQuestReplace(session, questId, Loc.GetString("daily-quest-replace-denied"),
+                $"prototype-missing ({slot.QuestId})");
+            return;
+        }
+
+        if (slot.Status != DailyQuestStatus.Active)
+        {
+            DenyQuestReplace(session, questId, Loc.GetString("daily-quest-replace-denied"),
+                $"status={slot.Status}");
+            return;
+        }
+
+        if (state.DailyReplaceUsed)
+        {
+            DenyQuestReplace(session, questId, Loc.GetString("daily-quest-replace-denied-used"), "daily-replace-used");
+            return;
+        }
+
+        if (!CanReplaceSlot(state, slot, proto))
+        {
+            var detail = IsTimeBasedQuest(proto)
+                ? $"active-playtime={state.Round.ActivePlaytime.TotalSeconds:F0}s"
+                : $"progress={slot.Progress}/{proto.TargetCount}";
+            DenyQuestReplace(session, questId, Loc.GetString("daily-quest-replace-denied-progress"), detail);
+            return;
+        }
+
+        var exclude = state.Slots.Select(s => s.QuestId).ToHashSet();
+        var pick = PickRandomQuestForReplace(session, state.QuestDate, exclude);
+        if (pick == null)
+        {
+            DenyQuestReplace(session, questId, Loc.GetString("daily-quest-replace-empty-pool"), "empty-pool");
+            return;
+        }
+
+        slot.QuestId = pick;
+        slot.Progress = 0;
+        state.DailyReplaceUsed = true;
+        state.Round.UniqueProgress.Remove(questId);
+        DeduplicateSlots(state);
+
+        Persist(session.UserId, refreshUi: true);
+
+        Log.Info($"Daily quest replaced for {session.Name}: {questId} -> {pick} (slot {slotIndex})");
+
+        if (session.AttachedEntity is { Valid: true } uid)
+            _popup.PopupEntity(Loc.GetString("daily-quest-replace-success"), uid, session);
+    }
+
+    private void DenyQuestReplace(ICommonSession session, string questId, string reason, string detail)
+    {
+        Log.Info($"Daily quest replace denied for {session.Name}: quest={questId}, reason={detail}");
+
+        RaiseNetworkEvent(new DailyQuestReplaceDeniedEvent(questId, reason), session);
+
+        EntityManager.System<DailyRewardSystem>().RefreshUi(session.UserId);
+
+        if (session.AttachedEntity is { Valid: true } uid)
+            _popup.PopupEntity(reason, uid, session);
+    }
+
+    private static bool CanReplaceSlot(
+        PlayerDailyQuestState state,
+        DailyQuestSlot slot,
+        DailyQuestPrototype proto)
+    {
+        if (slot.Status != DailyQuestStatus.Active)
+            return false;
+
+        if (IsTimeBasedQuest(proto))
+            return state.Round.ActivePlaytime <= TimeSpan.Zero;
+
+        return slot.Progress <= 0;
+    }
+
+    private async Task LoadPlayerData(ICommonSession player, CancellationToken cancel)
+    {
+        var today = DateTime.UtcNow.Date;
+        DailyQuestProgress? progress = null;
+
+        try
+        {
+            progress = await _db.GetDailyQuestProgress(player.UserId.UserId, today, cancel);
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Failed to load daily quest progress for {player}: {e}");
+        }
+
+        if (_states.TryGetValue(player.UserId, out var existing) && existing.LoadedFromDb)
+            return;
+
+        _states[player.UserId] = PlayerDailyQuestState.FromDb(progress, player.UserId.UserId, today);
+        _states[player.UserId].LoadedFromDb = true;
+    }
+
+    private void OnPlayerDataLoaded(ICommonSession player)
+    {
+        var state = EnsureState(player.UserId);
+        if (ArePreferencesReady(player))
+            EnsureDailyAssignments(player, state);
+
+        Persist(player.UserId);
+        EntityManager.System<DailyRewardSystem>().RefreshUi(player.UserId);
+    }
+
+    private void OnPlayerDisconnect(ICommonSession player)
+    {
+        Persist(player.UserId);
+        _states.Remove(player.UserId);
+    }
+
+    private void OnPlayerSpawnComplete(PlayerSpawnCompleteEvent ev)
+    {
+        if (ev.Player.AttachedEntity is not { Valid: true } uid)
+            return;
+
+        if (!_states.TryGetValue(ev.Player.UserId, out var state))
+        {
+            state = EnsureState(ev.Player.UserId);
+        }
+
+        if (ev.Player.GetMind() is { } mindId && _roles.MindHasRole<ObserverRoleComponent>(mindId))
+            return;
+
+        state.Round.WasActivePlayer = true;
+        state.Round.ActiveEntity = uid;
+        state.Round.TrackingSince ??= _timing.CurTime;
+
+        var points = _miningPoints.GetPointComp(uid);
+        if (points?.Comp != null)
+            state.Round.MiningPointsBaseline = points.Value.Comp.Points;
+    }
+
+    private void OnRoundEnd(RoundEndMessageEvent ev)
+    {
+        foreach (var session in _playerManager.Sessions)
+        {
+            if (!_states.TryGetValue(session.UserId, out var state))
+                continue;
+
+            FlushPlaytime(state);
+            EvaluatePassiveQuests(session, state);
+        }
+
+        foreach (var userId in _states.Keys.ToArray())
+            Persist(userId);
+    }
+
+    private void OnRoundRestartCleanup(RoundRestartCleanupEvent _)
+    {
+        foreach (var state in _states.Values)
+            state.Round.Reset();
+    }
+
+    private void CompleteSlot(ICommonSession session, DailyQuestSlot slot, DailyQuestPrototype proto)
+    {
+        if (slot.Status != DailyQuestStatus.Active)
+            return;
+
+        slot.Progress = proto.TargetCount;
+        _antagTokens.AddBalance(session.UserId, proto.RewardCoins, out var granted, out var note);
+        slot.Status = DailyQuestStatus.Claimed;
+        Persist(session.UserId);
+        EntityManager.System<DailyRewardSystem>().RefreshUi(session.UserId);
+
+        if (session.AttachedEntity is not { Valid: true } uid)
+            return;
+
+        var message = granted > 0
+            ? Loc.GetString("daily-quest-claim-success", ("amount", granted))
+            : Loc.GetString("daily-quest-claim-empty");
+
+        if (!string.IsNullOrWhiteSpace(note))
+            message = $"{message} {note}";
+
+        _popup.PopupEntity(message, uid, uid);
+    }
+
+    #region Tracking handlers
+
+    private void ResolveQuestIcon(
+        DailyQuestPrototype proto,
+        out string? iconId,
+        out string? iconSprite,
+        out string? iconState)
+    {
+        iconId = null;
+        iconSprite = null;
+        iconState = null;
+
+        if (proto.Icon != null)
+        {
+            iconId = proto.Icon.Value.ToString();
+            return;
+        }
+
+        if (proto.Sprite is { } sprite)
+        {
+            switch (sprite)
+            {
+                case SpriteSpecifier.Rsi rsi:
+                    iconSprite = rsi.RsiPath.ToString();
+                    iconState = rsi.RsiState;
+                    return;
+                case SpriteSpecifier.Texture tex:
+                    iconSprite = tex.TexturePath.ToString();
+                    return;
+            }
+        }
+
+        if (proto.RequiredJob != null && _prototypes.TryIndex(proto.RequiredJob.Value, out JobPrototype? job))
+        {
+            iconId = job.Icon.ToString();
+            return;
+        }
+
+        if (proto.RequiredJob == null)
+        {
+            iconId = "JobIconNoId";
+            return;
+        }
+
+        iconId = proto.QuestType switch
+        {
+            DailyQuestType.NoMeleeHits => "JobIconMime",
+            DailyQuestType.NoDamageTaken => "JobIconMedicalDoctor",
+            DailyQuestType.SurviveRound => "JobIconCaptain",
+            DailyQuestType.PerformEmotes => "JobIconMime",
+            DailyQuestType.HealOthers => "JobIconMedicalDoctor",
+            DailyQuestType.StampDocuments => "JobIconHeadOfPersonnel",
+            DailyQuestType.EarnMiningPoints => "JobIconQuarterMaster",
+            DailyQuestType.CuffPlayers => "JobIconSecurityOfficer",
+            DailyQuestType.UnlockTechnology => "JobIconScientist",
+            DailyQuestType.CookMeals => "JobIconChef",
+            DailyQuestType.HarvestPlants => "JobIconBotanist",
+            DailyQuestType.WeldStructures => "JobIconAtmosphericTechnician",
+            DailyQuestType.InjectPatients => "JobIconChemist",
+            DailyQuestType.FulfillCargoBounty => "JobIconQuarterMaster",
+            DailyQuestType.CleanDecals => "JobIconJanitor",
+            DailyQuestType.ScanForensics => "JobIconDetective",
+            DailyQuestType.PullSalvageMagnet => "JobIconQuarterMaster",
+            DailyQuestType.LatheProduce => "JobIconScientist",
+            DailyQuestType.KillHostiles => "JobIconSecurityOfficer",
+            DailyQuestType.RepairStructures => "JobIconStationEngineer",
+            _ => "JobIconUnknown",
+        };
+    }
+
+    private void OnMedicalHealApplied(ref MedicalHealAppliedEvent args)
+    {
+        if (args.User == args.Target)
+            return;
+
+        if (!IsHumanPlayer(args.Target))
+            return;
+
+        TryIncrement(args.User, DailyQuestType.HealOthers, 1, uniqueKey: args.Target);
+    }
+
+    private void OnPaperStamped(Entity<PaperComponent> ent, ref PaperStampedEvent args)
+    {
+        if (args.User == EntityUid.Invalid)
+            return;
+
+        TryIncrement(args.User, DailyQuestType.StampDocuments);
+    }
+
+    private void OnHyposprayPatientInjected(ref HyposprayPatientInjectedEvent args)
+    {
+        if (args.User == args.Target)
+            return;
+
+        if (!IsHumanPlayer(args.Target))
+            return;
+
+        TryIncrement(args.User, DailyQuestType.InjectPatients);
+    }
+
+    private void OnPlayerCuffed(ref PlayerCuffedEvent args)
+    {
+        TryIncrement(args.User, DailyQuestType.CuffPlayers);
+    }
+
+    private void OnSalvageMagnetClaimed(ref SalvageMagnetClaimedEvent args)
+    {
+        TryIncrement(args.Actor, DailyQuestType.PullSalvageMagnet);
+    }
+
+    private void OnForensicScanCompleted(ref ForensicScanCompletedEvent args)
+    {
+        TryIncrement(args.User, DailyQuestType.ScanForensics);
+    }
+
+    private void OnPlantHarvested(ref PlantHarvestedEvent args)
+    {
+        TryIncrement(args.User, DailyQuestType.HarvestPlants);
+    }
+
+    private void OnFloorCleaned(ref FloorCleanedEvent args)
+    {
+        if (args.Count > 0)
+            TryIncrement(args.User, DailyQuestType.CleanDecals, args.Count);
+    }
+
+    private void OnTechnologyUnlocked(ref TechnologyUnlockedEvent args)
+    {
+        TryIncrement(args.Actor, DailyQuestType.UnlockTechnology);
+    }
+
+    private void OnMicrowaveMeal(ref MicrowaveMealProducedEvent args)
+    {
+        if (args.User is { } user)
+            TryIncrement(user, DailyQuestType.CookMeals);
+    }
+
+    private void OnLatheItemProduced(ref LatheItemProducedEvent args)
+    {
+        if (args.User is { } user)
+            TryIncrement(user, DailyQuestType.LatheProduce);
+    }
+
+    private void OnRepaired(Entity<RepairableComponent> ent, ref RepairedEvent args)
+    {
+        TryIncrement(args.User, DailyQuestType.RepairStructures);
+    }
+
+    private void OnMobStateChanged(MobStateChangedEvent args)
+    {
+        if (args.NewMobState != MobState.Dead)
+            return;
+
+        if (IsHumanPlayer(args.Target))
+            return;
+
+        if (args.Origin == null || !TryGetSession(args.Origin.Value, out _))
+            return;
+
+        TryIncrement(args.Origin.Value, DailyQuestType.KillHostiles);
+    }
+
+    private void OnDamageChanged(EntityUid uid, DamageableComponent component, DamageChangedEvent args)
+    {
+        if (!args.DamageIncreased || args.Origin == null)
+            return;
+
+        if (TryGetPlayerState(uid, out var victimState) && victimState.Round.WasActivePlayer)
+            victimState.Round.FailedNoDamage = true;
+
+        if (args.Origin != null &&
+            TryGetPlayerState(args.Origin.Value, out var attackerState) &&
+            IsHumanPlayer(uid) &&
+            uid != args.Origin)
+        {
+            attackerState.Round.FailedNoMelee = true;
+        }
+    }
+
+    private void OnMeleeHit(MeleeHitEvent args)
+    {
+        if (!TryGetPlayerState(args.User, out var state))
+            return;
+
+        foreach (var hit in args.HitEntities)
+        {
+            if (!IsHumanPlayer(hit))
+                continue;
+
+            if (hit == args.User)
+                continue;
+
+            state.Round.FailedNoMelee = true;
+            return;
+        }
+    }
+
+    private void OnEmotePerformed(ref EmotePerformedEvent args)
+    {
+        TryIncrement(args.User, DailyQuestType.PerformEmotes);
+    }
+
+    private void OnCargoBountyLabelPrinted(ref CargoBountyLabelPrintedEvent args)
+    {
+        TryIncrement(args.Actor, DailyQuestType.FulfillCargoBounty);
+    }
+
+    private void OnMiningPointsClaimed(ref MiningPointsClaimedEvent args)
+    {
+        if (!TryGetSession(args.Actor, out var session) ||
+            !_states.TryGetValue(session.UserId, out var state) ||
+            state.Round.ActiveEntity is not { Valid: true } uid)
+            return;
+
+        var points = _miningPoints.GetPointComp(uid);
+        if (points?.Comp == null)
+            return;
+
+        var earned = points.Value.Comp.Points >= state.Round.MiningPointsBaseline
+            ? points.Value.Comp.Points - state.Round.MiningPointsBaseline
+            : 0;
+
+        foreach (var slot in state.Slots)
+        {
+            if (slot.Status != DailyQuestStatus.Active)
+                continue;
+
+            if (!_prototypes.TryIndex(slot.QuestId, out DailyQuestPrototype? proto))
+                continue;
+
+            if (proto.QuestType != DailyQuestType.EarnMiningPoints)
+                continue;
+
+            if (!JobMatches(session, proto.RequiredJob))
+                continue;
+
+            slot.Progress = (int)Math.Min(earned, proto.TargetCount);
+            if (slot.Progress >= proto.TargetCount)
+                CompleteSlot(session, slot, proto);
+
+            Persist(session.UserId);
+            return;
+        }
+    }
+
+    private void OnStructureWelded(ref StructureWeldedEvent args)
+    {
+        TryIncrement(args.User, DailyQuestType.WeldStructures);
+    }
+
+    #endregion
+
+    private void EvaluatePassiveQuests(ICommonSession session, PlayerDailyQuestState state)
+    {
+        FlushPlaytime(state);
+
+        foreach (var slot in state.Slots)
+        {
+            if (slot.Status != DailyQuestStatus.Active)
+                continue;
+
+            if (!_prototypes.TryIndex(slot.QuestId, out DailyQuestPrototype? proto))
+                continue;
+
+            if (!JobMatches(session, proto.RequiredJob))
+                continue;
+
+            if (state.Round.ActivePlaytime < proto.MinRoundPlaytime)
+                continue;
+
+            switch (proto.QuestType)
+            {
+                case DailyQuestType.NoMeleeHits:
+                    if (!state.Round.FailedNoMelee && state.Round.WasActivePlayer)
+                        CompleteSlot(session, slot, proto);
+                    break;
+                case DailyQuestType.NoDamageTaken:
+                    if (!state.Round.FailedNoDamage && state.Round.WasActivePlayer)
+                        CompleteSlot(session, slot, proto);
+                    break;
+                case DailyQuestType.SurviveRound:
+                    if (state.Round.WasActivePlayer && state.Round.ActivePlaytime >= proto.MinRoundPlaytime)
+                        CompleteSlot(session, slot, proto);
+                    break;
+                case DailyQuestType.EarnMiningPoints:
+                    UpdateMiningProgress(session, state, slot, proto);
+                    break;
+            }
+        }
+    }
+
+    private void UpdateMiningProgress(ICommonSession session, PlayerDailyQuestState state, DailyQuestSlot slot, DailyQuestPrototype proto)
+    {
+        if (state.Round.ActiveEntity is not { Valid: true } uid)
+            return;
+
+        var points = _miningPoints.GetPointComp(uid);
+        if (points?.Comp == null)
+            return;
+
+        var earned = points.Value.Comp.Points >= state.Round.MiningPointsBaseline
+            ? points.Value.Comp.Points - state.Round.MiningPointsBaseline
+            : 0;
+
+        slot.Progress = (int)Math.Min(earned, proto.TargetCount);
+        if (slot.Progress >= proto.TargetCount)
+            CompleteSlot(session, slot, proto);
+    }
+
+    private void TryIncrement(EntityUid user, DailyQuestType type, int amount = 1, EntityUid? uniqueKey = null)
+    {
+        if (!TryGetSession(user, out var session))
+            return;
+
+        TryIncrement(session, type, amount, uniqueKey);
+    }
+
+    private void TryIncrement(ICommonSession session, DailyQuestType type, int amount = 1, EntityUid? uniqueKey = null)
+    {
+        var state = EnsureState(session.UserId);
+
+        foreach (var slot in state.Slots)
+        {
+            if (slot.Status != DailyQuestStatus.Active)
+                continue;
+
+            if (!_prototypes.TryIndex(slot.QuestId, out DailyQuestPrototype? proto))
+                continue;
+
+            if (proto.QuestType != type)
+                continue;
+
+            if (!JobMatches(session, proto.RequiredJob))
+                continue;
+
+            if (uniqueKey != null)
+            {
+                if (!state.Round.UniqueProgress.TryGetValue(slot.QuestId, out var set))
+                {
+                    set = new HashSet<EntityUid>();
+                    state.Round.UniqueProgress[slot.QuestId] = set;
+                }
+
+                if (!set.Add(uniqueKey.Value))
+                    continue;
+            }
+
+            slot.Progress = Math.Min(slot.Progress + amount, proto.TargetCount);
+            if (slot.Progress >= proto.TargetCount)
+                CompleteSlot(session, slot, proto);
+
+            Persist(session.UserId);
+            return;
+        }
+    }
+
+    private static bool IsTimeBasedQuest(DailyQuestPrototype proto) =>
+        proto.QuestType is DailyQuestType.SurviveRound
+            or DailyQuestType.NoMeleeHits
+            or DailyQuestType.NoDamageTaken;
+
+    private static (int Current, int Target) GetQuestProgressDisplay(
+        PlayerDailyQuestState state,
+        DailyQuestSlot slot,
+        DailyQuestPrototype proto)
+    {
+        if (IsTimeBasedQuest(proto))
+        {
+            var current = (int)Math.Min(state.Round.ActivePlaytime.TotalSeconds, proto.MinRoundPlaytime.TotalSeconds);
+            var target = Math.Max(1, (int)proto.MinRoundPlaytime.TotalSeconds);
+            return (current, target);
+        }
+
+        return (slot.Progress, proto.TargetCount);
+    }
+
+    private bool UpdateLiveQuestProgress(ICommonSession session, PlayerDailyQuestState state)
+    {
+        var changed = false;
+
+        foreach (var slot in state.Slots)
+        {
+            if (slot.Status != DailyQuestStatus.Active)
+                continue;
+
+            if (!_prototypes.TryIndex(slot.QuestId, out DailyQuestPrototype? proto))
+                continue;
+
+            if (!JobMatches(session, proto.RequiredJob))
+                continue;
+
+            if (proto.QuestType == DailyQuestType.SurviveRound
+                && state.Round.WasActivePlayer
+                && state.Round.ActivePlaytime >= proto.MinRoundPlaytime)
+            {
+                CompleteSlot(session, slot, proto);
+                changed = true;
+                continue;
+            }
+
+            if (proto.QuestType == DailyQuestType.EarnMiningPoints)
+            {
+                var before = slot.Progress;
+                UpdateMiningProgress(session, state, slot, proto);
+                if (slot.Progress != before || slot.Status != DailyQuestStatus.Active)
+                    changed = true;
+            }
+        }
+
+        return changed;
+    }
+
+    private bool JobMatches(ICommonSession session, ProtoId<JobPrototype>? requiredJob)
+    {
+        if (requiredJob == null)
+            return true;
+
+        var mind = session.GetMind();
+        if (mind == null || !_jobs.MindTryGetJobId(mind, out var jobId))
+            return false;
+
+        return jobId == requiredJob;
+    }
+
+    private bool IsHumanPlayer(EntityUid uid)
+    {
+        if (!_mindQuery.TryComp(uid, out var mind) || mind.UserId == null)
+            return false;
+
+        return _playerManager.TryGetSessionById(mind.UserId.Value, out _);
+    }
+
+    private bool TryGetPlayerState(EntityUid uid, out PlayerDailyQuestState state)
+    {
+        state = null!;
+        if (!TryGetSession(uid, out var session))
+            return false;
+
+        if (!_states.TryGetValue(session.UserId, out var found))
+            return false;
+
+        state = found;
+        return true;
+    }
+
+    private bool TryGetSession(EntityUid uid, out ICommonSession session)
+    {
+        session = null!;
+        if (!_minds.TryGetMind(uid, out _, out var mind) || mind.UserId is not { } userId)
+            return false;
+
+        if (!_playerManager.TryGetSessionById(userId, out var found) || found is null)
+            return false;
+
+        session = found;
+        return true;
+    }
+
+    private void FlushPlaytime(PlayerDailyQuestState state)
+    {
+        if (!state.Round.WasActivePlayer || state.Round.TrackingSince == null)
+            return;
+
+        state.Round.ActivePlaytime += _timing.CurTime - state.Round.TrackingSince.Value;
+        state.Round.TrackingSince = _timing.CurTime;
+    }
+
+    private PlayerDailyQuestState EnsureState(NetUserId userId)
+    {
+        if (_states.TryGetValue(userId, out var existing))
+            return existing;
+
+        var today = DateTime.UtcNow.Date;
+        var state = PlayerDailyQuestState.FromDb(null, userId.UserId, today);
+        _states[userId] = state;
+        return state;
+    }
+
+    private void Persist(NetUserId userId, bool refreshUi = true)
+    {
+        if (!_states.TryGetValue(userId, out var state))
+            return;
+
+        _ = _db.UpsertDailyQuestProgress(state.ToDb());
+        if (refreshUi)
+            EntityManager.System<DailyRewardSystem>().RefreshUi(userId);
+    }
+
+    private bool ArePreferencesReady(ICommonSession session) =>
+        _preferences.TryGetCachedPreferences(session.UserId, out _);
+
+    private bool IsQuestAvailable(ICommonSession session, DailyQuestPrototype quest)
+    {
+        if (quest.RequiredJob == null)
+            return true;
+
+        if (!ArePreferencesReady(session))
+            return false;
+
+        return _playTime.IsAllowed(session, quest.RequiredJob.Value);
+    }
+
+    private void EnsureDailyAssignmentsIfNeeded(ICommonSession session, PlayerDailyQuestState state)
+    {
+        if (!ArePreferencesReady(session))
+            return;
+
+        var today = DateTime.UtcNow.Date;
+        if (state.QuestDate.Date != today)
+        {
+            EnsureDailyAssignments(session, state);
+            return;
+        }
+
+        if (state.Slots.Count == 0)
+        {
+            EnsureDailyAssignments(session, state);
+            return;
+        }
+
+        if (state.Slots.Count < DailyQuestCount)
+            TopUpDailyQuestSlots(session, state);
+    }
+
+    private void TopUpDailyQuestSlots(ICommonSession session, PlayerDailyQuestState state)
+    {
+        var today = DateTime.UtcNow.Date;
+        var assigned = state.Slots.Select(s => s.QuestId).ToHashSet();
+
+        while (state.Slots.Count < DailyQuestCount)
+        {
+            var pick = PickRandomQuest(session, today, assigned);
+            if (pick == null)
+                break;
+
+            state.Slots.Add(new DailyQuestSlot
+            {
+                QuestId = pick,
+                Progress = 0,
+                Status = DailyQuestStatus.Active,
+            });
+            assigned.Add(pick);
+        }
+    }
+
+    private void EnsureDailyAssignments(ICommonSession session, PlayerDailyQuestState state)
+    {
+        if (!ArePreferencesReady(session))
+            return;
+
+        var today = DateTime.UtcNow.Date;
+
+        if (state.QuestDate.Date != today)
+        {
+            state.QuestDate = today;
+            state.Slots.Clear();
+            state.Round = new DailyQuestRoundTracker();
+            state.DailyReplaceUsed = false;
+        }
+
+        DeduplicateSlots(state);
+
+        for (var i = state.Slots.Count - 1; i >= 0; i--)
+        {
+            var slot = state.Slots[i];
+            if (slot.Status == DailyQuestStatus.Claimed)
+                continue;
+
+            if (!_prototypes.TryIndex(slot.QuestId, out DailyQuestPrototype? proto) || !IsQuestAvailable(session, proto))
+                state.Slots.RemoveAt(i);
+        }
+
+        var assigned = state.Slots.Select(s => s.QuestId).ToHashSet();
+        while (state.Slots.Count < DailyQuestCount)
+        {
+            var pick = PickRandomQuest(session, today, assigned);
+            if (pick == null)
+                break;
+
+            state.Slots.Add(new DailyQuestSlot
+            {
+                QuestId = pick,
+                Progress = 0,
+                Status = DailyQuestStatus.Active,
+            });
+            assigned.Add(pick);
+        }
+    }
+
+    private string? PickRandomQuestForReplace(ICommonSession session, DateTime date, HashSet<string> exclude)
+    {
+        var pick = PickRandomQuest(session, date, exclude);
+        if (pick != null)
+            return pick;
+
+        var fallbackPool = _prototypes.EnumeratePrototypes<DailyQuestPrototype>()
+            .Where(q => !exclude.Contains(q.ID))
+            .ToList();
+
+        if (fallbackPool.Count == 0)
+            return null;
+
+        var rng = new Random(HashCode.Combine(session.UserId.UserId.GetHashCode(), date.Date.Ticks, exclude.Count, 17));
+        var totalWeight = fallbackPool.Sum(p => p.Weight);
+        var roll = rng.NextDouble() * totalWeight;
+        var acc = 0f;
+
+        foreach (var quest in fallbackPool)
+        {
+            acc += quest.Weight;
+            if (roll <= acc)
+                return quest.ID;
+        }
+
+        return fallbackPool[0].ID;
+    }
+
+    private string? PickRandomQuest(ICommonSession session, DateTime date, HashSet<string> exclude)
+    {
+        var pool = _prototypes.EnumeratePrototypes<DailyQuestPrototype>()
+            .Where(q => !exclude.Contains(q.ID) && IsQuestAvailable(session, q))
+            .ToList();
+
+        if (pool.Count == 0)
+            return null;
+
+        var rng = new Random(HashCode.Combine(session.UserId.UserId.GetHashCode(), date.Date.Ticks, exclude.Count));
+        var totalWeight = pool.Sum(p => p.Weight);
+        var roll = rng.NextDouble() * totalWeight;
+        var acc = 0f;
+
+        foreach (var quest in pool)
+        {
+            acc += quest.Weight;
+            if (roll <= acc)
+                return quest.ID;
+        }
+
+        return pool[0].ID;
+    }
+
+    private static void DeduplicateSlots(PlayerDailyQuestState state)
+    {
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        for (var i = state.Slots.Count - 1; i >= 0; i--)
+        {
+            var questId = state.Slots[i].QuestId;
+            if (string.IsNullOrWhiteSpace(questId) || !seen.Add(questId))
+                state.Slots.RemoveAt(i);
+        }
+    }
+
+    private sealed class PlayerDailyQuestState
+    {
+        public bool LoadedFromDb;
+        public Guid PlayerId;
+        public DateTime QuestDate;
+        public bool DailyReplaceUsed;
+        public List<DailyQuestSlot> Slots = new();
+        public DailyQuestRoundTracker Round = new();
+
+        public static PlayerDailyQuestState FromDb(
+            DailyQuestProgress? db,
+            Guid playerId,
+            DateTime date)
+        {
+            var state = new PlayerDailyQuestState
+            {
+                PlayerId = playerId,
+                QuestDate = date.Date,
+            };
+
+            if (db != null && db.QuestDate.Date == date.Date)
+            {
+                var (flagValues, dailyReplaceUsed) = ParseStatusFlags(db.StatusFlags);
+                var ids = Split(db.AssignedQuestIds);
+                var progress = SplitInt(db.ProgressValues);
+
+                for (var i = 0; i < ids.Count; i++)
+                {
+                    var packed = i < flagValues.Count ? flagValues[i] : 0;
+
+                    state.Slots.Add(new DailyQuestSlot
+                    {
+                        QuestId = ids[i],
+                        Progress = i < progress.Count ? progress[i] : 0,
+                        Status = (DailyQuestStatus)(packed & 3),
+                    });
+                }
+
+                state.DailyReplaceUsed = dailyReplaceUsed;
+            }
+
+            DeduplicateSlots(state);
+            return state;
+        }
+
+        public DailyQuestProgress ToDb()
+        {
+            var flags = string.Join(',', Slots.Select(s => (int)s.Status));
+            if (DailyReplaceUsed)
+                flags += ";r";
+
+            return new DailyQuestProgress
+            {
+                PlayerId = PlayerId,
+                QuestDate = QuestDate,
+                AssignedQuestIds = string.Join(',', Slots.Select(s => s.QuestId)),
+                ProgressValues = string.Join(',', Slots.Select(s => s.Progress)),
+                StatusFlags = flags,
+            };
+        }
+
+        private static (List<int> Flags, bool DailyReplaceUsed) ParseStatusFlags(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return (new List<int>(), false);
+
+            var parts = value.Split(';', 2, StringSplitOptions.TrimEntries);
+            var dailyReplaceUsed = parts.Length > 1 && parts[1] == "r";
+            return (SplitInt(parts[0]), dailyReplaceUsed);
+        }
+
+        private static List<string> Split(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return new List<string>();
+
+            return value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
+        }
+
+        private static List<int> SplitInt(string value)
+        {
+            var result = new List<int>();
+            if (string.IsNullOrWhiteSpace(value))
+                return result;
+
+            foreach (var part in value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                if (int.TryParse(part, out var number))
+                    result.Add(number);
+            }
+
+            return result;
+        }
+    }
+
+    private sealed class DailyQuestSlot
+    {
+        public string QuestId = string.Empty;
+        public int Progress;
+        public DailyQuestStatus Status;
+    }
+
+    private enum DailyQuestStatus : byte
+    {
+        Active = 0,
+        Completed = 1,
+        Claimed = 2,
+    }
+
+    private sealed class DailyQuestRoundTracker
+    {
+        public bool WasActivePlayer;
+        public EntityUid? ActiveEntity;
+        public TimeSpan ActivePlaytime;
+        public TimeSpan? TrackingSince;
+        public bool FailedNoMelee;
+        public bool FailedNoDamage;
+        public uint MiningPointsBaseline;
+        public Dictionary<string, HashSet<EntityUid>> UniqueProgress = new();
+
+        public void Reset()
+        {
+            WasActivePlayer = false;
+            ActiveEntity = null;
+            ActivePlaytime = TimeSpan.Zero;
+            TrackingSince = null;
+            FailedNoMelee = false;
+            FailedNoDamage = false;
+            MiningPointsBaseline = 0;
+            UniqueProgress.Clear();
+        }
+    }
+}

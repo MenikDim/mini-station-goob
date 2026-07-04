@@ -1,0 +1,484 @@
+// SPDX-FileCopyrightText: 2026 Casha
+// Мини-станция/Freaky-station, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/ministation/mini-station-goob/master/LICENSE.TXT
+using System;
+using System.Numerics;
+using Content.Client.Resources;
+using Content.Client.UserInterface;
+using Content.Shared._Mini.AntagTokens;
+using Content.Shared._Mini.DailyQuests;
+using Content.Shared.StatusIcon;
+using Robust.Client.Graphics;
+using Robust.Client.ResourceManagement;
+using Robust.Client.UserInterface;
+using Robust.Client.UserInterface.Controls;
+using Robust.Client.Utility;
+using Robust.Shared.IoC;
+using Robust.Shared.Localization;
+using Robust.Shared.Maths;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
+
+namespace Content.Client._Mini.DailyQuests;
+
+public sealed class DailyQuestCardControl : BoxContainer
+{
+    public const float RewardQuestCardHeight = 304f;
+    public const float CompactQuestCardHeight = 108f;
+
+    private static readonly Color AccentColor = Color.FromHex("#9a8fb5");
+    private static readonly Color ClaimReadyColor = Color.FromHex("#6b9e7a");
+    private static readonly Color CardBackgroundColor = Color.FromHex("#201e28").WithAlpha(0.8f);
+    private static readonly Color CurrentCardColor = Color.FromHex("#2c2a3a").WithAlpha(0.95f);
+    private static readonly Color PurchasedCardColor = Color.FromHex("#2d2a38").WithAlpha(0.85f);
+
+    private readonly IResourceCache _resourceCache;
+    private readonly IPrototypeManager _prototypeManager;
+    private readonly Texture _antagCoinTexture;
+    private readonly PixelTiledProgressBar _progressBar;
+    private readonly Label _progressLabel;
+    private readonly Label _statusLabel;
+    private readonly bool _compact;
+    private string? _boundQuestId;
+    private bool _boundClaimed;
+    private bool _boundShowReplace;
+    private PanelContainer? _cardPanel;
+    private StyleBoxFlat? _cardStyle;
+    private Button? _replaceButton;
+    private Action? _replaceHandler;
+
+    public string? BoundQuestId => _boundQuestId;
+
+    public DailyQuestCardControl(bool compact = false)
+    {
+        _compact = compact;
+
+        IoCManager.InjectDependencies(this);
+        _resourceCache = IoCManager.Resolve<IResourceCache>();
+        _prototypeManager = IoCManager.Resolve<IPrototypeManager>();
+        _antagCoinTexture = _resourceCache.TryGetResource<TextureResource>(
+                new ResPath(AntagTokenCatalog.CurrencyIconPath), out var antagRes)
+            ? antagRes.Texture
+            : _resourceCache.GetTexture("/Textures/_Mini/Interface/Coin.png");
+
+        Orientation = LayoutOrientation.Vertical;
+        SeparationOverride = compact ? 4 : 6;
+        HorizontalExpand = true;
+
+        _progressBar = new PixelTiledProgressBar();
+        _progressLabel = new Label { Modulate = Color.FromHex("#d7e2f4"), HorizontalAlignment = HAlignment.Right };
+        _statusLabel = new Label { HorizontalAlignment = HAlignment.Center, Modulate = Color.FromHex("#e8eef8") };
+    }
+
+    public void SetReplaceHandler(Action? handler)
+    {
+        _replaceHandler = handler;
+        AttachReplaceHandler();
+    }
+
+    private void AttachReplaceHandler()
+    {
+        if (_replaceButton == null)
+            return;
+
+        _replaceButton.OnPressed -= OnReplaceButtonPressed;
+        _replaceButton.OnPressed += OnReplaceButtonPressed;
+    }
+
+    private void OnReplaceButtonPressed(BaseButton.ButtonEventArgs _)
+    {
+        _replaceHandler?.Invoke();
+    }
+
+    public void SetInteractable(bool interactable)
+    {
+        if (_replaceButton != null)
+            _replaceButton.Disabled = !interactable;
+    }
+
+    public void SetRerollPulse(float strength)
+    {
+        if (_cardPanel == null || _cardStyle == null)
+            return;
+
+        var glow = Math.Clamp(strength, 0f, 1f);
+        _cardStyle.BorderColor = Color.InterpolateBetween(AccentColor.WithAlpha(0.35f), ClaimReadyColor, glow);
+        _cardStyle.BackgroundColor = Color.InterpolateBetween(CurrentCardColor, Color.FromHex("#353347"), glow * 0.6f);
+        _cardPanel.PanelOverride = _cardStyle;
+        _cardPanel.Modulate = Color.White.WithAlpha(0.82f + 0.18f * glow);
+    }
+
+    public void SetQuest(DailyQuestEntry quest, float smoothTimeExtra = 0f, bool forceRebuild = false)
+    {
+        var showReplace = !_compact && CanShowReplace(quest);
+
+        if (!forceRebuild
+            && _boundQuestId == quest.QuestId
+            && ChildCount > 0
+            && _boundClaimed == quest.IsClaimed
+            && _boundShowReplace == showReplace)
+        {
+            UpdateProgressDisplay(quest, smoothTimeExtra);
+            UpdateStatusLabel(quest);
+            return;
+        }
+
+        _boundQuestId = quest.QuestId;
+        _boundClaimed = quest.IsClaimed;
+        _boundShowReplace = showReplace;
+        _cardPanel = null;
+        _cardStyle = null;
+        _replaceButton = null;
+        DetachReusedControls();
+        RemoveAllChildren();
+
+        var isClaimed = quest.IsClaimed;
+        var isComplete = quest.IsCompleted && !isClaimed;
+
+        if (!_compact)
+        {
+            _cardStyle = new StyleBoxFlat
+            {
+                BackgroundColor = isClaimed ? PurchasedCardColor : CurrentCardColor,
+                BorderColor = isComplete || isClaimed ? ClaimReadyColor.WithAlpha(0.5f) : AccentColor.WithAlpha(0.35f),
+                BorderThickness = new Thickness(1),
+                ContentMarginLeftOverride = 12,
+                ContentMarginTopOverride = 8,
+                ContentMarginRightOverride = 12,
+                ContentMarginBottomOverride = 8
+            };
+
+            _cardPanel = new PanelContainer
+            {
+                HorizontalExpand = true,
+                VerticalExpand = true,
+                MinSize = new Vector2(0, RewardQuestCardHeight),
+                MaxSize = new Vector2(float.PositiveInfinity, RewardQuestCardHeight),
+                PanelOverride = _cardStyle
+            };
+
+            var column = new BoxContainer
+            {
+                Orientation = LayoutOrientation.Vertical,
+                SeparationOverride = 4,
+                HorizontalExpand = true,
+                VerticalExpand = true,
+            };
+            _cardPanel.AddChild(column);
+            AddChild(_cardPanel);
+            PopulateContent(column, quest, isClaimed, showReplace);
+            return;
+        }
+
+        var compactPanel = new PanelContainer
+        {
+            HorizontalExpand = true,
+            VerticalExpand = false,
+            RectClipContent = true,
+            MinSize = new Vector2(0, CompactQuestCardHeight),
+            Margin = new Thickness(0, 0, 0, 0),
+            PanelOverride = new StyleBoxFlat
+            {
+                BackgroundColor = CardBackgroundColor.WithAlpha(0.55f),
+                BorderColor = isComplete || isClaimed ? ClaimReadyColor.WithAlpha(0.4f) : Color.FromHex("#455674").WithAlpha(0.35f),
+                BorderThickness = new Thickness(1),
+                ContentMarginLeftOverride = 8,
+                ContentMarginTopOverride = 6,
+                ContentMarginRightOverride = 8,
+                ContentMarginBottomOverride = 6
+            }
+        };
+
+        var compactColumn = new BoxContainer
+        {
+            Orientation = LayoutOrientation.Vertical,
+            SeparationOverride = 4,
+            HorizontalExpand = true
+        };
+        compactPanel.AddChild(compactColumn);
+        AddChild(compactPanel);
+        PopulateContent(compactColumn, quest, isClaimed, showReplace: false);
+    }
+
+    private void PopulateContent(BoxContainer column, DailyQuestEntry quest, bool isClaimed, bool showReplace)
+    {
+        if (!_compact)
+        {
+            var topRow = new BoxContainer
+            {
+                Orientation = LayoutOrientation.Horizontal,
+                SeparationOverride = 8,
+                VerticalAlignment = VAlignment.Center,
+            };
+            column.AddChild(topRow);
+
+            var questIcon = TryGetQuestIcon(quest);
+            if (questIcon != null)
+            {
+                topRow.AddChild(new TextureRect
+                {
+                    Texture = questIcon,
+                    MinSize = new Vector2(22, 22),
+                    TextureScale = new Vector2(1.15f),
+                    Stretch = TextureRect.StretchMode.KeepAspectCentered,
+                    VerticalAlignment = VAlignment.Center
+                });
+            }
+
+            var title = new MarqueeLabel
+            {
+                Text = quest.Title,
+                Modulate = Color.White,
+                HorizontalExpand = true,
+                MinSize = new Vector2(0, 20),
+                VerticalAlignment = VAlignment.Center,
+            };
+            title.SetStyleClass("LabelHeading");
+            topRow.AddChild(title);
+
+            var rewardRow = new BoxContainer
+            {
+                Orientation = LayoutOrientation.Horizontal,
+                SeparationOverride = 2,
+                VerticalAlignment = VAlignment.Center,
+            };
+            rewardRow.AddChild(new Label
+            {
+                Text = $"+{quest.RewardCoins}",
+                Modulate = AccentColor,
+                VerticalAlignment = VAlignment.Center,
+            });
+            rewardRow.AddChild(new TextureRect
+            {
+                Texture = _antagCoinTexture,
+                MinSize = new Vector2(18, 18),
+                TextureScale = new Vector2(0.38f, 0.38f),
+                Stretch = TextureRect.StretchMode.KeepAspectCentered,
+                VerticalAlignment = VAlignment.Center,
+            });
+            topRow.AddChild(rewardRow);
+
+            column.AddChild(new MarqueeLabel
+            {
+                Text = quest.Description,
+                Modulate = Color.FromHex("#c5d3ed"),
+                HorizontalExpand = true,
+                MinSize = new Vector2(0, 18),
+            });
+
+            if (!string.IsNullOrWhiteSpace(quest.RoleHint))
+            {
+                column.AddChild(new MarqueeLabel
+                {
+                    Text = Loc.GetString("daily-quest-role-hint", ("role", quest.RoleHint)),
+                    Modulate = Color.FromHex("#9fb4d8"),
+                    HorizontalExpand = true,
+                    MinSize = new Vector2(0, 18),
+                });
+            }
+        }
+        else
+        {
+            var header = new BoxContainer
+            {
+                Orientation = LayoutOrientation.Horizontal,
+                SeparationOverride = 8,
+                VerticalAlignment = VAlignment.Center,
+            };
+            column.AddChild(header);
+
+            var questIcon = TryGetQuestIcon(quest);
+            if (questIcon != null)
+            {
+                header.AddChild(new TextureRect
+                {
+                    Texture = questIcon,
+                    MinSize = new Vector2(20, 20),
+                    TextureScale = new Vector2(1f),
+                    Stretch = TextureRect.StretchMode.KeepAspectCentered,
+                    VerticalAlignment = VAlignment.Center
+                });
+            }
+
+            var titleMarquee = new MarqueeLabel
+            {
+                Text = quest.Title,
+                Modulate = Color.White,
+                MinSize = new Vector2(0, 18),
+                VerticalAlignment = VAlignment.Center,
+            };
+            titleMarquee.SetStyleClass("LabelSubText");
+            header.AddChild(WrapMarquee(titleMarquee));
+
+            column.AddChild(CreateMarqueeHost(quest.Description, Color.FromHex("#c5d3ed"), 16));
+        }
+
+        UpdateProgressDisplay(quest, 0f);
+        column.AddChild(_progressBar);
+        column.AddChild(_progressLabel);
+
+        if (!_compact)
+        {
+            _statusLabel.HorizontalAlignment = HAlignment.Center;
+            column.AddChild(_statusLabel);
+            UpdateStatusLabel(quest);
+
+            if (showReplace)
+            {
+                var replaceRow = new BoxContainer
+                {
+                    Orientation = LayoutOrientation.Horizontal,
+                    HorizontalExpand = true,
+                    HorizontalAlignment = HAlignment.Center,
+                    Margin = new Thickness(0, 4, 0, 0),
+                };
+                _replaceButton = new Button
+                {
+                    Text = Loc.GetString("daily-quest-replace"),
+                    MinSize = new Vector2(168, 32),
+                    HorizontalAlignment = HAlignment.Center,
+                };
+                _replaceButton.MouseFilter = MouseFilterMode.Stop;
+                replaceRow.AddChild(_replaceButton);
+                AttachReplaceHandler();
+                column.AddChild(replaceRow);
+            }
+        }
+    }
+
+    private void DetachReusedControls()
+    {
+        _progressBar.Orphan();
+        _progressLabel.Orphan();
+        _statusLabel.Orphan();
+    }
+
+    private static bool CanShowReplace(DailyQuestEntry quest)
+    {
+        return quest.CanReplace;
+    }
+
+    private static PanelContainer WrapMarquee(MarqueeLabel marquee)
+    {
+        var host = new PanelContainer
+        {
+            HorizontalExpand = true,
+            RectClipContent = true,
+            MinSize = marquee.MinSize,
+        };
+        host.AddChild(marquee);
+        return host;
+    }
+
+    private static PanelContainer CreateMarqueeHost(string text, Color color, float height)
+    {
+        var host = new PanelContainer
+        {
+            HorizontalExpand = true,
+            RectClipContent = true,
+            MinSize = new Vector2(0, height),
+        };
+
+        host.AddChild(new MarqueeLabel
+        {
+            Text = text,
+            Modulate = color,
+            MinSize = new Vector2(0, height),
+        });
+
+        return host;
+    }
+
+    private void UpdateStatusLabel(DailyQuestEntry quest)
+    {
+        if (_compact)
+            return;
+
+        if (quest.IsClaimed)
+        {
+            _statusLabel.Text = Loc.GetString("daily-quest-status-claimed", ("amount", quest.RewardCoins));
+            _statusLabel.Modulate = ClaimReadyColor;
+            return;
+        }
+
+        if (quest.IsCompleted)
+        {
+            _statusLabel.Text = Loc.GetString("daily-quest-status-complete");
+            _statusLabel.Modulate = ClaimReadyColor;
+            return;
+        }
+
+        _statusLabel.Text = Loc.GetString("daily-quest-status-active");
+        _statusLabel.Modulate = Color.FromHex("#e8eef8");
+    }
+
+    private void UpdateProgressDisplay(DailyQuestEntry quest, float smoothTimeExtra = 0f)
+    {
+        var current = GetDisplayProgress(quest, smoothTimeExtra);
+        var progressRatio = quest.TargetProgress <= 0
+            ? 1f
+            : Math.Clamp(current / quest.TargetProgress, 0f, 1f);
+
+        _progressBar.Value = progressRatio;
+        _progressLabel.Text = FormatProgressLabel(quest, smoothTimeExtra);
+    }
+
+    private static float GetDisplayProgress(DailyQuestEntry quest, float smoothTimeExtra)
+    {
+        if (!quest.IsTimeBased || quest.IsCompleted || quest.IsClaimed)
+            return quest.CurrentProgress;
+
+        return Math.Min(quest.CurrentProgress + smoothTimeExtra, quest.TargetProgress);
+    }
+
+    private static string FormatProgressLabel(DailyQuestEntry quest, float smoothTimeExtra = 0f)
+    {
+        if (quest.IsTimeBased)
+        {
+            var current = GetDisplayProgress(quest, smoothTimeExtra);
+            return $"{FormatDuration(current)} / {FormatDuration(quest.TargetProgress)}";
+        }
+
+        return Loc.GetString("daily-quest-progress",
+            ("current", quest.CurrentProgress),
+            ("target", quest.TargetProgress));
+    }
+
+    private static string FormatDuration(float totalSeconds)
+    {
+        if (totalSeconds <= 0f)
+            return "00:00";
+
+        if (totalSeconds >= 3600f)
+        {
+            var span = TimeSpan.FromSeconds(totalSeconds);
+            return $"{(int)span.TotalHours:00}:{span.Minutes:00}:{span.Seconds:00}";
+        }
+
+        var minutes = (int)(totalSeconds / 60f);
+        var seconds = (int)(totalSeconds % 60);
+        return $"{minutes:00}:{seconds:00}";
+    }
+
+    private Texture? TryGetQuestIcon(DailyQuestEntry quest)
+    {
+        if (!string.IsNullOrWhiteSpace(quest.IconId) &&
+            _prototypeManager.TryIndex<JobIconPrototype>(quest.IconId, out var jobIcon))
+        {
+            return jobIcon.Icon.Frame0();
+        }
+
+        if (!string.IsNullOrWhiteSpace(quest.IconSprite))
+        {
+            if (!string.IsNullOrWhiteSpace(quest.IconState))
+            {
+                var specifier = new SpriteSpecifier.Rsi(new ResPath(quest.IconSprite), quest.IconState);
+                return specifier.Frame0();
+            }
+
+            if (_resourceCache.TryGetResource<TextureResource>(new ResPath(quest.IconSprite), out var texture))
+                return texture.Texture;
+        }
+
+        return null;
+    }
+}

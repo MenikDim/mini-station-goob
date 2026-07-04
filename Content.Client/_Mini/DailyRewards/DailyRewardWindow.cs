@@ -3,20 +3,24 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Content.Client._Mini.DailyRewards;
+using Content.Client._Mini.DailyQuests;
 using Content.Client.Resources;
+using Content.Client.UserInterface;
 using Content.Shared._Mini.AntagTokens;
+using Content.Shared._Mini.DailyQuests;
 using Content.Shared._Mini.DailyRewards;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
 using Robust.Shared.Localization;
 using Robust.Shared.Maths;
 using Robust.Shared.Utility;
 using static Robust.Client.UserInterface.Controls.BoxContainer;
-using static Robust.Client.UserInterface.Controls.LayoutContainer;
 
 namespace Content.Client._Mini.DailyRewards;
 
@@ -45,25 +49,34 @@ public sealed class DailyRewardWindow : DefaultWindow
 
     public event Action? OnClaimPressed;
 
+    private readonly DailyRewardUiSystem _uiSystem;
     private readonly IResourceCache _resourceCache;
     private readonly Label _streakValueLabel;
     private readonly Label _activeProgressLabel;
     private readonly Label _cooldownLabel;
     private readonly Label _expiryLabel;
-    private readonly ProgressBar _activeProgressBar;
+    private readonly PixelTiledProgressBar _activeProgressBar;
     private readonly Button _claimButton;
     private readonly BoxContainer _rewardTrack;
     private readonly Texture _clockTexture;
     private readonly Texture _coinTexture;
     private readonly Texture _antagCoinTexture;
-    private readonly ProgressBar[] _onlineSegmentBars;
-    private readonly Label[] _onlineBarTimeLabels;
-    private readonly Label[] _onlineRewardLabels;
+    private readonly GridContainer _questTrack;
+    private readonly Label _questSectionLabel;
+    private readonly List<DailyQuestCardControl> _questCards = new();
+    private readonly List<PanelContainer> _questSlots = new();
+    private float _questTimeSmooth;
+    private float _replaceErrorTimer;
+    private float _replacePendingTimer;
+    private string? _replaceError;
+    private string? _pendingReplaceQuestId;
+    private int _pendingReplaceSlotIndex = -1;
     private DailyRewardUpdateMessage? _state;
 
     public DailyRewardWindow()
     {
         IoCManager.InjectDependencies(this);
+        _uiSystem = IoCManager.Resolve<IEntityManager>().System<DailyRewardUiSystem>();
         _resourceCache = IoCManager.Resolve<IResourceCache>();
         _clockTexture = _resourceCache.GetTexture(ClockIconPath);
         _coinTexture = _resourceCache.GetTexture(CoinIconPath);
@@ -72,57 +85,84 @@ public sealed class DailyRewardWindow : DefaultWindow
             : _resourceCache.GetTexture(CoinIconPath);
 
         Title = Loc.GetString("daily-reward-window-title");
-        MinSize = new Vector2(900, 720);
-        SetSize = new Vector2(900, 720);
+        MinSize = new Vector2(1080, 900);
+        SetSize = new Vector2(1120, 920);
 
         var root = new BoxContainer
         {
             Orientation = LayoutOrientation.Vertical,
-            SeparationOverride = 12,
-            Margin = new Thickness(12)
+            SeparationOverride = 10,
+            Margin = new Thickness(14),
+            VerticalExpand = true,
+            HorizontalExpand = true,
         };
 
         var backdrop = new PanelContainer
         {
-            PanelOverride = new StyleBoxFlat { BackgroundColor = WindowBackgroundColor }
+            PanelOverride = new StyleBoxFlat { BackgroundColor = WindowBackgroundColor },
+            VerticalExpand = true,
+            HorizontalExpand = true,
         };
         Contents.AddChild(backdrop);
         backdrop.AddChild(root);
 
         root.AddChild(BuildHeroSection(out _streakValueLabel, out _activeProgressLabel, out _cooldownLabel, out _expiryLabel, out _activeProgressBar, out _claimButton));
 
-        root.AddChild(new Label
+        _questSectionLabel = new Label
         {
-            Text = Loc.GetString("daily-reward-online-title"),
+            Text = Loc.GetString("daily-quest-section-title"),
             StyleClasses = { "LabelHeading" },
-            Margin = new Thickness(4, 0, 0, 0)
-        });
+            Margin = new Thickness(2, 2, 0, 0)
+        };
+        root.AddChild(_questSectionLabel);
 
-        root.AddChild(BuildOnlineTimeRewardsPanel(
-            out _onlineSegmentBars,
-            out _onlineBarTimeLabels,
-            out _onlineRewardLabels));
+        var questPanel = new PanelContainer
+        {
+            HorizontalExpand = true,
+            VerticalExpand = false,
+            PanelOverride = new StyleBoxFlat
+            {
+                BackgroundColor = Color.FromHex("#141820").WithAlpha(0.9f),
+                BorderColor = Color.FromHex("#31415f"),
+                BorderThickness = new Thickness(1),
+                ContentMarginLeftOverride = 10,
+                ContentMarginTopOverride = 10,
+                ContentMarginRightOverride = 10,
+                ContentMarginBottomOverride = 10,
+            }
+        };
+        _questTrack = new GridContainer
+        {
+            Columns = 2,
+            HorizontalExpand = true,
+            VerticalExpand = false,
+            MinSize = new Vector2(0, DailyQuestCardControl.RewardQuestCardHeight + 8),
+        };
+        questPanel.AddChild(_questTrack);
+        root.AddChild(questPanel);
 
         root.AddChild(new Label
         {
             Text = Loc.GetString("daily-reward-window-road-title"),
             StyleClasses = { "LabelHeading" },
-            Margin = new Thickness(4, 0, 0, 0)
+            Margin = new Thickness(2, 6, 0, 0)
         });
 
         var rewardsPanel = new PanelContainer
         {
             VerticalExpand = true,
             HorizontalExpand = true,
+            MinSize = new Vector2(0, 210),
+            MaxSize = new Vector2(float.PositiveInfinity, 250),
             PanelOverride = new StyleBoxFlat
             {
                 BackgroundColor = Color.FromHex("#0f1623"),
                 BorderColor = Color.FromHex("#31415f"),
                 BorderThickness = new Thickness(2),
                 ContentMarginLeftOverride = 12,
-                ContentMarginTopOverride = 12,
+                ContentMarginTopOverride = 10,
                 ContentMarginRightOverride = 12,
-                ContentMarginBottomOverride = 12
+                ContentMarginBottomOverride = 10
             }
         };
         root.AddChild(rewardsPanel);
@@ -132,7 +172,9 @@ public sealed class DailyRewardWindow : DefaultWindow
             HorizontalExpand = true,
             VerticalExpand = true,
             HScrollEnabled = true,
-            VScrollEnabled = false
+            VScrollEnabled = false,
+            MinSize = new Vector2(0, 180),
+            MaxSize = new Vector2(float.PositiveInfinity, 230),
         };
         rewardsPanel.AddChild(scroll);
 
@@ -140,7 +182,8 @@ public sealed class DailyRewardWindow : DefaultWindow
         {
             Orientation = LayoutOrientation.Horizontal,
             SeparationOverride = 0,
-            VerticalAlignment = VAlignment.Top
+            VerticalAlignment = VAlignment.Center,
+            MinSize = new Vector2(0, 130),
         };
         scroll.AddChild(_rewardTrack);
 
@@ -149,8 +192,50 @@ public sealed class DailyRewardWindow : DefaultWindow
 
     public void UpdateState(DailyRewardUpdateMessage state)
     {
+        TryFinishQuestReplace(state);
+        var rebuildQuestSection = NeedsQuestSectionRebuild(_state?.DailyQuests, state.DailyQuests);
+        _questTimeSmooth = 0f;
         _state = state;
-        RefreshState();
+        RefreshState(rebuildQuestSection);
+    }
+
+    private static bool NeedsQuestSectionRebuild(
+        IReadOnlyList<DailyQuestEntry>? previous,
+        IReadOnlyList<DailyQuestEntry>? next)
+    {
+        if (previous == null || next == null)
+            return previous != next;
+
+        if (previous.Count != next.Count)
+            return true;
+
+        for (var i = 0; i < next.Count; i++)
+        {
+            var a = previous[i];
+            var b = next[i];
+            if (a.QuestId != b.QuestId
+                || a.IsClaimed != b.IsClaimed
+                || a.IsCompleted != b.IsCompleted
+                || a.CanReplace != b.CanReplace)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void TryFinishQuestReplace(DailyRewardUpdateMessage state)
+    {
+        if (string.IsNullOrWhiteSpace(_pendingReplaceQuestId) || _pendingReplaceSlotIndex < 0)
+            return;
+
+        if (state.DailyQuests == null || _pendingReplaceSlotIndex >= state.DailyQuests.Count)
+            return;
+
+        var quest = state.DailyQuests[_pendingReplaceSlotIndex];
+        if (quest.QuestId != _pendingReplaceQuestId || !ShouldShowReplaceButton(quest))
+            ClearQuestReplacePending();
     }
 
     public void AdvanceTimers(float frameTime)
@@ -167,10 +252,6 @@ public sealed class DailyRewardWindow : DefaultWindow
             currentActiveTime = Min(currentActiveTime + step, _state.RequiredActiveTime);
 
         var canClaim = currentActiveTime >= _state.RequiredActiveTime && timeUntilNextClaim == TimeSpan.Zero;
-        var onlineElapsed = _state.OnlineElapsed + step;
-        var grantedCopy = _state.OnlineGrantedThresholds != null
-            ? new List<TimeSpan>(_state.OnlineGrantedThresholds)
-            : new List<TimeSpan>();
 
         _state = new DailyRewardUpdateMessage(
             _state.CurrentStreak,
@@ -183,30 +264,145 @@ public sealed class DailyRewardWindow : DefaultWindow
             currentActiveTime,
             _state.RequiredActiveTime,
             _state.Rewards,
-            onlineElapsed,
-            grantedCopy);
+            _state.OnlineElapsed,
+            _state.OnlineGrantedThresholds,
+            _state.DailyQuests);
 
-        RefreshState();
+        UpdateActiveTimerUi();
+        _questTimeSmooth += frameTime;
+
+        if (_replaceErrorTimer > 0f)
+        {
+            _replaceErrorTimer -= frameTime;
+            if (_replaceErrorTimer <= 0f)
+            {
+                _replaceError = null;
+                UpdateQuestSectionLabel();
+            }
+        }
+
+        if (_replacePendingTimer > 0f)
+        {
+            _replacePendingTimer -= frameTime;
+            if (_replacePendingTimer <= 0f)
+                ClearQuestReplacePending();
+        }
+
+        UpdateQuestCardsSmooth();
     }
 
-    private void RefreshState()
+    private void UpdateQuestSectionLabel()
+    {
+        if (!string.IsNullOrWhiteSpace(_pendingReplaceQuestId))
+        {
+            _questSectionLabel.Text = Loc.GetString("daily-quest-replace-pending");
+            _questSectionLabel.Modulate = Color.FromHex("#c5d3ed");
+            return;
+        }
+
+        if (_replaceErrorTimer > 0f && !string.IsNullOrWhiteSpace(_replaceError))
+        {
+            _questSectionLabel.Text = _replaceError;
+            _questSectionLabel.Modulate = Color.FromHex("#f0a0a0");
+            return;
+        }
+
+        if (_state?.DailyQuests == null || _state.DailyQuests.Count == 0)
+        {
+            _questSectionLabel.Text = Loc.GetString("daily-quest-section-title");
+            _questSectionLabel.Modulate = Color.White;
+            return;
+        }
+
+        var done = 0;
+        foreach (var quest in _state.DailyQuests)
+        {
+            if (quest.IsClaimed)
+                done++;
+        }
+
+        _questSectionLabel.Text = Loc.GetString("daily-quest-section-summary",
+            ("done", done),
+            ("total", _state.DailyQuests.Count));
+        _questSectionLabel.Modulate = Color.White;
+    }
+
+    public void BeginQuestReplace(string questId, int slotIndex = -1)
+    {
+        _pendingReplaceQuestId = questId;
+        _pendingReplaceSlotIndex = slotIndex >= 0
+            ? slotIndex
+            : FindQuestSlotIndex(questId);
+
+        foreach (var card in _questCards)
+            card.SetInteractable(false);
+
+        _replaceError = null;
+        _replaceErrorTimer = 0f;
+        _replacePendingTimer = 5f;
+        _questSectionLabel.Text = Loc.GetString("daily-quest-replace-pending");
+        _questSectionLabel.Modulate = Color.FromHex("#c5d3ed");
+    }
+
+    public void ClearQuestReplacePending()
+    {
+        _replacePendingTimer = 0f;
+        _pendingReplaceQuestId = null;
+        _pendingReplaceSlotIndex = -1;
+        foreach (var card in _questCards)
+            card.SetInteractable(true);
+
+        UpdateQuestSectionLabel();
+    }
+
+    public void ShowQuestReplaceError(string message)
+    {
+        _replaceError = message;
+        _replaceErrorTimer = 4f;
+        UpdateQuestSectionLabel();
+    }
+
+    private int FindQuestSlotIndex(string questId)
+    {
+        for (var i = 0; i < _questCards.Count; i++)
+        {
+            if (_questCards[i].BoundQuestId == questId)
+                return i;
+        }
+
+        return -1;
+    }
+
+    private void OnQuestReplaceClicked(int slotIndex)
+    {
+        if (_state?.DailyQuests == null || slotIndex < 0 || slotIndex >= _state.DailyQuests.Count)
+            return;
+
+        var quest = _state.DailyQuests[slotIndex];
+        if (!ShouldShowReplaceButton(quest))
+            return;
+
+        BeginQuestReplace(quest.QuestId, slotIndex);
+        _uiSystem.SendReplaceRequest(quest.QuestId, slotIndex);
+    }
+
+    private static bool ShouldShowReplaceButton(DailyQuestEntry quest)
+    {
+        return quest.CanReplace;
+    }
+
+    private void UpdateActiveTimerUi()
     {
         if (_state == null)
             return;
 
         var state = _state;
 
-        _streakValueLabel.Text = Loc.GetString("daily-reward-window-streak-value",
-            ("current", state.CurrentStreak),
-            ("max", state.Rewards.Count));
-
         var progressRatio = state.RequiredActiveTime <= TimeSpan.Zero
             ? 1f
             : Math.Clamp((float)(state.CurrentActiveTime.TotalSeconds / state.RequiredActiveTime.TotalSeconds), 0f, 1f);
 
-        _activeProgressBar.MinValue = 0;
-        _activeProgressBar.MaxValue = 100;
-        _activeProgressBar.Value = progressRatio * 100f;
+        _activeProgressBar.Value = progressRatio;
 
         _activeProgressLabel.Text = progressRatio >= 1f
             ? Loc.GetString("daily-reward-window-active-ready")
@@ -223,8 +419,25 @@ public sealed class DailyRewardWindow : DefaultWindow
         _claimButton.Text = Loc.GetString(state.CanClaim
             ? "daily-reward-window-claim-ready"
             : "daily-reward-window-claim-locked");
+    }
 
-        RefreshOnlineTimeSection();
+    private void RefreshState(bool rebuildQuestSection)
+    {
+        if (_state == null)
+            return;
+
+        var state = _state;
+
+        _streakValueLabel.Text = Loc.GetString("daily-reward-window-streak-value",
+            ("current", state.CurrentStreak),
+            ("max", state.Rewards.Count));
+
+        UpdateActiveTimerUi();
+
+        if (rebuildQuestSection)
+            RefreshQuestSection();
+        else
+            UpdateQuestCardsFromState();
 
         _rewardTrack.RemoveAllChildren();
         for (var i = 0; i < state.Rewards.Count; i++)
@@ -242,8 +455,8 @@ public sealed class DailyRewardWindow : DefaultWindow
         var column = new BoxContainer
         {
             Orientation = LayoutOrientation.Vertical,
-            SeparationOverride = 6,
-            MinSize = new Vector2(150, 0)
+            SeparationOverride = 4,
+            MinSize = new Vector2(136, 0)
         };
 
         column.AddChild(CreateRewardCard(reward));
@@ -279,7 +492,7 @@ public sealed class DailyRewardWindow : DefaultWindow
 
             var timerPanel = new PanelContainer
             {
-                Margin = new Thickness(0, 4, 0, 0),
+                Margin = new Thickness(0, 2, 0, 0),
                 PanelOverride = new StyleBoxFlat
                 {
                     BackgroundColor = TimePanelColor.WithAlpha(0.9f),
@@ -300,197 +513,86 @@ public sealed class DailyRewardWindow : DefaultWindow
         return column;
     }
 
-    private Control BuildOnlineTimeRewardsPanel(
-        out ProgressBar[] bars,
-        out Label[] barTimeLabels,
-        out Label[] rewardLabels)
-    {
-        var milestones = AntagTokenCatalog.OnlineRewardMilestones;
-        var n = milestones.Length;
-        bars = new ProgressBar[n];
-        barTimeLabels = new Label[n];
-        rewardLabels = new Label[n];
-
-        var panel = new PanelContainer
-        {
-            HorizontalExpand = true,
-            PanelOverride = new StyleBoxFlat
-            {
-                BackgroundColor = HeroPanelColor,
-                BorderColor = AccentColor,
-                BorderThickness = new Thickness(2),
-                ContentMarginLeftOverride = 12,
-                ContentMarginTopOverride = 10,
-                ContentMarginRightOverride = 12,
-                ContentMarginBottomOverride = 10
-            }
-        };
-
-        var row = new BoxContainer
-        {
-            Orientation = LayoutOrientation.Horizontal,
-            SeparationOverride = 8
-        };
-        panel.AddChild(row);
-
-        for (var i = 0; i < n; i++)
-        {
-            var col = new BoxContainer
-            {
-                Orientation = LayoutOrientation.Vertical,
-                SeparationOverride = 6,
-                HorizontalExpand = true
-            };
-            row.AddChild(col);
-
-            var threshold = milestones[i].Threshold;
-            var hours = (int)threshold.TotalHours;
-            col.AddChild(new Label
-            {
-                Text = Loc.GetString("daily-reward-online-hour-stage", ("hours", hours)),
-                StyleClasses = { "LabelHeading" },
-                Modulate = Color.White,
-                HorizontalAlignment = HAlignment.Center
-            });
-
-            var barWrap = new LayoutContainer
-            {
-                HorizontalExpand = true,
-                MinSize = new Vector2(0, 22)
-            };
-
-            bars[i] = new ProgressBar
-            {
-                MinSize = new Vector2(0, 22),
-                BackgroundStyleBoxOverride = new StyleBoxFlat { BackgroundColor = Color.FromHex("#0c1220") },
-                ForegroundStyleBoxOverride = new StyleBoxFlat { BackgroundColor = ClaimReadyColor },
-                MinValue = 0,
-                MaxValue = 100,
-                MouseFilter = MouseFilterMode.Pass
-            };
-            SetAnchorPreset(bars[i], LayoutPreset.Wide);
-            barWrap.AddChild(bars[i]);
-
-            barTimeLabels[i] = new Label
-            {
-                Align = Label.AlignMode.Center,
-                HorizontalAlignment = HAlignment.Center,
-                VerticalAlignment = VAlignment.Center,
-                MouseFilter = MouseFilterMode.Ignore,
-                Modulate = Color.FromHex("#e8eef8")
-            };
-            SetAnchorPreset(barTimeLabels[i], LayoutPreset.Wide);
-            barWrap.AddChild(barTimeLabels[i]);
-
-            col.AddChild(barWrap);
-
-            var coinRow = new BoxContainer
-            {
-                Orientation = LayoutOrientation.Horizontal,
-                SeparationOverride = 4,
-                HorizontalAlignment = HAlignment.Center
-            };
-            rewardLabels[i] = new Label
-            {
-                Modulate = AccentColor,
-                HorizontalAlignment = HAlignment.Center,
-                VerticalAlignment = VAlignment.Center
-            };
-            coinRow.AddChild(rewardLabels[i]);
-            coinRow.AddChild(new TextureRect
-            {
-                Texture = _antagCoinTexture,
-                MinSize = new Vector2(22, 22),
-                TextureScale = new Vector2(0.4f, 0.4f),
-                Stretch = TextureRect.StretchMode.KeepAspectCentered,
-                VerticalAlignment = VAlignment.Center
-            });
-            col.AddChild(coinRow);
-        }
-
-        return panel;
-    }
-
-    private void RefreshOnlineTimeSection()
+    private void RefreshQuestSection()
     {
         if (_state == null)
             return;
 
-        var milestones = AntagTokenCatalog.OnlineRewardMilestones;
-        var prev = TimeSpan.Zero;
-        var granted = _state.OnlineGrantedThresholds ?? new List<TimeSpan>();
-        var elapsed = _state.OnlineElapsed;
+        _questTrack.RemoveAllChildren();
 
-        for (var i = 0; i < milestones.Length; i++)
+        if (_state.DailyQuests == null || _state.DailyQuests.Count == 0)
         {
-            var (threshold, amount) = milestones[i];
-            ComputeOnlineSegment(elapsed, granted, threshold, prev, out var fill, out var remaining, out var claimed);
+            _questCards.Clear();
+            _questSlots.Clear();
+            _questSectionLabel.Text = Loc.GetString("daily-quest-section-title");
+            _questTrack.AddChild(new Label
+            {
+                Text = Loc.GetString("daily-quest-empty"),
+                Modulate = Color.FromHex("#9fb4d8"),
+                HorizontalExpand = true,
+                HorizontalAlignment = HAlignment.Center
+            });
+            return;
+        }
 
-            _onlineSegmentBars[i].Value = fill * 100f;
+        UpdateQuestSectionLabel();
 
-            _onlineBarTimeLabels[i].Text = claimed
-                ? Loc.GetString("daily-reward-online-claimed")
-                : FormatHms(remaining);
+        EnsureQuestSlots(_state.DailyQuests.Count);
 
-            _onlineBarTimeLabels[i].Modulate = claimed ? ClaimReadyColor : Color.FromHex("#e8eef8");
-
-            _onlineRewardLabels[i].Text = Loc.GetString("daily-reward-online-reward", ("amount", amount));
-
-            prev = threshold;
+        for (var i = 0; i < _state.DailyQuests.Count; i++)
+        {
+            var quest = _state.DailyQuests[i];
+            _questCards[i].SetQuest(quest, _questTimeSmooth);
+            _questSlots[i].HorizontalExpand = true;
+            _questSlots[i].VerticalExpand = false;
+            _questTrack.AddChild(_questSlots[i]);
         }
     }
 
-    private static void ComputeOnlineSegment(
-        TimeSpan elapsed,
-        IReadOnlyList<TimeSpan> granted,
-        TimeSpan threshold,
-        TimeSpan prevThreshold,
-        out float fill,
-        out TimeSpan remaining,
-        out bool claimed)
+    private void EnsureQuestSlots(int count)
     {
-        claimed = false;
-        for (var g = 0; g < granted.Count; g++)
+        while (_questSlots.Count < count)
         {
-            if (granted[g] == threshold)
+            var slotIndex = _questSlots.Count;
+            var card = new DailyQuestCardControl
             {
-                claimed = true;
-                break;
-            }
-        }
+                HorizontalExpand = true,
+                VerticalExpand = true,
+            };
+            card.SetReplaceHandler(() => OnQuestReplaceClicked(slotIndex));
+            _questCards.Add(card);
 
-        var segmentDuration = threshold - prevThreshold;
-        if (claimed)
-        {
-            fill = 1f;
-            remaining = TimeSpan.Zero;
+            var slot = new PanelContainer
+            {
+                HorizontalExpand = true,
+                VerticalExpand = false,
+                MinSize = new Vector2(0, DailyQuestCardControl.RewardQuestCardHeight),
+            };
+            slot.AddChild(card);
+            _questSlots.Add(slot);
+        }
+    }
+
+    private void UpdateQuestCardsFromState()
+    {
+        if (_state?.DailyQuests == null)
             return;
-        }
 
-        if (elapsed >= threshold)
-        {
-            fill = 1f;
-            remaining = TimeSpan.Zero;
+        var count = Math.Min(_questCards.Count, _state.DailyQuests.Count);
+        for (var i = 0; i < count; i++)
+            _questCards[i].SetQuest(_state.DailyQuests[i], _questTimeSmooth);
+
+        UpdateQuestSectionLabel();
+    }
+
+    private void UpdateQuestCardsSmooth()
+    {
+        if (_state?.DailyQuests == null)
             return;
-        }
 
-        if (segmentDuration <= TimeSpan.Zero)
-        {
-            fill = 0f;
-            remaining = MaxZero(threshold - elapsed);
-            return;
-        }
-
-        if (elapsed <= prevThreshold)
-        {
-            fill = 0f;
-            remaining = MaxZero(threshold - elapsed);
-            return;
-        }
-
-        var inSeg = elapsed - prevThreshold;
-        fill = (float)Math.Clamp(inSeg.TotalSeconds / segmentDuration.TotalSeconds, 0d, 1d);
-        remaining = MaxZero(threshold - elapsed);
+        var count = Math.Min(_questCards.Count, _state.DailyQuests.Count);
+        for (var i = 0; i < count; i++)
+            _questCards[i].SetQuest(_state.DailyQuests[i], _questTimeSmooth);
     }
 
     private Control BuildHeroSection(
@@ -498,7 +600,7 @@ public sealed class DailyRewardWindow : DefaultWindow
         out Label activeProgressLabel,
         out Label cooldownLabel,
         out Label expiryLabel,
-        out ProgressBar activeProgressBar,
+        out PixelTiledProgressBar activeProgressBar,
         out Button claimButton)
     {
         var panel = new PanelContainer
@@ -517,31 +619,83 @@ public sealed class DailyRewardWindow : DefaultWindow
 
         var content = new BoxContainer
         {
-            Orientation = LayoutOrientation.Horizontal,
-            SeparationOverride = 14
+            Orientation = LayoutOrientation.Vertical,
+            SeparationOverride = 10
         };
         panel.AddChild(content);
 
-        var left = new BoxContainer
+        var headerRow = new BoxContainer
+        {
+            Orientation = LayoutOrientation.Horizontal,
+            SeparationOverride = 12
+        };
+        content.AddChild(headerRow);
+
+        var titleCol = new BoxContainer
         {
             Orientation = LayoutOrientation.Vertical,
-            SeparationOverride = 8,
+            SeparationOverride = 4,
             HorizontalExpand = true
         };
-        content.AddChild(left);
+        headerRow.AddChild(titleCol);
 
-        left.AddChild(new Label
+        titleCol.AddChild(new Label
         {
             Text = Loc.GetString("daily-reward-window-title"),
             StyleClasses = { "LabelHeading" },
             Modulate = Color.White
         });
 
-        left.AddChild(new Label
+        titleCol.AddChild(new Label
         {
             Text = Loc.GetString("daily-reward-window-subtitle"),
             Modulate = Color.FromHex("#c5d3ed")
         });
+
+        var claimPanel = new PanelContainer
+        {
+            MinSize = new Vector2(190, 72),
+            MaxSize = new Vector2(190, 72),
+            VerticalAlignment = VAlignment.Top,
+            HorizontalAlignment = HAlignment.Right,
+            PanelOverride = new StyleBoxFlat
+            {
+                BackgroundColor = Color.FromHex("#0f1725"),
+                BorderColor = Color.FromHex("#455674"),
+                BorderThickness = new Thickness(1),
+                ContentMarginLeftOverride = 10,
+                ContentMarginTopOverride = 8,
+                ContentMarginRightOverride = 10,
+                ContentMarginBottomOverride = 8
+            }
+        };
+        headerRow.AddChild(claimPanel);
+
+        var claimBox = new BoxContainer
+        {
+            Orientation = LayoutOrientation.Vertical,
+            SeparationOverride = 6,
+            HorizontalAlignment = HAlignment.Center,
+            VerticalAlignment = VAlignment.Center
+        };
+        claimPanel.AddChild(claimBox);
+
+        claimBox.AddChild(new Label
+        {
+            Text = Loc.GetString("daily-reward-window-claim-panel-title"),
+            StyleClasses = { "LabelHeading" },
+            Modulate = Color.White,
+            HorizontalAlignment = HAlignment.Center
+        });
+
+        claimButton = new Button
+        {
+            Text = Loc.GetString("daily-reward-window-claim"),
+            MinSize = new Vector2(168, 36),
+            HorizontalExpand = true,
+            Modulate = Color.White
+        };
+        claimBox.AddChild(claimButton);
 
         var streakPanel = new PanelContainer
         {
@@ -556,7 +710,7 @@ public sealed class DailyRewardWindow : DefaultWindow
                 ContentMarginBottomOverride = 6
             }
         };
-        left.AddChild(streakPanel);
+        content.AddChild(streakPanel);
 
         var streakBox = new BoxContainer
         {
@@ -575,66 +729,22 @@ public sealed class DailyRewardWindow : DefaultWindow
         streakBox.AddChild(streakValueLabel);
 
         activeProgressLabel = new Label { Modulate = Color.White };
-        left.AddChild(CreateIconLabelRow(_clockTexture, activeProgressLabel));
+        content.AddChild(CreateIconLabelRow(_clockTexture, activeProgressLabel));
 
-        activeProgressBar = new ProgressBar
-        {
-            MinSize = new Vector2(0, 18),
-            BackgroundStyleBoxOverride = new StyleBoxFlat { BackgroundColor = Color.FromHex("#0c1220") },
-            ForegroundStyleBoxOverride = new StyleBoxFlat { BackgroundColor = ClaimReadyColor }
-        };
-        left.AddChild(activeProgressBar);
+        activeProgressBar = new PixelTiledProgressBar();
+        content.AddChild(activeProgressBar);
 
         var statusRow = new BoxContainer
         {
             Orientation = LayoutOrientation.Horizontal,
             SeparationOverride = 20
         };
-        left.AddChild(statusRow);
 
         cooldownLabel = new Label { Modulate = Color.FromHex("#d7e2f4") };
         expiryLabel = new Label { Modulate = Color.FromHex("#9fb4d8") };
-
-        var right = new PanelContainer
-        {
-            MinSize = new Vector2(200, 0),
-            VerticalAlignment = VAlignment.Center,
-            PanelOverride = new StyleBoxFlat
-            {
-                BackgroundColor = Color.FromHex("#0f1725"),
-                BorderColor = Color.FromHex("#455674"),
-                BorderThickness = new Thickness(1),
-                ContentMarginLeftOverride = 12,
-                ContentMarginTopOverride = 12,
-                ContentMarginRightOverride = 12,
-                ContentMarginBottomOverride = 12
-            }
-        };
-        content.AddChild(right);
-
-        var rightBox = new BoxContainer
-        {
-            Orientation = LayoutOrientation.Vertical,
-            SeparationOverride = 8,
-            HorizontalAlignment = HAlignment.Center,
-            VerticalAlignment = VAlignment.Center
-        };
-        right.AddChild(rightBox);
-
-        rightBox.AddChild(new Label
-        {
-            Text = Loc.GetString("daily-reward-window-claim-panel-title"),
-            StyleClasses = { "LabelHeading" },
-            Modulate = Color.White
-        });
-
-        claimButton = new Button
-        {
-            Text = Loc.GetString("daily-reward-window-claim"),
-            MinSize = new Vector2(160, 40),
-            Modulate = Color.White
-        };
-        rightBox.AddChild(claimButton);
+        statusRow.AddChild(cooldownLabel);
+        statusRow.AddChild(expiryLabel);
+        content.AddChild(statusRow);
 
         return panel;
     }
@@ -651,7 +761,8 @@ public sealed class DailyRewardWindow : DefaultWindow
 
         var panel = new PanelContainer
         {
-            MinSize = new Vector2(120, 160),
+            MinSize = new Vector2(132, 124),
+            MaxSize = new Vector2(132, 124),
             Margin = new Thickness(0, 0, 6, 0),
             PanelOverride = new StyleBoxFlat
             {
@@ -668,7 +779,7 @@ public sealed class DailyRewardWindow : DefaultWindow
         var box = new BoxContainer
         {
             Orientation = LayoutOrientation.Vertical,
-            SeparationOverride = 6,
+            SeparationOverride = 4,
             VerticalAlignment = VAlignment.Center,
             HorizontalAlignment = HAlignment.Center,
             VerticalExpand = true
@@ -716,8 +827,8 @@ public sealed class DailyRewardWindow : DefaultWindow
                 row.AddChild(new TextureRect
                 {
                     Texture = texture,
-                    MinSize = new Vector2(24, 24),
-                    TextureScale = new Vector2(0.4f, 0.4f),
+                    MinSize = new Vector2(20, 20),
+                    TextureScale = new Vector2(0.35f, 0.35f),
                     Stretch = TextureRect.StretchMode.KeepAspectCentered,
                     VerticalAlignment = VAlignment.Center
                 });
@@ -729,8 +840,8 @@ public sealed class DailyRewardWindow : DefaultWindow
                 box.AddChild(new TextureRect
                 {
                     Texture = texture,
-                    MinSize = new Vector2(56, 56),
-                    TextureScale = new Vector2(0.6f, 0.6f),
+                    MinSize = new Vector2(40, 40),
+                    TextureScale = new Vector2(0.5f, 0.5f),
                     Stretch = TextureRect.StretchMode.KeepAspectCentered,
                     HorizontalAlignment = HAlignment.Center
                 });
@@ -759,8 +870,8 @@ public sealed class DailyRewardWindow : DefaultWindow
 
         return new PanelContainer
         {
-            MinSize = new Vector2(15, 2),
-            Margin = new Thickness(1, 70, 1, 80),
+            MinSize = new Vector2(10, 2),
+            Margin = new Thickness(0, 54, 0, 54),
             PanelOverride = new StyleBoxFlat { BackgroundColor = color }
         };
     }
@@ -848,14 +959,6 @@ public sealed class DailyRewardWindow : DefaultWindow
             return "00:00";
         var totalHours = (int)span.TotalHours;
         return $"{totalHours:00}:{span.Minutes:00}";
-    }
-
-    private static string FormatHms(TimeSpan span)
-    {
-        if (span <= TimeSpan.Zero)
-            return "00:00:00";
-        var h = (int)span.TotalHours;
-        return $"{h:00}:{span.Minutes:00}:{span.Seconds:00}";
     }
 
     private static string GetAvailabilityText(DailyRewardUpdateMessage state)

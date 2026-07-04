@@ -15,11 +15,13 @@ public static class MiniSliderStyles
     public const string PlainTrackPath = "/Textures/_Mini/Interface/plain_scroll_line.png";
     public const string LongPlainTrackPath = "/Textures/_Mini/Interface/long_plain_scroll_line.png";
     public const string MarkedTrackPath = "/Textures/_Mini/Interface/scroll_line.png";
+    public const string GreenPlainTrackPath = "/Textures/_Mini/Interface/green_plain_scroll_line.png";
     public const string PointerPath = "/Textures/_Mini/Interface/pointer.png";
 
     public const float NativePlainTrackWidth = 32f;
     public const float NativeWhiteTrackWidth = 16f;
     public const float NativeLongPlainTrackWidth = 64f;
+    public const float NativeGreenPlainTrackWidth = 48f;
     public const float NativeMarkedTrackWidth = 29f;
     public const float NativeTrackHeight = 7f;
     public const float NativePointerWidth = 7f;

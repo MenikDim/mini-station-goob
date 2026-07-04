@@ -57,6 +57,12 @@ public sealed partial class UiFontStylePrototype : IPrototype, IComparable<UiFon
     [DataField]
     public int ChatSizeOffset;
 
+    /// <summary>
+    /// Extra multiplier applied to chat font size after Noto height normalization.
+    /// </summary>
+    [DataField]
+    public float ChatSizeScale = 1f;
+
     public string ResolveItalic() => Italic ?? Regular;
 
     public string ResolveBold() => Bold ?? Regular;

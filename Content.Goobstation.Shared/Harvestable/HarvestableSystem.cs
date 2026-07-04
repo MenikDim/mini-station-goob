@@ -1,4 +1,5 @@
-﻿using Content.Shared.DoAfter;
+﻿using Content.Shared._Mini.DailyQuests;
+using Content.Shared.DoAfter;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 
@@ -50,6 +51,9 @@ public sealed class HarvestableSystem : EntitySystem
 
         Harvest(ent,args.User);
         args.Handled = true;
+
+        var harvestEv = new PlantHarvestedEvent(args.User);
+        RaiseLocalEvent(ref harvestEv);
     }
 
     public void Harvest(Entity<HarvestableComponent> ent, EntityUid harvester)

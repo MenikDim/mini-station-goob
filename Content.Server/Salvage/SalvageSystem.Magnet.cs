@@ -31,6 +31,7 @@ using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 using Content.Server.Salvage.Magnet;
+using Content.Shared._Mini.DailyQuests;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Procedural;
 using Content.Shared.Radio;
@@ -68,6 +69,9 @@ public sealed partial class SalvageSystem
 
     private void OnMagnetClaim(EntityUid uid, SalvageMagnetComponent component, ref MagnetClaimOfferEvent args)
     {
+        var questEv = new SalvageMagnetClaimedEvent(args.Actor);
+        RaiseLocalEvent(ref questEv);
+
         var station = _station.GetOwningStation(uid);
 
         if (!TryComp(station, out SalvageMagnetDataComponent? dataComp) ||

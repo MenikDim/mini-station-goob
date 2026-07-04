@@ -1,0 +1,379 @@
+﻿# SPDX-FileCopyrightText: 2026 Casha
+# Daily quest pool — 2 random quests per player per day.
+
+- type: dailyQuest
+  id: TypanMedicHeal5
+  questType: HealOthers
+  name: daily-quest-typan-medic-heal-5-name
+  description: daily-quest-typan-medic-heal-5-desc
+  requiredJob: TypanMedic
+  targetCount: 5
+  rewardCoins: 2
+  weight: 1.2
+
+- type: dailyQuest
+  id: TypanCommanderStamp3
+  questType: StampDocuments
+  name: daily-quest-typan-commander-stamp-3-name
+  description: daily-quest-typan-commander-stamp-3-desc
+  requiredJob: TypanCommander
+  targetCount: 3
+  rewardCoins: 1
+  weight: 1.1
+
+- type: dailyQuest
+  id: TypanCargotechMining2000
+  questType: EarnMiningPoints
+  name: daily-quest-typan-cargo-mining-2000-name
+  description: daily-quest-typan-cargo-mining-2000-desc
+  requiredJob: TypanCargotech
+  targetCount: 2000
+  rewardCoins: 3
+  weight: 0.9
+
+- type: dailyQuest
+  id: PacifistRound
+  questType: NoMeleeHits
+  icon: JobIconMime
+  name: daily-quest-pacifist-round-name
+  description: daily-quest-pacifist-round-desc
+  rewardCoins: 2
+  minRoundPlaytime: 900
+  weight: 0.8
+
+- type: dailyQuest
+  id: UntouchableRound
+  questType: NoDamageTaken
+  icon: JobIconMedicalDoctor
+  name: daily-quest-untouchable-round-name
+  description: daily-quest-untouchable-round-desc
+  rewardCoins: 3
+  minRoundPlaytime: 900
+  weight: 0.7
+
+- type: dailyQuest
+  id: TypanPatrolCuff2
+  questType: CuffPlayers
+  name: daily-quest-typan-patrol-cuff-2-name
+  description: daily-quest-typan-patrol-cuff-2-desc
+  requiredJob: TypanPatrol
+  targetCount: 2
+  rewardCoins: 2
+  weight: 1
+
+- type: dailyQuest
+  id: TypanScienceUnlock1
+  questType: UnlockTechnology
+  name: daily-quest-typan-science-unlock-1-name
+  description: daily-quest-typan-science-unlock-1-desc
+  requiredJob: TypanScience
+  targetCount: 1
+  rewardCoins: 1
+  weight: 1.1
+
+- type: dailyQuest
+  id: TypanChefCook3
+  questType: CookMeals
+  name: daily-quest-typan-chef-cook-3-name
+  description: daily-quest-typan-chef-cook-3-desc
+  requiredJob: TypanChef
+  targetCount: 3
+  rewardCoins: 1
+  weight: 1.1
+
+- type: dailyQuest
+  id: TypanBotanistHarvest10
+  questType: HarvestPlants
+  name: daily-quest-typan-botanist-harvest-10-name
+  description: daily-quest-typan-botanist-harvest-10-desc
+  requiredJob: TypanBotanist
+  targetCount: 10
+  rewardCoins: 1
+  weight: 1.1
+
+- type: dailyQuest
+  id: TypanAtmosWeld5
+  questType: WeldStructures
+  name: daily-quest-typan-atmos-weld-5-name
+  description: daily-quest-typan-atmos-weld-5-desc
+  requiredJob: TypanAtmosTech
+  targetCount: 5
+  rewardCoins: 2
+  weight: 1
+
+- type: dailyQuest
+  id: TypanMedicInject3
+  questType: InjectPatients
+  name: daily-quest-typan-medic-inject-3-name
+  description: daily-quest-typan-medic-inject-3-desc
+  requiredJob: TypanMedic
+  targetCount: 3
+  rewardCoins: 2
+  weight: 1.1
+
+- type: dailyQuest
+  id: TypanCargotechBounty2
+  questType: FulfillCargoBounty
+  name: daily-quest-typan-cargo-bounty-2-name
+  description: daily-quest-typan-cargo-bounty-2-desc
+  requiredJob: TypanCargotech
+  targetCount: 2
+  rewardCoins: 2
+  weight: 1
+
+- type: dailyQuest
+  id: TypanPatrolClean15
+  questType: CleanDecals
+  name: daily-quest-typan-patrol-clean-15-name
+  description: daily-quest-typan-patrol-clean-15-desc
+  requiredJob: TypanPatrol
+  targetCount: 15
+  rewardCoins: 1
+  weight: 0.9
+
+- type: dailyQuest
+  id: TypanCommanderSurvive30
+  questType: SurviveRound
+  name: daily-quest-typan-commander-survive-30-name
+  description: daily-quest-typan-commander-survive-30-desc
+  requiredJob: TypanCommander
+  targetCount: 1
+  rewardCoins: 2
+  minRoundPlaytime: 1800
+  weight: 0.9
+
+- type: dailyQuest
+  id: DetectiveScan3
+  questType: ScanForensics
+  name: daily-quest-detective-scan-3-name
+  description: daily-quest-detective-scan-3-desc
+  requiredJob: Detective
+  targetCount: 3
+  rewardCoins: 2
+  weight: 0.8
+
+- type: dailyQuest
+  id: TypanCargotechMagnet1
+  questType: PullSalvageMagnet
+  sprite:
+    sprite: /Textures/Structures/Machines/salvage.rsi
+    state: salvage-magnet
+  name: daily-quest-typan-cargo-magnet-1-name
+  description: daily-quest-typan-cargo-magnet-1-desc
+  requiredJob: TypanCargotech
+  targetCount: 1
+  rewardCoins: 1
+  weight: 1
+
+- type: dailyQuest
+  id: TypanScienceLathe5
+  questType: LatheProduce
+  name: daily-quest-typan-science-lathe-5-name
+  description: daily-quest-typan-science-lathe-5-desc
+  requiredJob: TypanScience
+  targetCount: 5
+  rewardCoins: 1
+  weight: 1.1
+
+- type: dailyQuest
+  id: TypanPatrolKill5
+  questType: KillHostiles
+  name: daily-quest-typan-patrol-kill-5-name
+  description: daily-quest-typan-patrol-kill-5-desc
+  requiredJob: TypanPatrol
+  targetCount: 5
+  rewardCoins: 2
+  weight: 1
+
+- type: dailyQuest
+  id: MimeEmote8
+  questType: PerformEmotes
+  name: daily-quest-mime-emote-8-name
+  description: daily-quest-mime-emote-8-desc
+  requiredJob: Mime
+  targetCount: 8
+  rewardCoins: 1
+  weight: 0.7
+
+- type: dailyQuest
+  id: TypanAtmosRepair3
+  questType: RepairStructures
+  name: daily-quest-typan-atmos-repair-3-name
+  description: daily-quest-typan-atmos-repair-3-desc
+  requiredJob: TypanAtmosTech
+  targetCount: 3
+  rewardCoins: 1
+  weight: 1
+
+- type: dailyQuest
+  id: TypanRDUnlock2
+  questType: UnlockTechnology
+  name: daily-quest-typan-rd-unlock-2-name
+  description: daily-quest-typan-rd-unlock-2-desc
+  requiredJob: TypanResearchDirector
+  targetCount: 2
+  rewardCoins: 2
+  weight: 0.9
+
+- type: dailyQuest
+  id: TypanBorgSurvive20
+  questType: SurviveRound
+  name: daily-quest-typan-borg-survive-20-name
+  description: daily-quest-typan-borg-survive-20-desc
+  requiredJob: TypanBorg
+  targetCount: 1
+  rewardCoins: 1
+  minRoundPlaytime: 1200
+  weight: 0.9
+
+- type: dailyQuest
+  id: MedicalDoctorHeal5
+  questType: HealOthers
+  name: daily-quest-medical-doctor-heal-5-name
+  description: daily-quest-medical-doctor-heal-5-desc
+  requiredJob: MedicalDoctor
+  targetCount: 5
+  rewardCoins: 2
+  weight: 1
+
+- type: dailyQuest
+  id: HeadOfPersonnelStamp3
+  questType: StampDocuments
+  name: daily-quest-hop-stamp-3-name
+  description: daily-quest-hop-stamp-3-desc
+  requiredJob: HeadOfPersonnel
+  targetCount: 3
+  rewardCoins: 1
+  weight: 1
+
+- type: dailyQuest
+  id: SalvageMining1500
+  questType: EarnMiningPoints
+  name: daily-quest-salvage-mining-1500-name
+  description: daily-quest-salvage-mining-1500-desc
+  requiredJob: SalvageSpecialist
+  targetCount: 1500
+  rewardCoins: 3
+  weight: 0.9
+
+- type: dailyQuest
+  id: SecurityCuff2
+  questType: CuffPlayers
+  name: daily-quest-security-cuff-2-name
+  description: daily-quest-security-cuff-2-desc
+  requiredJob: SecurityOfficer
+  targetCount: 2
+  rewardCoins: 2
+  weight: 1
+
+- type: dailyQuest
+  id: ScientistUnlock1
+  questType: UnlockTechnology
+  name: daily-quest-scientist-unlock-1-name
+  description: daily-quest-scientist-unlock-1-desc
+  requiredJob: Scientist
+  targetCount: 1
+  rewardCoins: 1
+  weight: 1
+
+- type: dailyQuest
+  id: ChefCook3
+  questType: CookMeals
+  name: daily-quest-chef-cook-3-name
+  description: daily-quest-chef-cook-3-desc
+  requiredJob: Chef
+  targetCount: 3
+  rewardCoins: 1
+  weight: 1
+
+- type: dailyQuest
+  id: BotanistHarvest8
+  questType: HarvestPlants
+  name: daily-quest-botanist-harvest-8-name
+  description: daily-quest-botanist-harvest-8-desc
+  requiredJob: Botanist
+  targetCount: 8
+  rewardCoins: 1
+  weight: 1
+
+- type: dailyQuest
+  id: JanitorClean20
+  questType: CleanDecals
+  name: daily-quest-janitor-clean-20-name
+  description: daily-quest-janitor-clean-20-desc
+  requiredJob: Janitor
+  targetCount: 20
+  rewardCoins: 1
+  weight: 1
+
+- type: dailyQuest
+  id: ParamedicInject4
+  questType: InjectPatients
+  name: daily-quest-paramedic-inject-4-name
+  description: daily-quest-paramedic-inject-4-desc
+  requiredJob: Paramedic
+  targetCount: 4
+  rewardCoins: 2
+  weight: 1
+
+- type: dailyQuest
+  id: CargoTechBounty2
+  questType: FulfillCargoBounty
+  name: daily-quest-cargo-bounty-2-name
+  description: daily-quest-cargo-bounty-2-desc
+  requiredJob: CargoTechnician
+  targetCount: 2
+  rewardCoins: 2
+  weight: 1
+
+- type: dailyQuest
+  id: CaptainSurvive30
+  questType: SurviveRound
+  name: daily-quest-captain-survive-30-name
+  description: daily-quest-captain-survive-30-desc
+  requiredJob: Captain
+  targetCount: 1
+  rewardCoins: 2
+  minRoundPlaytime: 1800
+  weight: 0.8
+
+- type: dailyQuest
+  id: ClownEmote10
+  questType: PerformEmotes
+  name: daily-quest-clown-emote-10-name
+  description: daily-quest-clown-emote-10-desc
+  requiredJob: Clown
+  targetCount: 10
+  rewardCoins: 1
+  weight: 0.7
+
+- type: dailyQuest
+  id: GeneralPlay30
+  questType: SurviveRound
+  icon: JobIconNoId
+  name: daily-quest-general-play-30-name
+  description: daily-quest-general-play-30-desc
+  targetCount: 1
+  rewardCoins: 1
+  minRoundPlaytime: 1800
+  weight: 1.3
+
+- type: dailyQuest
+  id: GeneralEmote6
+  questType: PerformEmotes
+  icon: JobIconNoId
+  name: daily-quest-general-emote-6-name
+  description: daily-quest-general-emote-6-desc
+  targetCount: 6
+  rewardCoins: 1
+  weight: 1.2
+
+- type: dailyQuest
+  id: GeneralHeal3
+  questType: HealOthers
+  icon: JobIconNoId
+  name: daily-quest-general-heal-3-name
+  description: daily-quest-general-heal-3-desc
+  targetCount: 3
+  rewardCoins: 1
+  weight: 1.2

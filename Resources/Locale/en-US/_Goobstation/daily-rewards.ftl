@@ -15,6 +15,7 @@ daily-reward-window-claim = Claim reward
 daily-reward-window-claim-ready = Claim today
 daily-reward-window-claim-locked = Play 15 minutes first
 daily-reward-window-claim-panel-title = Login reward
+daily-reward-window-opening = Opening daily rewards window...
 daily-reward-card-day = Day {$day}
 daily-reward-card-claimed = Claimed
 daily-reward-card-current = Today

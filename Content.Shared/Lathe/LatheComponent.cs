@@ -137,6 +137,12 @@ namespace Content.Shared.Lathe
         [DataField, ViewVariables(VVAccess.ReadWrite)]
         public bool OutputToStorage = false;
         // Goobstation change end
+
+        /// <summary>
+        /// Last player who queued a recipe. Used for daily quest tracking.
+        /// </summary>
+        [ViewVariables]
+        public EntityUid? LastQuestActor;
     }
 
     public sealed class LatheGetRecipesEvent : EntityEventArgs

@@ -83,6 +83,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Server.Cargo.Components;
 using Content.Server.NameIdentifier;
+using Content.Shared._Mini.DailyQuests;
 using Content.Shared.Access.Components;
 using Content.Shared.Cargo;
 using Content.Shared.Cargo.Components;
@@ -154,6 +155,9 @@ public sealed partial class CargoSystem
         component.NextPrintTime = Timing.CurTime + component.PrintDelay;
         SetupBountyLabel(label, station, bounty.Value);
         _audio.PlayPvs(component.PrintSound, uid);
+
+        var bountyEv = new CargoBountyLabelPrintedEvent(args.Actor);
+        RaiseLocalEvent(ref bountyEv);
     }
 
     private void OnSkipBountyMessage(EntityUid uid, CargoBountyConsoleComponent component, BountySkipMessage args)

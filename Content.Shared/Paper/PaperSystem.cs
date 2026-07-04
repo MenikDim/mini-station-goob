@@ -76,6 +76,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Shared._Mini.DailyQuests;
 using Content.Shared.Administration.Logs;
 using Content.Shared.UserInterface;
 using Content.Shared.Database;
@@ -229,7 +230,7 @@ public sealed class PaperSystem : EntitySystem
         }
 
         // If a stamp, attempt to stamp paper
-        if (TryComp<StampComponent>(args.Used, out var stampComp) && TryStamp(entity, GetStampInfo(stampComp), stampComp.StampState))
+        if (TryComp<StampComponent>(args.Used, out var stampComp) && TryStamp(entity, GetStampInfo(stampComp), stampComp.StampState, args.User))
         {
             // successfully stamped, play popup
             var stampPaperOtherMessage = Loc.GetString("paper-component-action-stamp-paper-other",
@@ -297,7 +298,7 @@ public sealed class PaperSystem : EntitySystem
     /// <summary>
     ///     Accepts the name and state to be stamped onto the paper, returns true if successful.
     /// </summary>
-    public bool TryStamp(Entity<PaperComponent> entity, StampDisplayInfo stampInfo, string spriteStampState)
+    public bool TryStamp(Entity<PaperComponent> entity, StampDisplayInfo stampInfo, string spriteStampState, EntityUid? user = null)
     {
         if (!entity.Comp.StampedBy.Contains(stampInfo))
         {
@@ -316,6 +317,12 @@ public sealed class PaperSystem : EntitySystem
                 // Would be nice to be able to display multiple sprites on the paper
                 // but most of the existing images overlap
                 _appearance.SetData(entity, PaperVisuals.Stamp, entity.Comp.StampState, appearance);
+            }
+
+            if (user != null)
+            {
+                var ev = new PaperStampedEvent(user.Value);
+                RaiseLocalEvent(entity.Owner, ref ev);
             }
         }
         return true;

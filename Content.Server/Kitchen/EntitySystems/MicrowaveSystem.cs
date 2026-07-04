@@ -63,6 +63,7 @@ using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
 using Content.Server.Temperature.Components;
 using Content.Server.Temperature.Systems;
+using Content.Shared._Mini.DailyQuests;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Part;
 using Content.Shared.Chemistry.Components.SolutionManager;
@@ -644,6 +645,7 @@ namespace Content.Server.Kitchen.EntitySystems
             activeComp.CookTimeRemaining = component.CurrentCookTimerTime * component.CookTimeMultiplier;
             activeComp.TotalTime = component.CurrentCookTimerTime; //this doesn't scale so that we can have the "actual" time
             activeComp.PortionedRecipe = portionedRecipe;
+            activeComp.CookUser = user;
             //Scale tiems with cook times
             component.CurrentCookTimeEnd = _gameTiming.CurTime + TimeSpan.FromSeconds(component.CurrentCookTimerTime * component.CookTimeMultiplier);
             if (malfunctioning)
@@ -731,6 +733,9 @@ namespace Content.Server.Kitchen.EntitySystems
                         SubtractContents(microwave, active.PortionedRecipe.Item1);
                         Spawn(active.PortionedRecipe.Item1.Result, coords);
                     }
+
+                    var mealEv = new MicrowaveMealProducedEvent(uid, active.CookUser);
+                    RaiseLocalEvent(ref mealEv);
                 }
 
                 _container.EmptyContainer(microwave.Storage);

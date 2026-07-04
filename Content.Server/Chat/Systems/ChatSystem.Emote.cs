@@ -27,6 +27,7 @@
 
 using System.Collections.Frozen;
 using Content.Goobstation.Common.MisandryBox;
+using Content.Shared._Mini.DailyQuests;
 using Content.Shared.Chat; // Einstein Engines - Languages & Goobmod
 using Content.Server.Popups;
 using Content.Shared.Chat.Prototypes;
@@ -309,6 +310,12 @@ public partial class ChatSystem
 
         var ev = new EmoteEvent(proto, voluntary);
         RaiseLocalEvent(uid, ref ev);
+
+        if (voluntary)
+        {
+            var questEv = new EmotePerformedEvent(uid);
+            RaiseLocalEvent(ref questEv);
+        }
 
         return true;
     }

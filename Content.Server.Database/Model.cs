@@ -44,6 +44,7 @@ namespace Content.Server.Database
 
         public DbSet<PlayTime> PlayTime { get; set; } = default!;
         public DbSet<DailyRewardProgress> DailyRewardProgresses { get; set; } = default!;
+        public DbSet<DailyQuestProgress> DailyQuestProgresses { get; set; } = default!;
         public DbSet<PlayerAntagToken> PlayerAntagTokens { get; set; } = default!;
         public DbSet<PlayerAntagTokenSelection> PlayerAntagTokenSelections { get; set; } = default!;
         public DbSet<PlayerGhostRoleTickets> PlayerGhostRoleTickets { get; set; } = default!;
@@ -143,6 +144,10 @@ namespace Content.Server.Database
 
             modelBuilder.Entity<DailyRewardProgress>()
                 .HasIndex(v => v.PlayerId)
+                .IsUnique();
+
+            modelBuilder.Entity<DailyQuestProgress>()
+                .HasIndex(v => new { v.PlayerId, v.QuestDate })
                 .IsUnique();
 
             modelBuilder.Entity<PlayerAntagToken>()
@@ -837,6 +842,37 @@ namespace Content.Server.Database
         public DateTime? PendingActiveDate { get; set; }
 
         public TimeSpan PendingActiveTime { get; set; }
+    }
+
+    [Table("daily_quest_progress")]
+    public sealed class DailyQuestProgress
+    {
+        [Required, Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
+        [Required, ForeignKey("player")]
+        public Guid PlayerId { get; set; }
+
+        [Required]
+        public DateTime QuestDate { get; set; }
+
+        /// <summary>
+        /// Comma-separated quest prototype ids assigned for the day.
+        /// </summary>
+        [Required]
+        public string AssignedQuestIds { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Comma-separated progress values matching assigned quests.
+        /// </summary>
+        [Required]
+        public string ProgressValues { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Comma-separated flags: 0 = active, 1 = completed, 2 = claimed.
+        /// </summary>
+        [Required]
+        public string StatusFlags { get; set; } = string.Empty;
     }
 
     [Table("player_antag_token")]

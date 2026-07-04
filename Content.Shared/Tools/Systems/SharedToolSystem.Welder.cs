@@ -7,6 +7,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Mini.DailyQuests;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Components.SolutionManager;
@@ -175,6 +176,9 @@ public abstract partial class SharedToolSystem
             return;
 
         SolutionContainerSystem.RemoveReagent(solution.Value, ent.Comp.FuelReagent, FixedPoint2.New(args.Fuel));
+
+        var weldEv = new StructureWeldedEvent(args.User);
+        RaiseLocalEvent(ref weldEv);
     }
 
     private void OnToggle(Entity<WelderComponent> entity, ref ItemToggledEvent args)

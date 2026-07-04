@@ -9,6 +9,7 @@ using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Decals;
 using Content.Shared.DoAfter;
 using Content.Shared.Fluids;
+using Content.Shared._Mini.DailyQuests;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
 using Content.Shared.Timing;
@@ -116,6 +117,13 @@ public sealed class FloorCleanerSystem : EntitySystem
 
             if (gridNullable is {} grid)
                 _decal.RemoveDecal(grid, index);
+        }
+
+        var count = args.Decals.Count + args.Entities.Count;
+        if (count > 0)
+        {
+            var cleanEv = new FloorCleanedEvent(args.User, count);
+            RaiseLocalEvent(ref cleanEv);
         }
     }
 

@@ -97,6 +97,7 @@
 
 using System.Linq;
 using System.Text;
+using Content.Shared._Mini.DailyQuests;
 using Content.Server.Popups;
 using Content.Shared.UserInterface;
 using Content.Shared.DoAfter;
@@ -197,6 +198,12 @@ namespace Content.Server.Forensics
             }
 
             OpenUserInterface(args.Args.User, (uid, scanner));
+
+            if (args.Args.Target != null)
+            {
+                var scanEv = new ForensicScanCompletedEvent(args.Args.User);
+                RaiseLocalEvent(ref scanEv);
+            }
         }
 
         /// <remarks>

@@ -21,6 +21,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using Content.Shared._Mini.DailyQuests;
 using Content.Goobstation.Maths.FixedPoint;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Administration.Logs;
@@ -240,6 +241,12 @@ public sealed class HypospraySystem : EntitySystem
 
         var afterinjectev = new AfterHyposprayInjectsEvent { User = user, Target = target }; //Goobedit
         RaiseLocalEvent(entity, ref afterinjectev);
+
+        if (user != target)
+        {
+            var questEv = new HyposprayPatientInjectedEvent(user, target);
+            RaiseLocalEvent(ref questEv);
+        }
 
         // same LogType as syringes...
         _adminLogger.Add(LogType.ForceFeed, $"{ToPrettyString(user):user} injected {ToPrettyString(target):target} with a solution {SharedSolutionContainerSystem.ToPrettyString(removedSolution):removedSolution} using a {ToPrettyString(entity):using}");

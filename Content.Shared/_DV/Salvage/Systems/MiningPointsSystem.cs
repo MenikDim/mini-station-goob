@@ -23,6 +23,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Content.Goobstation.Common.Silo;
+using Content.Shared._Mini.DailyQuests;
 using Content.Shared._DV.Salvage.Components;
 using Content.Shared._Lavaland.UnclaimedOre;
 using Content.Shared.Access.Systems;
@@ -76,6 +77,9 @@ public sealed class MiningPointsSystem : EntitySystem
         var user = args.Actor;
         if (GetPointComp(user) is {} dest) // Goobstation - borg Miningpoints
             TransferAll(ent.Owner, dest);
+
+        var questEv = new MiningPointsClaimedEvent(user);
+        RaiseLocalEvent(ref questEv);
     }
 
     #endregion

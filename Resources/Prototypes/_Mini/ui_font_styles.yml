@@ -1,5 +1,5 @@
 # Mini Station - selectable UI font styles
-
+# Non-Noto fonts are scaled at runtime to match Noto Sans line height at the same requested size.
 - type: uiFontStyle
   id: Default
   name: ui-options-font-style-default
@@ -19,8 +19,7 @@
   regular: /Fonts/_Mini/Epilepsy Sans/EpilepsySans.ttf
   bold: /Fonts/_Mini/Epilepsy Sans/EpilepsySansBold.ttf
   mono: /Fonts/_Mini/Epilepsy Sans/EpilepsySans.ttf
-  sizeOffset: 3
-  chatSizeOffset: 3
+  chatSizeScale: 0.52
   order: 1
 
 - type: uiFontStyle
@@ -29,8 +28,7 @@
   regular: /Fonts/_Mini/Cozette/CozetteVector.ttf
   bold: /Fonts/_Mini/Cozette/CozetteVectorBold.ttf
   mono: /Fonts/_Mini/Cozette/CozetteVector.ttf
-  sizeOffset: 4
-  chatSizeOffset: 3
+  chatSizeScale: 0.48
   order: 2
 
 - type: uiFontStyle
@@ -38,8 +36,6 @@
   name: ui-options-font-style-bedstead
   regular: /Fonts/Bedstead/Bedstead.otf
   mono: /Fonts/Bedstead/Bedstead.otf
-  sizeOffset: 2
-  chatSizeOffset: 2
   order: 3
 
 - type: uiFontStyle
@@ -48,6 +44,4 @@
   regular: /Fonts/_Mini/Pixeloid/PixeloidSans.ttf
   bold: /Fonts/_Mini/Pixeloid/PixeloidSans-Bold.ttf
   mono: /Fonts/_Mini/Pixeloid/PixeloidMono.ttf
-  sizeOffset: 1
-  chatSizeOffset: 1
   order: 4

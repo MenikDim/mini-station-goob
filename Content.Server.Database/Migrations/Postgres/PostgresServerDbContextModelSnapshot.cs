@@ -894,6 +894,47 @@ namespace Content.Server.Database.Migrations.Postgres
                         });
                 });
 
+            modelBuilder.Entity("Content.Server.Database.DailyQuestProgress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("daily_quest_progress_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AssignedQuestIds")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("assigned_quest_ids");
+
+                    b.Property<Guid>("PlayerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("player_id");
+
+                    b.Property<string>("ProgressValues")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("progress_values");
+
+                    b.Property<DateTime>("QuestDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("quest_date");
+
+                    b.Property<string>("StatusFlags")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("status_flags");
+
+                    b.HasKey("Id")
+                        .HasName("PK_daily_quest_progress");
+
+                    b.HasIndex("PlayerId", "QuestDate")
+                        .IsUnique();
+
+                    b.ToTable("daily_quest_progress", (string)null);
+                });
+
             modelBuilder.Entity("Content.Server.Database.DailyRewardProgress", b =>
                 {
                     b.Property<int>("Id")

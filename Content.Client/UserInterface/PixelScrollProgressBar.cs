@@ -46,7 +46,7 @@ public sealed class PixelScrollProgressBar : Control
         MinSize = new System.Numerics.Vector2(PreferredWidth, MiniSliderStyles.NativeTrackHeight * Scale);
         MaxSize = new System.Numerics.Vector2(PreferredWidth, MiniSliderStyles.NativeTrackHeight * Scale);
 
-        var tex = _cache.GetTexture(MiniSliderStyles.LongPlainTrackPath);
+        var tex = _cache.GetTexture(MiniSliderStyles.GreenPlainTrackPath);
         _trackStyle = MiniSliderStyles.CreateLongTrackBox(tex, Scale);
     }
 
