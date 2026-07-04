@@ -191,11 +191,14 @@ public sealed partial class RatvarProgressSystem : EntitySystem
         if (!TryComp<RatvarSummonObjectiveComponent>(comp.RatvarSummonObjective, out var objectiveComponent))
             return false;
 
-        if (objectiveComponent.Target == null)
+        if (objectiveComponent.Target is not { } target || TerminatingOrDeleted(target))
             return false;
 
-        var targetTransform = Transform(objectiveComponent.Target.Value);
-        var uidTransform = Transform(uid);
+        if (!TryComp<TransformComponent>(target, out var targetTransform))
+            return false;
+
+        if (!TryComp<TransformComponent>(uid, out var uidTransform))
+            return false;
 
         return uidTransform.Coordinates.InRange(EntityManager, targetTransform.Coordinates, objectiveComponent.SummonRange);
     }

@@ -7,7 +7,6 @@ using Content.Shared.Warps;
 using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
 using Robust.Shared.Localization;
-using Robust.Shared.Map;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
@@ -41,8 +40,13 @@ public sealed class RatvarSummonObjectiveSystem : EntitySystem
         var query = EntityQueryEnumerator<RatvarSummonObjectiveComponent, MetaDataComponent>();
         while (query.MoveNext(out var uid, out var component, out var meta))
         {
-            if (component.Target == null)
+            if (component.Target is not { } target || TerminatingOrDeleted(target))
+            {
+                if (component.Target != null)
+                    component.Target = null;
+
                 continue;
+            }
 
             if (component.UpdateCoordinatesTime > time)
                 continue;
@@ -120,10 +124,13 @@ public sealed class RatvarSummonObjectiveSystem : EntitySystem
 
     private void UpdateSummonObjectiveText(EntityUid uid, RatvarSummonObjectiveComponent component, MetaDataComponent meta)
     {
-        if (component.Target == null)
+        if (component.Target is not { } target || TerminatingOrDeleted(target))
+        {
+            component.Target = null;
             return;
+        }
 
-        var location = GetSummonLocationName(component.Target.Value);
+        var location = GetSummonLocationName(target);
         _metaData.SetEntityName(uid, Loc.GetString("objective-title-RatvarSummonObjective"), meta);
         _metaData.SetEntityDescription(uid,
             Loc.GetString("ratvar-summon-objective-location", ("location", location)),
@@ -132,7 +139,10 @@ public sealed class RatvarSummonObjectiveSystem : EntitySystem
 
     private string GetSummonLocationName(EntityUid target)
     {
-        var coordinates = _transform.GetMapCoordinates(target);
+        if (TerminatingOrDeleted(target) || !TryComp<TransformComponent>(target, out var xform))
+            return Loc.GetString("nav-beacon-pos-no-beacons");
+
+        var coordinates = _transform.GetMapCoordinates(target, xform);
         var beaconName = FormattedMessage.RemoveMarkupPermissive(_navMap.GetNearestBeaconString(coordinates, onlyName: true));
         if (!string.IsNullOrWhiteSpace(beaconName) &&
             beaconName != Loc.GetString("nav-beacon-pos-no-beacons"))

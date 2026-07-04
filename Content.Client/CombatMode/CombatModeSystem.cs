@@ -42,7 +42,6 @@ public sealed class CombatModeSystem : SharedCombatModeSystem
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
     [Dependency] private readonly IInputManager _inputManager = default!;
-    [Dependency] private readonly IEyeManager _eye = default!;
     [Dependency] private readonly AudioSystem _audio = default!;
 
     //CorvaxGoob-CombatMode-Sound
@@ -121,7 +120,6 @@ public sealed class CombatModeSystem : SharedCombatModeSystem
             _overlayManager.AddOverlay(new CombatModeIndicatorsOverlay(
                 _inputManager,
                 EntityManager,
-                _eye,
                 this,
                 EntityManager.System<HandsSystem>()));
         }

@@ -85,8 +85,8 @@ public sealed class DailyRewardWindow : DefaultWindow
             : _resourceCache.GetTexture(CoinIconPath);
 
         Title = Loc.GetString("daily-reward-window-title");
-        MinSize = new Vector2(1080, 860);
-        SetSize = new Vector2(1120, 880);
+        MinSize = new Vector2(1080, 760);
+        SetSize = new Vector2(1120, 780);
 
         var root = new BoxContainer
         {
@@ -126,9 +126,9 @@ public sealed class DailyRewardWindow : DefaultWindow
                 BorderColor = Color.FromHex("#31415f"),
                 BorderThickness = new Thickness(1),
                 ContentMarginLeftOverride = 8,
-                ContentMarginTopOverride = 8,
+                ContentMarginTopOverride = 6,
                 ContentMarginRightOverride = 8,
-                ContentMarginBottomOverride = 8,
+                ContentMarginBottomOverride = 6,
             }
         };
         _questTrack = new GridContainer
@@ -557,7 +557,7 @@ public sealed class DailyRewardWindow : DefaultWindow
             var card = new DailyQuestCardControl
             {
                 HorizontalExpand = true,
-                VerticalExpand = true,
+                VerticalExpand = false,
             };
             card.SetReplaceHandler(() => OnQuestReplaceClicked(slotIndex));
             _questCards.Add(card);

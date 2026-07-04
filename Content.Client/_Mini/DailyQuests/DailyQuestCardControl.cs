@@ -23,7 +23,7 @@ namespace Content.Client._Mini.DailyQuests;
 
 public sealed class DailyQuestCardControl : BoxContainer
 {
-    public const float RewardQuestCardHeight = 252f;
+    public const float RewardQuestCardHeight = 188f;
     public const float CompactQuestCardHeight = CharacterMenuCardStyle.CompactCardHeight;
 
     private static readonly Color AccentColor = Color.FromHex("#9a8fb5");
@@ -31,6 +31,17 @@ public sealed class DailyQuestCardControl : BoxContainer
     private static readonly Color CardBackgroundColor = Color.FromHex("#201e28").WithAlpha(0.8f);
     private static readonly Color CurrentCardColor = Color.FromHex("#2c2a3a").WithAlpha(0.95f);
     private static readonly Color PurchasedCardColor = Color.FromHex("#2d2a38").WithAlpha(0.85f);
+
+    private static readonly StyleBoxFlat ReplaceButtonStyle = new()
+    {
+        BackgroundColor = Color.FromHex("#121824"),
+        BorderColor = AccentColor.WithAlpha(0.95f),
+        BorderThickness = new Thickness(1),
+        ContentMarginLeftOverride = 10,
+        ContentMarginRightOverride = 10,
+        ContentMarginTopOverride = 3,
+        ContentMarginBottomOverride = 3,
+    };
 
     private readonly IResourceCache _resourceCache;
     private readonly IPrototypeManager _prototypeManager;
@@ -92,8 +103,13 @@ public sealed class DailyQuestCardControl : BoxContainer
 
     public void SetInteractable(bool interactable)
     {
-        if (_replaceButton != null)
-            _replaceButton.Disabled = !interactable;
+        if (_replaceButton == null)
+            return;
+
+        _replaceButton.Disabled = !interactable;
+        _replaceButton.Modulate = interactable
+            ? Color.FromHex("#eef2fb")
+            : Color.FromHex("#8b93a8");
     }
 
     public void SetRerollPulse(float strength)
@@ -145,15 +161,15 @@ public sealed class DailyQuestCardControl : BoxContainer
                     : AccentColor.WithAlpha(0.35f),
                 BorderThickness = new Thickness(1),
                 ContentMarginLeftOverride = 10,
-                ContentMarginTopOverride = 6,
+                ContentMarginTopOverride = 5,
                 ContentMarginRightOverride = 10,
-                ContentMarginBottomOverride = 6
+                ContentMarginBottomOverride = 4
             };
 
             _cardPanel = new PanelContainer
             {
                 HorizontalExpand = true,
-                VerticalExpand = true,
+                VerticalExpand = false,
                 MinSize = new Vector2(0, RewardQuestCardHeight),
                 MaxSize = new Vector2(float.PositiveInfinity, RewardQuestCardHeight),
                 PanelOverride = _cardStyle
@@ -162,9 +178,9 @@ public sealed class DailyQuestCardControl : BoxContainer
             var column = new BoxContainer
             {
                 Orientation = LayoutOrientation.Vertical,
-                SeparationOverride = 3,
+                SeparationOverride = 2,
                 HorizontalExpand = true,
-                VerticalExpand = true,
+                VerticalExpand = false,
             };
             _cardPanel.AddChild(column);
             AddChild(_cardPanel);
@@ -324,8 +340,11 @@ public sealed class DailyQuestCardControl : BoxContainer
                 _replaceButton = new Button
                 {
                     Text = Loc.GetString("daily-quest-replace"),
-                    MinSize = new Vector2(168, 28),
+                    MinSize = new Vector2(168, 26),
                     HorizontalAlignment = HAlignment.Center,
+                    StyleClasses = { "OpenBoth" },
+                    StyleBoxOverride = ReplaceButtonStyle,
+                    Modulate = Color.FromHex("#eef2fb"),
                 };
                 _replaceButton.MouseFilter = MouseFilterMode.Stop;
                 replaceRow.AddChild(_replaceButton);

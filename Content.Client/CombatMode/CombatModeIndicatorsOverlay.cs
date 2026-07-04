@@ -30,7 +30,6 @@ public sealed class CombatModeIndicatorsOverlay : Overlay
 {
     private readonly IInputManager _inputManager;
     private readonly IEntityManager _entMan;
-    private readonly IEyeManager _eye;
     private readonly CombatModeSystem _combat;
     private readonly HandsSystem _hands = default!;
 
@@ -45,11 +44,10 @@ public sealed class CombatModeIndicatorsOverlay : Overlay
     public float Scale = 0.6f;  // 1 is a little big
 
     public CombatModeIndicatorsOverlay(IInputManager input, IEntityManager entMan,
-            IEyeManager eye, CombatModeSystem combatSys, HandsSystem hands)
+            CombatModeSystem combatSys, HandsSystem hands)
     {
         _inputManager = input;
         _entMan = entMan;
-        _eye = eye;
         _combat = combatSys;
         _hands = hands;
 
@@ -73,18 +71,20 @@ public sealed class CombatModeIndicatorsOverlay : Overlay
     protected override void Draw(in OverlayDrawArgs args)
     {
         var mouseScreenPosition = _inputManager.MouseScreenPosition;
-        var mousePosMap = _eye.PixelToMap(mouseScreenPosition);
-        if (mousePosMap.MapId != args.MapId)
+        var mousePos = mouseScreenPosition.Position;
+
+        if (!args.ViewportBounds.Contains((int) mousePos.X, (int) mousePos.Y))
             return;
 
         var handEntity = _hands.GetActiveHandEntity();
-        var isHandGunItem = _entMan.HasComponent<GunComponent>(handEntity);
+        var isHandGunItem = handEntity != null && _entMan.HasComponent<GunComponent>(handEntity);
         var isGunBolted = true;
-        if (_entMan.TryGetComponent(handEntity, out ChamberMagazineAmmoProviderComponent? chamber))
+        if (handEntity != null &&
+            _entMan.TryGetComponent(handEntity, out ChamberMagazineAmmoProviderComponent? chamber))
+        {
             isGunBolted = chamber.BoltClosed ?? true;
+        }
 
-
-        var mousePos = mouseScreenPosition.Position;
         var uiScale = (args.ViewportControl as Control)?.UIScale ?? 1f;
         var limitedScale = uiScale > 1.25f ? 1.25f : uiScale;
 
