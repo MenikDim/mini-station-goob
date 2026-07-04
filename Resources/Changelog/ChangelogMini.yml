@@ -1,0 +1,59 @@
+Name: Mini
+Order: -2
+Entries:
+- author: Mini Station
+  changes:
+    - type: Add
+      message: Новый анимированный фон лобби Mars!
+    - type: Tweak
+      message: Реворк раздела «Антагонисты» в персонализации персонажа
+  id: 1
+  time: '2026-07-04T12:00:00.0000000+00:00'
+- author: Mini Station
+  changes:
+    - type: Fix
+      message: Фикс размеров шрифтов Cozette и EpilepsySans в чате
+    - type: Fix
+      message: Исправлены квадраты перед текстом при использовании шрифта Cozette
+  id: 2
+  time: '2026-07-04T18:00:00.0000000+00:00'
+- author: Mini Station
+  changes:
+    - type: Add
+      message: Ежедневные квесты — награда выдаётся автоматически при выполнении
+    - type: Tweak
+      message: Переработано окно ежедневных наград и карточки квестов
+    - type: Tweak
+      message: Уменьшена высота карточек квестов в окне ежедневных наград
+    - type: Fix
+      message: Кнопка замены квеста больше не сливается с фоном
+  id: 3
+  time: '2026-07-04T20:00:00.0000000+00:00'
+- author: Mini Station
+  changes:
+    - type: Add
+      message: Культ Nar'Sie добавлен в пул средних событий
+    - type: Fix
+      message: Исправлен краш при постройке культовых стен крови
+    - type: Tweak
+      message: Улучшено меню строительства культа крови
+  id: 4
+  time: '2026-07-04T22:00:00.0000000+00:00'
+- author: Mini Station
+  changes:
+    - type: Add
+      message: Культ Ратвара добавлен в пул Secret+
+    - type: Fix
+      message: Исправлен призыв Ратвара осколком на алтаре в точке warp
+    - type: Fix
+      message: Исправлена локализация зачарований RatvarShard (Реконструкция, ЭМИ)
+    - type: Fix
+      message: Исправлен краш сервера при появлении Ратвара
+    - type: Tweak
+      message: Цель призыва Ратвара показывает название локации вместо координат
+    - type: Tweak
+      message: Портал Ратвара увеличен до 3×3 тайлов
+    - type: Fix
+      message: В боевом режиме снова отображается прицел мыши
+  id: 5
+  time: '2026-07-05T00:00:00.0000000+00:00'

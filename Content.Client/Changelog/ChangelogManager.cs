@@ -35,7 +35,7 @@ namespace Content.Client.Changelog
         [Dependency] private readonly IConfigurationManager _configManager = default!;
 
         private const string SawmillName = "changelog";
-        public const string MainChangelogName = "Gooblog";
+        public const string MainChangelogName = "Mini";
 
         private ISawmill _sawmill = default!;
 
@@ -84,7 +84,7 @@ namespace Content.Client.Changelog
                 return;
             }
 
-            var changelog = changelogs[0];
+            var changelog = mainChangelogs[0];
             if (mainChangelogs.Length > 1)
             {
                 _sawmill.Error($"More than one file found in Resource/Changelog with name {MainChangelogName}");

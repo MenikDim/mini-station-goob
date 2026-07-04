@@ -10,6 +10,9 @@ const fs = require("fs");
 const yaml = require("js-yaml");
 const axios = require("axios");
 
+const MINI_CHANGELOG_DIR = process.env.MINI_CHANGELOG_DIR ?? "Resources/Changelog/ChangelogMini.yml";
+const MINI_PREFIX_REGEX = /^Mini\s*[—\-–:]\s*/i;
+
 // Use GitHub token if available
 if (process.env.GITHUB_TOKEN) axios.defaults.headers.common["Authorization"] = `Bearer ${process.env.GITHUB_TOKEN}`;
 
@@ -41,8 +44,12 @@ async function main() {
     }
 
     // Get all changes from the body
-    const entries = getChanges(commentlessBody);
+    const { mini, goob } = getChanges(commentlessBody);
 
+    if (mini.length === 0 && goob.length === 0) {
+        console.log("No changes found, skipping");
+        return;
+    }
 
     // Time is something like 2021-08-29T20:00:00Z
     // Time should be something like 2023-02-18T00:00:00.0000000+00:00
@@ -57,19 +64,29 @@ async function main() {
         return;
     }
 
+    if (mini.length > 0) {
+        const miniEntry = {
+            author: author,
+            changes: mini,
+            id: getHighestCLNumber(MINI_CHANGELOG_DIR) + 1,
+            time: time,
+        };
 
-    // Construct changelog yml entry
-    const entry = {
-        author: author,
-        changes: entries,
-        id: getHighestCLNumber() + 1,
-        time: time,
-    };
+        console.log("mini entry:", miniEntry);
+        appendChangelogEntry(MINI_CHANGELOG_DIR, miniEntry, "Name: Mini\nOrder: -2\nEntries:\n");
+    }
 
-    console.log('entry (line 63): ', entry);
+    if (goob.length > 0) {
+        const goobEntry = {
+            author: author,
+            changes: goob,
+            id: getHighestCLNumber(process.env.CHANGELOG_DIR) + 1,
+            time: time,
+        };
 
-    // Write changelogs
-    writeChangelog(entry);
+        console.log("goob entry:", goobEntry);
+        appendChangelogEntry(process.env.CHANGELOG_DIR, goobEntry, "Name: Gooblog\nOrder: -1\nEntries:\n");
+    }
 
     console.log(`Changelog updated with changes from PR #${process.env.PR_NUMBER}`);
 }
@@ -77,21 +94,15 @@ async function main() {
 
 // Code chunking
 
-// Get all changes from the PR body
+// Get all changes from the PR body, split by Mini prefix
 function getChanges(body) {
     const matches = [];
-    const entries = [];
+    const mini = [];
+    const goob = [];
 
     for (const match of body.matchAll(EntryRegex)) {
         matches.push([match[1], match[2]]);
     }
-
-    if (!matches)
-    {
-        console.log("No changes found, skipping");
-        return;
-    }
-
 
     // Check change types and construct changelog entry
     matches.forEach((entry) => {
@@ -114,50 +125,58 @@ function getChanges(body) {
                 break;
         }
 
-        if (type) {
-            entries.push({
-                type: type,
-                message: entry[1],
-            });
+        if (!type) {
+            return;
+        }
+
+        const message = entry[1].trim();
+        const change = {
+            type: type,
+            message: MINI_PREFIX_REGEX.test(message)
+                ? message.replace(MINI_PREFIX_REGEX, "")
+                : message,
+        };
+
+        if (MINI_PREFIX_REGEX.test(message)) {
+            mini.push(change);
+        } else {
+            goob.push(change);
         }
     });
 
-    return entries;
+    return { mini, goob };
 }
 
 // Get the highest changelog number from the changelogs file
-function getHighestCLNumber() {
-    // Read changelogs file
-    const file = fs.readFileSync(`../../${process.env.CHANGELOG_DIR}`, "utf8");
+function getHighestCLNumber(path) {
+    const fullPath = `../../${path}`;
 
-    // Get list of CL numbers
+    if (!fs.existsSync(fullPath)) {
+        return 0;
+    }
+
+    const file = fs.readFileSync(fullPath, "utf8");
     const data = yaml.load(file);
     const entries = data && data.Entries ? Array.from(data.Entries) : [];
     const clNumbers = entries.map((entry) => entry.id);
 
-    // Return highest changelog number
     return Math.max(...clNumbers, 0);
 }
 
-function writeChangelog(entry) {
+function appendChangelogEntry(path, entry, header) {
     let data = { Entries: [] };
+    const fullPath = `../../${path}`;
 
-    // Create a new changelogs file if it does not exist
-    if (fs.existsSync(`../../${process.env.CHANGELOG_DIR}`)) {
-        const file = fs.readFileSync(`../../${process.env.CHANGELOG_DIR}`, "utf8");
+    if (fs.existsSync(fullPath)) {
+        const file = fs.readFileSync(fullPath, "utf8");
         data = yaml.load(file);
     }
 
-    console.log('entry (line 145): ', entry);
-    console.log('data (line 146): ', data);
-
     data.Entries.push(entry);
 
-    // Write updated changelogs file
     fs.writeFileSync(
-        `../../${process.env.CHANGELOG_DIR}`,
-        "Name: Gooblog\nOrder: -1\nEntries:\n" + // IF YOU ARE A FORK, CHANGE THIS!!!!!!!!!!!!
-            yaml.dump(data.Entries, { indent: 2 }).replace(/^---/, "")
+        fullPath,
+        header + yaml.dump(data.Entries, { indent: 2 }).replace(/^---/, "")
     );
 }
 
