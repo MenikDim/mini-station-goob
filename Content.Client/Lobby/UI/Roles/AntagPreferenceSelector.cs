@@ -26,7 +26,7 @@ namespace Content.Client.Lobby.UI.Roles;
 public sealed class AntagPreferenceCard : PanelContainer
 {
     private const float IconSize = 36f;
-    private const float RowHeight = 58f;
+    private const float RowHeight = 68f;
 
     private static readonly Color RowBackground = Color.FromHex("#1e1a26").WithAlpha(0.65f);
 
@@ -102,7 +102,12 @@ public sealed class AntagPreferenceCard : PanelContainer
 
         _toggle = new PixelAntagToggle();
         _toggle.OnSelected += value => OnSelected?.Invoke(value);
-        controls.AddChild(_toggle);
+        controls.AddChild(new Control
+        {
+            MinSize = new Vector2(PixelAntagToggle.PreferredWidth + 8, 0),
+            VerticalAlignment = VAlignment.Center,
+            Children = { _toggle },
+        });
 
         _lockIcon = new RoleLockIcon
         {
@@ -223,23 +228,34 @@ public sealed class AntagPreferenceCard : PanelContainer
 /// <summary>
 /// Two-position yes/no toggle using a white scroll track and colored pointer.
 /// </summary>
-public sealed class PixelAntagToggle : Control
+public sealed class PixelAntagToggle : PanelContainer
 {
-    private const string TrackTexturePath = MiniSliderStyles.WhiteTrackPath;
+    private const string TrackTexturePath = MiniSliderStyles.PlainTrackPath;
     private const string PointerTexturePath = MiniSliderStyles.PointerPath;
 
-    private const float NativeTrackWidth = MiniSliderStyles.NativeWhiteTrackWidth;
+    private const float NativeTrackWidth = MiniSliderStyles.NativePlainTrackWidth;
     private const float NativeTrackHeight = MiniSliderStyles.NativeTrackHeight;
     private const float NativePointerWidth = MiniSliderStyles.NativePointerWidth;
     private const float NativePointerHeight = MiniSliderStyles.NativePointerHeight;
 
-    private const float Scale = MiniSliderStyles.LobbyScale;
-    private const float ClickToggleThreshold = 6f;
+    private const float Scale = MiniSliderStyles.AntagScale;
+    private const float FramePadding = 4f;
+    private const float ClickToggleThreshold = 8f;
     private const float SnapLerpSpeed = 18f;
 
-    private static readonly Color TrackColor = Color.FromHex("#B5B3BD");
-    private static readonly Color YesPointerColor = Color.FromHex("#5CBF6A");
-    private static readonly Color NoPointerColor = Color.FromHex("#E04848");
+    public static float PreferredWidth => ScaledTrackWidth + FramePadding * 2;
+
+    private static readonly Color FrameBackground = Color.FromHex("#121018");
+    private static readonly Color FrameBorder = Color.FromHex("#6E6A82");
+    private static readonly Color TrackColor = Color.FromHex("#E2E0EA").WithAlpha(0.35f);
+    private static readonly Color YesZoneColor = Color.FromHex("#2A5C34").WithAlpha(0.55f);
+    private static readonly Color NoZoneColor = Color.FromHex("#6C2424").WithAlpha(0.55f);
+    private static readonly Color YesPointerColor = Color.FromHex("#6FDB7E");
+    private static readonly Color NoPointerColor = Color.FromHex("#F05858");
+    private static readonly Color YesLabelActive = Color.FromHex("#EFFFF1");
+    private static readonly Color YesLabelInactive = Color.FromHex("#8BC995");
+    private static readonly Color NoLabelActive = Color.FromHex("#FFF0F0");
+    private static readonly Color NoLabelInactive = Color.FromHex("#D89090");
 
     private static float ScaledTrackWidth => NativeTrackWidth * Scale;
     private static float ScaledTrackHeight => NativeTrackHeight * Scale;
@@ -250,6 +266,8 @@ public sealed class PixelAntagToggle : Control
     [Dependency] private readonly IResourceCache _cache = default!;
 
     private readonly LayoutContainer _layout;
+    private readonly PanelContainer _yesZone;
+    private readonly PanelContainer _noZone;
     private readonly TextureRect _track;
     private readonly TextureRect _pointer;
     private readonly Label _yesLabel;
@@ -272,27 +290,52 @@ public sealed class PixelAntagToggle : Control
         IoCManager.InjectDependencies(this);
 
         MouseFilter = MouseFilterMode.Stop;
-        MinSize = new Vector2(ScaledTrackWidth, ControlHeight);
-        MaxSize = new Vector2(ScaledTrackWidth, ControlHeight);
+        MinSize = new Vector2(PreferredWidth, ControlHeight + FramePadding * 2);
+        MaxSize = new Vector2(PreferredWidth, ControlHeight + FramePadding * 2);
         VerticalAlignment = VAlignment.Center;
+        PanelOverride = new StyleBoxFlat
+        {
+            BackgroundColor = FrameBackground,
+            BorderThickness = new Thickness(1),
+            BorderColor = FrameBorder,
+            ContentMarginLeftOverride = FramePadding,
+            ContentMarginRightOverride = FramePadding,
+            ContentMarginTopOverride = FramePadding,
+            ContentMarginBottomOverride = FramePadding,
+        };
 
         _layout = new LayoutContainer
         {
-            MinSize = MinSize,
+            MinSize = new Vector2(ScaledTrackWidth, ControlHeight),
+        };
+
+        _yesZone = new PanelContainer
+        {
+            PanelOverride = new StyleBoxFlat { BackgroundColor = YesZoneColor },
+            MouseFilter = MouseFilterMode.Ignore,
+        };
+        _noZone = new PanelContainer
+        {
+            PanelOverride = new StyleBoxFlat { BackgroundColor = NoZoneColor },
+            MouseFilter = MouseFilterMode.Ignore,
         };
 
         _track = new TextureRect
         {
             Stretch = TextureRect.StretchMode.Keep,
             TextureScale = new Vector2(Scale, Scale),
+            MouseFilter = MouseFilterMode.Ignore,
         };
 
         _pointer = new TextureRect
         {
             Stretch = TextureRect.StretchMode.Keep,
             TextureScale = new Vector2(Scale, Scale),
+            MouseFilter = MouseFilterMode.Ignore,
         };
 
+        _layout.AddChild(_yesZone);
+        _layout.AddChild(_noZone);
         _layout.AddChild(_track);
         _layout.AddChild(_pointer);
 
@@ -302,7 +345,8 @@ public sealed class PixelAntagToggle : Control
             Align = Label.AlignMode.Center,
             VAlign = Label.VAlignMode.Center,
             MouseFilter = MouseFilterMode.Ignore,
-            FontColorOverride = Color.FromHex("#D8F0DC"),
+            StyleClasses = { StyleNano.StyleClassLabelSmall },
+            FontColorOverride = YesLabelActive,
         };
         _noLabel = new Label
         {
@@ -310,13 +354,16 @@ public sealed class PixelAntagToggle : Control
             Align = Label.AlignMode.Center,
             VAlign = Label.VAlignMode.Center,
             MouseFilter = MouseFilterMode.Ignore,
-            FontColorOverride = Color.FromHex("#F5D0D0"),
+            StyleClasses = { StyleNano.StyleClassLabelSmall },
+            FontColorOverride = NoLabelActive,
         };
         _layout.AddChild(_yesLabel);
         _layout.AddChild(_noLabel);
 
         AddChild(_layout);
 
+        SetAnchorPreset(_yesZone, LayoutPreset.TopLeft);
+        SetAnchorPreset(_noZone, LayoutPreset.TopLeft);
         SetAnchorPreset(_track, LayoutPreset.TopLeft);
         SetAnchorPreset(_pointer, LayoutPreset.TopLeft);
         SetAnchorPreset(_yesLabel, LayoutPreset.TopLeft);
@@ -329,12 +376,20 @@ public sealed class PixelAntagToggle : Control
         SetMarginTop(_pointer, trackCenterY - ScaledPointerHeight / 2f);
 
         var labelWidth = ScaledTrackWidth / 2f;
+        _yesZone.MinSize = new Vector2(labelWidth, ScaledTrackHeight);
+        _yesZone.MaxSize = new Vector2(labelWidth, ScaledTrackHeight);
+        _noZone.MinSize = new Vector2(labelWidth, ScaledTrackHeight);
+        _noZone.MaxSize = new Vector2(labelWidth, ScaledTrackHeight);
         _yesLabel.MinSize = new Vector2(labelWidth, ScaledTrackHeight);
         _yesLabel.MaxSize = new Vector2(labelWidth, ScaledTrackHeight);
         _noLabel.MinSize = new Vector2(labelWidth, ScaledTrackHeight);
         _noLabel.MaxSize = new Vector2(labelWidth, ScaledTrackHeight);
+
+        SetMarginTop(_yesZone, trackMarginTop);
+        SetMarginTop(_noZone, trackMarginTop);
         SetMarginTop(_yesLabel, trackMarginTop);
         SetMarginTop(_noLabel, trackMarginTop);
+        SetMarginLeft(_noZone, labelWidth);
         SetMarginLeft(_noLabel, labelWidth);
 
         _track.Texture = _cache.GetTexture(TrackTexturePath);
@@ -354,7 +409,7 @@ public sealed class PixelAntagToggle : Control
         _dragging = true;
         _dragStartX = args.RelativePosition.X;
         _movedWhileDragging = false;
-        SetValueFromMouse(args.RelativePosition.X);
+        SetValueFromMouse(GetLocalTrackMouseX(args.RelativePosition.X));
     }
 
     protected override void KeyBindUp(GUIBoundKeyEventArgs args)
@@ -383,8 +438,10 @@ public sealed class PixelAntagToggle : Control
         if (Math.Abs(args.RelativePosition.X - _dragStartX) >= ClickToggleThreshold)
             _movedWhileDragging = true;
 
-        SetValueFromMouse(args.RelativePosition.X);
+        SetValueFromMouse(GetLocalTrackMouseX(args.RelativePosition.X));
     }
+
+    private float GetLocalTrackMouseX(float mouseX) => mouseX - FramePadding;
 
     protected override void FrameUpdate(FrameEventArgs args)
     {
@@ -475,5 +532,18 @@ public sealed class PixelAntagToggle : Control
 
         var preview = (int) Math.Clamp(Math.Round(_displayValue), 0, 1);
         _pointer.ModulateSelfOverride = preview == 0 ? YesPointerColor : NoPointerColor;
+
+        var yesSelected = preview == 0;
+        _yesLabel.FontColorOverride = yesSelected ? YesLabelActive : YesLabelInactive;
+        _noLabel.FontColorOverride = yesSelected ? NoLabelInactive : NoLabelActive;
+
+        _yesZone.PanelOverride = new StyleBoxFlat
+        {
+            BackgroundColor = yesSelected ? YesZoneColor.WithAlpha(0.85f) : YesZoneColor.WithAlpha(0.35f),
+        };
+        _noZone.PanelOverride = new StyleBoxFlat
+        {
+            BackgroundColor = yesSelected ? NoZoneColor.WithAlpha(0.35f) : NoZoneColor.WithAlpha(0.85f),
+        };
     }
 }

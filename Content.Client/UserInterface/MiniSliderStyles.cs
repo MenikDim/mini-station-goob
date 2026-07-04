@@ -33,6 +33,9 @@ public static class MiniSliderStyles
     /// <summary>Larger sliders for lobby job priority rows.</summary>
     public const float LobbyScale = 3.5f;
 
+    /// <summary>Antagonist yes/no toggles in lobby character setup.</summary>
+    public const float AntagScale = 5f;
+
     public static float GetControlMinHeight(float scale) =>
         Math.Max(NativeTrackHeight * scale, NativePointerHeight * scale);
 
