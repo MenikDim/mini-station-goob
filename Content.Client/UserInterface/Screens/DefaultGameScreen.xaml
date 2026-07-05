@@ -48,5 +48,5 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <targeting:TargetingControl Name="Targeting" Access="Protected"/> <!-- Shitmed Change -->
     <chat:ResizableChatBox Name="Chat" Access="Protected" />
     <alerts:AlertsUI Name="Alerts" Access="Protected" />
-    <typan:TypanWarHudControl Name="TypanWarHud" Access="Protected" MinWidth="520" MaxWidth="520" />
+    <typan:TypanWarHudControl Name="TypanWarHud" Access="Protected" MinWidth="580" MaxWidth="580" />
 </screens:DefaultGameScreen>

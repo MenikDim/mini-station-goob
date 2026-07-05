@@ -15,6 +15,9 @@ namespace Content.Client._Mini.TypanWar;
 
 public sealed class TypanWarHudControl : PanelContainer
 {
+    public const float PreferredWidth = 580f;
+    private const float BarWidth = 240f;
+
     private static readonly Color PanelBackground = Color.FromHex("#14141C").WithAlpha(0.72f);
 
     private readonly Label _titleLabel;
@@ -63,10 +66,8 @@ public sealed class TypanWarHudControl : PanelContainer
             Align = Label.AlignMode.Right,
         };
 
-        _bar = new TypanWarScrollBarControl
+        _bar = new TypanWarScrollBarControl(BarWidth)
         {
-            MinSize = new Vector2(200, 14),
-            MaxSize = new Vector2(200, 14),
             VerticalAlignment = VAlignment.Center,
         };
 
@@ -80,10 +81,10 @@ public sealed class TypanWarHudControl : PanelContainer
         _timerLabel = new Label
         {
             FontColorOverride = Color.FromHex("#F0D890"),
-            MinWidth = 52,
-            MaxWidth = 52,
+            MinWidth = 56,
+            MaxWidth = 56,
             Align = Label.AlignMode.Right,
-            HorizontalExpand = true,
+            Margin = new Thickness(6, 0, 0, 0),
         };
 
         row.AddChild(_titleLabel);
@@ -143,15 +144,19 @@ public sealed class TypanWarScrollBarControl : Control
     [Dependency] private readonly IResourceCache _cache = default!;
 
     private readonly StyleBoxTexture _trackStyle;
+    private readonly float _width;
     private int _ntCount = 1;
     private int _typanCount = 1;
 
-    public TypanWarScrollBarControl()
+    public TypanWarScrollBarControl(float width)
     {
+        _width = width;
         IoCManager.InjectDependencies(this);
         MouseFilter = MouseFilterMode.Ignore;
         MinHeight = MiniSliderStyles.NativeTrackHeight * BarScale;
         MaxHeight = MiniSliderStyles.NativeTrackHeight * BarScale;
+        MinSize = new Vector2(_width, MiniSliderStyles.NativeTrackHeight * BarScale);
+        MaxSize = MinSize;
 
         var tex = _cache.GetTexture(MiniSliderStyles.LongWhiteTrackPath);
         _trackStyle = MiniSliderStyles.CreateLongTrackBox(tex, BarScale);
@@ -194,6 +199,6 @@ public sealed class TypanWarScrollBarControl : Control
 
     protected override Vector2 MeasureOverride(Vector2 availableSize)
     {
-        return new Vector2(200, MiniSliderStyles.NativeTrackHeight * BarScale);
+        return new Vector2(_width, MiniSliderStyles.NativeTrackHeight * BarScale);
     }
 }
