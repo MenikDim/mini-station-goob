@@ -31,5 +31,5 @@
     issuer: typan-war-objective-issuer
     unique: true
     icon:
-      sprite: Objects/Weapons/Guns/Battery/blaser.rsi
+      sprite: Objects/Weapons/Guns/Battery/laser_gun.rsi
       state: icon
