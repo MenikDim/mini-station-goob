@@ -30,6 +30,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -64,7 +65,11 @@ namespace Content.Server.Voting.Managers
         private VotingSystem? _votingSystem;
         private RoleSystem? _roleSystem;
         private GameTicker? _gameTicker;
-        private string _lastPickedPreset = ""; //режимы, которые уже были выбраны в прошлых голосованиях
+        private const int MaxPresetVoteOptions = 6;
+        private const int RecentPresetHistorySize = 12;
+
+        private string _lastPickedPreset = "";
+        private readonly Queue<string> _recentVotePresets = new();
 
         private static readonly Dictionary<StandardVoteType, CVarDef<bool>> VoteTypesToEnableCVars = new()
         {
@@ -251,6 +256,7 @@ namespace Content.Server.Voting.Managers
         private void CreatePresetVote(ICommonSession? initiator)
         {
             var presets = GetGamePresets();
+            RememberVotePresets(presets.Keys);
 
             var alone = _playerManager.PlayerCount == 1 && initiator != null;
             var options = new VoteOptions
@@ -620,55 +626,141 @@ namespace Content.Server.Voting.Managers
             DirtyCanCallVoteAll();
         }
 
-        private Dictionary<string, string> GetGamePresets()
+        private List<GamePresetPrototype> GetEligiblePresetsForVote()
         {
-            var presets = new Dictionary<string, string>();
+            var eligible = new List<GamePresetPrototype>();
 
             foreach (var preset in _prototypeManager.EnumeratePrototypes<GamePresetPrototype>())
             {
-                if(!preset.ShowInVote)
+                if (!IsPresetEligibleForVote(preset))
                     continue;
 
-                if(_playerManager.PlayerCount < (preset.MinPlayers ?? int.MinValue))
+                if (preset.ID == _lastPickedPreset)
                     continue;
 
-                if(_playerManager.PlayerCount > (preset.MaxPlayers ?? int.MaxValue))
-                    continue;
-                if(preset.ModeTitle == "traitor-title" && _playerManager.PlayerCount<7)
-                    continue;
-                if(preset.ModeTitle == "nukeops-title" && _playerManager.PlayerCount<20)
-                    continue;
-                if(preset.ModeTitle == "ratvar-righteous-title" && _playerManager.PlayerCount<20)
-                    continue;
-                if(preset.ModeTitle == "cosmiccult-title" && _playerManager.PlayerCount<20)
-                    continue;
-                if(preset.ModeTitle == "blood-cult-title" && _playerManager.PlayerCount<20)
-                    continue;
-                if(preset.ModeTitle == "survivalplus-title" && _playerManager.PlayerCount<10)
-                    continue;
-                if(preset.ModeTitle == "secretplus-mid-title" && _playerManager.PlayerCount<10)
-                    continue;
-                if(preset.ModeTitle == "rev-title" && _playerManager.PlayerCount<25)
-                    continue;
-                if(preset.ModeTitle == "zombie-title" && _playerManager.PlayerCount<30)
-                    continue;
-                if(preset.ModeTitle == "shadowling-title" && _playerManager.PlayerCount<30)
-                    continue;
-                if(preset.ModeTitle == "blob-title" && _playerManager.PlayerCount<30)
-                    continue;
-                if(preset.ModeTitle == "xenomorph-title" && _playerManager.PlayerCount<35)
-                    continue;
-                if(preset.ModeTitle == "guide-title" && _playerManager.PlayerCount<10)
-                    continue;
-                if(preset.ModeTitle == "sleeper-title" && _playerManager.PlayerCount<5)
-                    continue;
-                if(preset.ModeTitle == "changeling-gamemode-title" && _playerManager.PlayerCount<30)
-                    continue;
-                if(preset.ID == _lastPickedPreset)
-                    continue;
-                presets[preset.ID] = preset.ModeTitle;
+                eligible.Add(preset);
             }
+
+            return eligible;
+        }
+
+        private Dictionary<string, string> GetGamePresets()
+        {
+            return SelectPresetsForVote(GetEligiblePresetsForVote());
+        }
+
+        private bool IsPresetEligibleForVote(GamePresetPrototype preset)
+        {
+            if (!preset.ShowInVote)
+                return false;
+
+            var playerCount = _playerManager.PlayerCount;
+
+            if (playerCount < (preset.MinPlayers ?? int.MinValue))
+                return false;
+
+            if (playerCount > (preset.MaxPlayers ?? int.MaxValue))
+                return false;
+
+            if (preset.ModeTitle == "traitor-title" && playerCount < 7)
+                return false;
+            if (preset.ModeTitle == "nukeops-title" && playerCount < 20)
+                return false;
+            if (preset.ModeTitle == "ratvar-righteous-title" && playerCount < 20)
+                return false;
+            if (preset.ModeTitle == "cosmiccult-title" && playerCount < 20)
+                return false;
+            if (preset.ModeTitle == "blood-cult-title" && playerCount < 20)
+                return false;
+            if (preset.ModeTitle == "survivalplus-title" && playerCount < 10)
+                return false;
+            if (preset.ModeTitle == "secretplus-mid-title" && playerCount < 10)
+                return false;
+            if (preset.ModeTitle == "rev-title" && playerCount < 25)
+                return false;
+            if (preset.ModeTitle == "zombie-title" && playerCount < 30)
+                return false;
+            if (preset.ModeTitle == "shadowling-title" && playerCount < 30)
+                return false;
+            if (preset.ModeTitle == "blob-title" && playerCount < 30)
+                return false;
+            if (preset.ModeTitle == "xenomorph-title" && playerCount < 35)
+                return false;
+            if (preset.ModeTitle == "guide-title" && playerCount < 10)
+                return false;
+            if (preset.ModeTitle == "sleeper-title" && playerCount < 5)
+                return false;
+            if (preset.ModeTitle == "changeling-gamemode-title" && playerCount < 30)
+                return false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Picks up to <see cref="MaxPresetVoteOptions"/> presets, preferring modes that were not
+        /// recently offered or won so the ballot rotates instead of listing every eligible mode.
+        /// </summary>
+        private Dictionary<string, string> SelectPresetsForVote(List<GamePresetPrototype> eligible)
+        {
+            var presets = new Dictionary<string, string>();
+            if (eligible.Count == 0)
+                return presets;
+
+            var recent = new HashSet<string>(_recentVotePresets);
+
+            var fresh = new List<GamePresetPrototype>();
+            var stale = new List<GamePresetPrototype>();
+
+            foreach (var preset in eligible)
+            {
+                if (preset.ID == _lastPickedPreset)
+                    continue;
+
+                if (recent.Contains(preset.ID))
+                    stale.Add(preset);
+                else
+                    fresh.Add(preset);
+            }
+
+            _random.Shuffle(fresh);
+            _random.Shuffle(stale);
+
+            var selected = new List<GamePresetPrototype>();
+            selected.AddRange(fresh);
+
+            if (selected.Count < MaxPresetVoteOptions)
+                selected.AddRange(stale.Take(MaxPresetVoteOptions - selected.Count));
+
+            if (selected.Count < MaxPresetVoteOptions)
+            {
+                var selectedIds = selected.Select(p => p.ID).ToHashSet();
+                var remainder = eligible
+                    .Where(p => p.ID != _lastPickedPreset && !selectedIds.Contains(p.ID))
+                    .ToList();
+
+                _random.Shuffle(remainder);
+                selected.AddRange(remainder.Take(MaxPresetVoteOptions - selected.Count));
+            }
+
+            if (selected.Count > MaxPresetVoteOptions)
+                selected = selected.Take(MaxPresetVoteOptions).ToList();
+
+            _random.Shuffle(selected);
+
+            foreach (var preset in selected)
+                presets[preset.ID] = preset.ModeTitle;
+
             return presets;
+        }
+
+        private void RememberVotePresets(IEnumerable<string> presetIds)
+        {
+            foreach (var id in presetIds)
+            {
+                _recentVotePresets.Enqueue(id);
+                while (_recentVotePresets.Count > RecentPresetHistorySize)
+                    _recentVotePresets.Dequeue();
+            }
         }
     }
 }

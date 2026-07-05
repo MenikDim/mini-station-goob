@@ -4,7 +4,7 @@
   - bloodcult
   name: blood-cult-title
   showInVote: false
-  minPlayers: 15
+  minPlayers: 20
   description: blood-cult-description
   rules:
   - BloodCult
