@@ -3,13 +3,13 @@
   parent: BaseGameRule
   components:
   - type: GameRule
-    minPlayers: 11
+    minPlayers: 15
     chaosScore: 900
   - type: Tag
     tags:
     - LoneRunRule
   - type: TypanStationWarRule
-    announcementDelaySeconds: 15
+    announcementDelaySeconds: 300
     warStartDelaySeconds: 30
     warDurationSeconds: 1800
     warMusicDelaySeconds: 90

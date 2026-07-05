@@ -27,6 +27,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
     xmlns:inventory="clr-namespace:Content.Client.UserInterface.Systems.Inventory.Widgets"
     xmlns:targeting="clr-namespace:Content.Client._Shitmed.UserInterface.Systems.Targeting.Widgets"
+    xmlns:typan="clr-namespace:Content.Client._Mini.TypanWar"
     xmlns:us="clr-namespace:Content.Client._Shitcode.UserActions"
     Name="SeparatedChatHud"
     VerticalExpand="False"
@@ -44,6 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 <BoxContainer Name="VoteMenu" Access="Public" Orientation="Vertical"/>
             </BoxContainer>
             <alerts:AlertsUI Name="Alerts" Access="Protected" />
+            <typan:TypanWarHudControl Name="TypanWarHud" Access="Protected" MinWidth="520" MaxWidth="520" />
         </LayoutContainer>
         <PanelContainer Name="SeparatedChatPanel" MinWidth="300">
             <PanelContainer.PanelOverride>

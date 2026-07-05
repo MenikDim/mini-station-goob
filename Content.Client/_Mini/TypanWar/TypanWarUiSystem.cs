@@ -21,6 +21,11 @@ public sealed class TypanWarUiSystem : EntitySystem
         SubscribeNetworkEvent<TypanWarStatusEvent>(OnStatus);
     }
 
+    public void RequestStatus()
+    {
+        RaiseNetworkEvent(new TypanWarStatusRequestEvent());
+    }
+
     private void OnStatus(TypanWarStatusEvent ev)
     {
         Phase = ev.Phase;

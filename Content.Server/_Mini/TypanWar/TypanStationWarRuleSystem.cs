@@ -70,6 +70,7 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         base.Initialize();
 
         SubscribeLocalEvent<GameRuleAddedEvent>(OnGameRuleAdded);
+        SubscribeNetworkEvent<TypanWarStatusRequestEvent>(OnStatusRequest);
         SubscribeLocalEvent<ConsoleFTLAttemptEvent>(OnConsoleFtlAttempt);
         SubscribeLocalEvent<ShuttleFTLAttemptEvent>(OnShuttleFtlAttempt);
         SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawnComplete);
@@ -89,6 +90,14 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
             return;
 
         SendStatusToSession(args.Session);
+    }
+
+    private void OnStatusRequest(TypanWarStatusRequestEvent ev, EntitySessionEventArgs args)
+    {
+        if (!IsModeActive)
+            return;
+
+        SendStatusToSession(args.SenderSession);
     }
 
     private void OnPlayerSpawnComplete(PlayerSpawnCompleteEvent args)
