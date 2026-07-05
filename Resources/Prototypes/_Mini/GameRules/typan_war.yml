@@ -9,8 +9,8 @@
     tags:
     - LoneRunRule
   - type: TypanStationWarRule
-    announcementDelaySeconds: 300
-    warStartDelaySeconds: 30
+    announcementDelaySeconds: 15
+    warStartDelaySeconds: 300
     warDurationSeconds: 1800
     warMusicDelaySeconds: 90
     warMusicDurationSeconds: 90

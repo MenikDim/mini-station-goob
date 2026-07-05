@@ -2,9 +2,11 @@ using Content.Server.GameTicking;
 using Content.Server.Shuttles.Systems;
 using Content.Server.Spawners.Components;
 using Content.Server.Spawners.EntitySystems;
+using Content.Server.Station.Components;
 using Content.Server.Station.Systems;
 using Content.Shared.Roles;
 using Content.Shared.Roles.Jobs;
+using Content.Shared.Station.Components;
 using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
@@ -41,20 +43,32 @@ public sealed class TTStationHandleJobSystem : EntitySystem
     }
 
     /// <summary>
-    /// Ensures handled jobs are assigned to their dedicated station at roundstart.
+    /// Ensures handled jobs are assigned to their dedicated station at roundstart,
+    /// and that non-handled jobs are not assigned to handled-only stations.
     /// </summary>
     public void FixJobStationAssignments(ref Dictionary<NetUserId, (ProtoId<JobPrototype>?, EntityUid)> assignedJobs)
     {
+        var handledStations = GetHandledStations();
+        var defaultStation = FindDefaultStation(assignedJobs, handledStations);
+
         foreach (var userId in assignedJobs.Keys.ToList())
         {
             var (job, station) = assignedJobs[userId];
             if (job == null)
                 continue;
 
-            if (GetStation(job.Value) is not { } requiredStation || station == requiredStation)
+            if (GetStation(job.Value) is { } requiredStation)
+            {
+                if (station != requiredStation)
+                    assignedJobs[userId] = (job, requiredStation);
+                continue;
+            }
+
+            if (station == EntityUid.Invalid || !handledStations.Contains(station))
                 continue;
 
-            assignedJobs[userId] = (job, requiredStation);
+            if (defaultStation is { } fallback)
+                assignedJobs[userId] = (job, fallback);
         }
     }
 
@@ -95,23 +109,10 @@ public sealed class TTStationHandleJobSystem : EntitySystem
                 $"Redirecting spawn for job {job} from {GetStationName(requestedStation)} to {GetStationName(handledStation)}.");
         }
 
-        var query = EntityQueryEnumerator<SpawnPointComponent, TransformComponent>();
-        var possiblePositions = new List<EntityCoordinates>();
+        var possiblePositions = CollectSpawnLocations(handledStation.Value, job, lateJoin: _gameTicker.RunLevel == GameRunLevel.InRound);
 
-        while (query.MoveNext(out var uid, out var spawnPoint, out var xform))
-        {
-            if (_station.GetOwningStation(uid, xform) != handledStation)
-                continue;
-
-            if (spawnPoint.Job != job)
-                continue;
-
-            if (_gameTicker.RunLevel == GameRunLevel.InRound && spawnPoint.SpawnType == SpawnPointType.LateJoin)
-                possiblePositions.Add(xform.Coordinates);
-
-            if (_gameTicker.RunLevel != GameRunLevel.InRound && spawnPoint.SpawnType == SpawnPointType.Job)
-                possiblePositions.Add(xform.Coordinates);
-        }
+        if (possiblePositions.Count == 0 && _gameTicker.RunLevel != GameRunLevel.InRound)
+            possiblePositions = CollectSpawnLocations(handledStation.Value, job, lateJoin: true);
 
         if (possiblePositions.Count == 0)
         {
@@ -127,6 +128,82 @@ public sealed class TTStationHandleJobSystem : EntitySystem
             job,
             ev.HumanoidCharacterProfile,
             handledStation);
+    }
+
+    private List<EntityCoordinates> CollectSpawnLocations(EntityUid handledStation, ProtoId<JobPrototype> job, bool lateJoin)
+    {
+        var possiblePositions = new List<EntityCoordinates>();
+        var expectedSpawnType = lateJoin ? SpawnPointType.LateJoin : SpawnPointType.Job;
+
+        var query = EntityQueryEnumerator<SpawnPointComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out var spawnPoint, out var xform))
+        {
+            if (!IsSpawnOnStation(uid, xform, handledStation))
+                continue;
+
+            if (spawnPoint.Job != job)
+                continue;
+
+            if (spawnPoint.SpawnType != expectedSpawnType)
+                continue;
+
+            possiblePositions.Add(xform.Coordinates);
+        }
+
+        return possiblePositions;
+    }
+
+    private bool IsSpawnOnStation(EntityUid spawnEnt, TransformComponent xform, EntityUid station)
+    {
+        if (_station.GetOwningStation(spawnEnt, xform) == station)
+            return true;
+
+        if (!TryComp<StationDataComponent>(station, out var data))
+            return false;
+
+        if (xform.GridUid is not { } gridUid)
+            return false;
+
+        foreach (var grid in data.Grids)
+        {
+            if (grid == gridUid)
+                return true;
+        }
+
+        return false;
+    }
+
+    private HashSet<EntityUid> GetHandledStations()
+    {
+        var stations = new HashSet<EntityUid>();
+        var query = EntityQueryEnumerator<TTStationHandleJobComponent>();
+        while (query.MoveNext(out var uid, out _))
+            stations.Add(uid);
+        return stations;
+    }
+
+    private EntityUid? FindDefaultStation(
+        Dictionary<NetUserId, (ProtoId<JobPrototype>?, EntityUid)> assignedJobs,
+        HashSet<EntityUid> handledStations)
+    {
+        foreach (var (_, (_, station)) in assignedJobs)
+        {
+            if (station == EntityUid.Invalid || handledStations.Contains(station))
+                continue;
+
+            return station;
+        }
+
+        var query = EntityQueryEnumerator<StationJobsComponent>();
+        while (query.MoveNext(out var uid, out _))
+        {
+            if (handledStations.Contains(uid))
+                continue;
+
+            return uid;
+        }
+
+        return null;
     }
 
     private EntityUid? GetStation(ProtoId<JobPrototype> job)

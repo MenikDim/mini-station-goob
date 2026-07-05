@@ -14,21 +14,21 @@ typan-war-hud-pending = Preparation
 typan-war-hud-active = War
 typan-war-hud-ended = End
 
-typan-war-prep-announce = Station war declared. Preparation time — FTL jumps disabled. Gamma/Omega and combat follow.
+typan-war-prep-announce = A war has been declared between the NanoTrasen and Typan stations. Bluespace jumps are blocked. Follow combat readiness protocols — hostilities begin in five minutes.
 
 typan-war-manifest =
     {"[bold]Station War Manifest[/bold]"}
     {"Factions: [color=#A8C8FF][bold]NanoTrasen[/bold][/color] vs [color=#FFB0B0][bold]Syndicate[/bold][/color]."}
     {"[color=#A8C8FF]NT[/color] objective: eliminate all combat-capable [color=#FFB0B0]Syndicate[/color] forces."}
     {"[color=#FFB0B0]Syndicate[/color] objective: eliminate all combat-capable [color=#A8C8FF]NT[/color] forces."}
-    {"Anti-friendly-fire on the action bar — your shots pass through allies."}
+    {"Targeting systems are configured not to harm allies."}
 
-typan-war-ff-action-name = Anti-friendly-fire
-typan-war-ff-action-desc = Skip allies when firing ranged weapons.
-typan-war-ff-enabled = Anti-friendly-fire enabled — you will not hit allies.
-typan-war-ff-disabled = Anti-friendly-fire disabled.
+typan-war-ff-action-name = Friendly fire
+typan-war-ff-action-desc = Do not harm allies with ranged weapons.
+typan-war-ff-enabled = Friendly fire disabled — you will not hit allies.
+typan-war-ff-disabled = Friendly fire enabled.
 
-typan-war-ftl-blocked = FTL jumps are disabled during the station war.
+typan-war-ftl-blocked = Bluespace jumps are impossible for the duration of the station war.
 typan-war-start-cancelled = Station war cancelled — one side has no combat-ready personnel.
 
 typan-war-end-announce-nt = The station war has ended. [color=#A8C8FF]NanoTrasen[/color] wins with fewer relative losses.

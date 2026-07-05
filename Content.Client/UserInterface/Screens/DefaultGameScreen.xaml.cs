@@ -40,7 +40,8 @@ public sealed partial class DefaultGameScreen : InGameScreen
         SetAnchorAndMarginPreset(Chat, LayoutPreset.TopRight, margin: 10);
         SetAnchorAndMarginPreset(Alerts, LayoutPreset.TopRight, margin: 10);
         SetAnchorAndMarginPreset(Targeting, LayoutPreset.BottomRight, margin: 5); // Shitmed Change
-        SetAnchorAndMarginPreset(TypanWarHud, LayoutPreset.CenterBottom, margin: 168);
+        SetAnchorAndMarginPreset(TypanWarHud, LayoutPreset.CenterBottom, margin: 163);
+        TypanWarHud.SetPositionLast();
 
         Chat.OnResized += ChatOnResized;
         Chat.OnChatResizeFinish += ChatOnResizeFinish;

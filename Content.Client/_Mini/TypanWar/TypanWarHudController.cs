@@ -4,6 +4,7 @@ using Content.Shared._Mini.TypanWar;
 using JetBrains.Annotations;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controllers;
+using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Mini.TypanWar;
 
@@ -47,7 +48,10 @@ public sealed class TypanWarHudController : UIController,
 
     private void Refresh()
     {
-        var hud = UIManager.ActiveScreen?.FindControl<TypanWarHudControl>("TypanWarHud");
+        if (UIManager.ActiveScreen == null)
+            return;
+
+        var hud = TryFindHud(UIManager.ActiveScreen);
         if (hud == null)
             return;
 
@@ -56,5 +60,11 @@ public sealed class TypanWarHudController : UIController,
             _war.NtAlive,
             _war.TypanAlive,
             _war.TimeRemainingSeconds);
+    }
+
+    private static TypanWarHudControl? TryFindHud(Control screen)
+    {
+        var nameScope = screen.FindNameScope();
+        return nameScope?.Find("TypanWarHud") as TypanWarHudControl;
     }
 }
