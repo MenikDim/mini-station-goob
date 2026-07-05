@@ -12,6 +12,9 @@
     announcementDelaySeconds: 15
     warStartDelaySeconds: 30
     warDurationSeconds: 1800
+    warMusicDelaySeconds: 90
+    warMusicDurationSeconds: 90
+    roundEndDelaySeconds: 120
     minNtAlive: 8
     minTypanAlive: 3
 

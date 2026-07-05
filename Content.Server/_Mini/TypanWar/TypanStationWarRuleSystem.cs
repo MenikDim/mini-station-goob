@@ -24,12 +24,15 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Roles.Jobs;
 using Content.Server.Station.Systems;
 using Content.Shared.Station.Components;
+using Robust.Server.Player;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Enums;
 using Robust.Shared.Maths;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Timing;
+using System.Threading;
 
 namespace Content.Server._Mini.TypanWar;
 
@@ -43,6 +46,9 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
     private static readonly SoundPathSpecifier WarDeclarationSound =
         new("/Audio/_Mini/TypanWar/war_declaration.ogg");
 
+    private static readonly SoundPathSpecifier StationWarMusic =
+        new("/Audio/_Mini/TypanWar/station_war.ogg");
+
     [Dependency] private readonly AlertLevelSystem _alertLevel = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
     [Dependency] private readonly IChatManager _chatManager = default!;
@@ -55,6 +61,7 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
     [Dependency] private readonly TypanWarFriendlyFireSystem _friendlyFire = default!;
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
 
     private float _statusBroadcastAccumulator;
 
@@ -66,6 +73,22 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         SubscribeLocalEvent<ConsoleFTLAttemptEvent>(OnConsoleFtlAttempt);
         SubscribeLocalEvent<ShuttleFTLAttemptEvent>(OnShuttleFtlAttempt);
         SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawnComplete);
+
+        _playerManager.PlayerStatusChanged += OnPlayerStatusChanged;
+    }
+
+    public override void Shutdown()
+    {
+        base.Shutdown();
+        _playerManager.PlayerStatusChanged -= OnPlayerStatusChanged;
+    }
+
+    private void OnPlayerStatusChanged(object? sender, SessionStatusEventArgs args)
+    {
+        if (!IsModeActive || args.NewStatus != SessionStatus.InGame)
+            return;
+
+        SendStatusToSession(args.Session);
     }
 
     private void OnPlayerSpawnComplete(PlayerSpawnCompleteEvent args)
@@ -128,6 +151,7 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         IsWarActive = false;
         IsModeActive = false;
         component.Phase = TypanWarPhase.Inactive;
+        StopWarMusic(component);
         ClearWarCombatants();
         BroadcastStatus(component);
     }
@@ -162,6 +186,8 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
 
             if (component.Phase == TypanWarPhase.Active)
             {
+                TryStartWarMusic(component);
+
                 var ntAliveNow = CountNtAlive();
                 var typanAliveNow = CountTypanAlive();
 
@@ -224,11 +250,11 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
             return;
 
         component.AnnouncementSent = true;
-        SendManifestAnnouncement();
         _chat.DispatchGlobalAnnouncement(
             Loc.GetString("typan-war-prep-announce"),
             Loc.GetString("typan-war-sender"),
             colorOverride: Color.OrangeRed);
+        BroadcastStatus(component);
     }
 
     private void SendManifestAnnouncement()
@@ -285,8 +311,12 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
 
     private void EndWar(EntityUid ruleUid, TypanStationWarRuleComponent component, bool elimination = false)
     {
+        if (component.Phase == TypanWarPhase.Ended)
+            return;
+
         component.Phase = TypanWarPhase.Ended;
         IsWarActive = false;
+        StopWarMusic(component);
 
         var ntAlive = CountNtAlive();
         var typanAlive = CountTypanAlive();
@@ -303,10 +333,54 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
             _ => "typan-war-end-announce-stalemate",
         };
 
+        SendManifestAnnouncement();
         SendMarkupGlobalAnnouncement(Loc.GetString(winnerKey));
 
         BroadcastStatus(component);
-        _roundEnd.RequestRoundEnd(checkCooldown: false);
+        _roundEnd.EndRound(TimeSpan.FromSeconds(component.RoundEndDelaySeconds));
+    }
+
+    private void TryStartWarMusic(TypanStationWarRuleComponent component)
+    {
+        if (component.WarMusicStarted || component.WarStartTime == null)
+            return;
+
+        if (_timing.CurTime < component.WarStartTime + TimeSpan.FromSeconds(component.WarMusicDelaySeconds))
+            return;
+
+        component.WarMusicStarted = true;
+        PlayWarMusicCycle(component);
+    }
+
+    private void PlayWarMusicCycle(TypanStationWarRuleComponent component)
+    {
+        if (component.Phase != TypanWarPhase.Active)
+            return;
+
+        _audio.PlayGlobal(
+            StationWarMusic,
+            Filter.Broadcast(),
+            false,
+            AudioParams.Default.WithVolume(-4f));
+
+        component.WarMusicLoopCancel?.Cancel();
+        component.WarMusicLoopCancel = new CancellationTokenSource();
+        var token = component.WarMusicLoopCancel.Token;
+
+        Robust.Shared.Timing.Timer.Spawn(TimeSpan.FromSeconds(component.WarMusicDurationSeconds), () =>
+        {
+            if (token.IsCancellationRequested || component.Phase != TypanWarPhase.Active)
+                return;
+
+            PlayWarMusicCycle(component);
+        }, token);
+    }
+
+    private void StopWarMusic(TypanStationWarRuleComponent component)
+    {
+        component.WarMusicLoopCancel?.Cancel();
+        component.WarMusicLoopCancel = null;
+        component.WarMusicStarted = false;
     }
 
     private static TypanWarWinner DetermineWinner(TypanStationWarRuleComponent component, int ntAlive, int typanAlive)
@@ -467,7 +541,37 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
 
         remaining = Math.Max(0f, remaining);
 
-        RaiseNetworkEvent(new TypanWarStatusEvent(phase, ntAlive, typanAlive, remaining));
+        RaiseNetworkEvent(new TypanWarStatusEvent(phase, ntAlive, typanAlive, remaining), Filter.Broadcast());
+    }
+
+    public void SendStatusToSession(ICommonSession session)
+    {
+        var query = EntityQueryEnumerator<TypanStationWarRuleComponent, GameRuleComponent>();
+        while (query.MoveNext(out var ruleUid, out var component, out var gameRule))
+        {
+            if (!GameTicker.IsGameRuleActive(ruleUid, gameRule))
+                continue;
+
+            if (component.Phase is TypanWarPhase.Inactive)
+                continue;
+
+            var phase = component.Phase;
+            var ntAlive = phase >= TypanWarPhase.Active ? CountNtAlive() : 0;
+            var typanAlive = phase >= TypanWarPhase.Active ? CountTypanAlive() : 0;
+
+            float remaining = 0f;
+            if (phase == TypanWarPhase.Pending && component.WarStartTime != null)
+                remaining = (float) (component.WarStartTime.Value - _timing.CurTime).TotalSeconds;
+            else if (phase == TypanWarPhase.Active && component.WarEndTime != null)
+                remaining = (float) (component.WarEndTime.Value - _timing.CurTime).TotalSeconds;
+
+            remaining = Math.Max(0f, remaining);
+
+            RaiseNetworkEvent(
+                new TypanWarStatusEvent(phase, ntAlive, typanAlive, remaining),
+                session);
+            return;
+        }
     }
 
     private void BlockStationEvents(TypanStationWarRuleComponent component)

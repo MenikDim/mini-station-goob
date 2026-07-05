@@ -18,13 +18,9 @@ typan-war-prep-announce = Объявлена война станций. Врем
 
 typan-war-manifest =
     {"[bold]Манифест войны станций[/bold]"}
-    {"\n"}
     {"Стороны: [color=#A8C8FF][bold]NanoTrasen[/bold][/color] против [color=#FFB0B0][bold]Синдиката[/bold][/color]."}
-    {"\n"}
     {"Цель [color=#A8C8FF]NT[/color]: уничтожить все боеспособные силы [color=#FFB0B0]Синдиката[/color]."}
-    {"\n"}
     {"Цель [color=#FFB0B0]Синдиката[/color]: уничтожить все боеспособные силы [color=#A8C8FF]NT[/color]."}
-    {"\n"}
     {"Антифрендлифайер на панели действий — ваши выстрелы проходят сквозь союзников."}
 
 typan-war-ff-action-name = Антифрендлифайер

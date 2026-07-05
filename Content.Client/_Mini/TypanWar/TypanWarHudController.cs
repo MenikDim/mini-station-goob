@@ -38,14 +38,12 @@ public sealed class TypanWarHudController : UIController,
 
         if (UIManager.ActiveScreen != null)
         {
-            var host = new LayoutContainer();
-            UIManager.ActiveScreen.AddChild(host);
-            SetAnchorPreset(host, LayoutPreset.BottomWide);
-            host.AddChild(_hud);
+            UIManager.ActiveScreen.AddChild(_hud);
             SetAnchorPreset(_hud, LayoutPreset.CenterBottom);
             SetMarginBottom(_hud, HudBottomMargin);
             _hud.MinWidth = HudWidth;
             _hud.MaxWidth = HudWidth;
+            _hud.SetPositionLast();
         }
 
         Refresh();
@@ -53,7 +51,7 @@ public sealed class TypanWarHudController : UIController,
 
     public void OnStateExited(GameplayState state)
     {
-        _hud?.Parent?.Orphan();
+        _hud?.Orphan();
         _hud = null;
     }
 

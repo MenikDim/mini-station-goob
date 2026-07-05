@@ -1,14 +1,15 @@
+using Content.Goobstation.Common.Weapons.Ranged;
 using Content.Shared.Actions;
 using Content.Shared.Popups;
 using Content.Shared.Projectiles;
 using Content.Shared.Toggleable;
-using Robust.Shared.Physics.Events;
 
 namespace Content.Shared._Mini.TypanWar;
 
 public sealed class TypanWarFriendlyFireSystem : EntitySystem
 {
     [Dependency] private readonly SharedActionsSystem _actions = default!;
+
     [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     public override void Initialize()
@@ -16,7 +17,7 @@ public sealed class TypanWarFriendlyFireSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<TypanWarFriendlyFireComponent, ToggleActionEvent>(OnToggle);
-        SubscribeLocalEvent<ProjectileComponent, PreventCollideEvent>(OnProjectilePreventCollide);
+        SubscribeLocalEvent<TypanWarFriendlyFireComponent, AmmoShotUserEvent>(OnAmmoShot);
     }
 
     public void SetupCombatant(EntityUid uid, TypanWarSide side, bool enabled = true)
@@ -88,16 +89,43 @@ public sealed class TypanWarFriendlyFireSystem : EntitySystem
         _popup.PopupClient(msg, ent, args.Performer);
     }
 
-    private void OnProjectilePreventCollide(Entity<ProjectileComponent> ent, ref PreventCollideEvent args)
+    private void OnAmmoShot(Entity<TypanWarFriendlyFireComponent> ent, ref AmmoShotUserEvent args)
     {
-        if (args.Cancelled)
+        if (!ent.Comp.Enabled || args.FiredProjectiles.Count == 0)
             return;
 
-        var shooter = ent.Comp.Shooter;
-        if (shooter == null)
+        if (!TryComp<TypanWarFactionComponent>(ent, out var shooterFaction))
             return;
 
-        if (ShouldPassThrough(shooter.Value, args.OtherEntity))
-            args.Cancelled = true;
+        var allies = GetAllies(shooterFaction.Side);
+        if (allies.Count == 0)
+            return;
+
+        foreach (var projectile in args.FiredProjectiles)
+        {
+            if (!TryComp<ProjectileComponent>(projectile, out var proj))
+                continue;
+
+            foreach (var ally in allies)
+            {
+                if (!proj.IgnoredEntities.Contains(ally))
+                    proj.IgnoredEntities.Add(ally);
+            }
+
+            Dirty(projectile, proj);
+        }
+    }
+
+    private List<EntityUid> GetAllies(TypanWarSide side)
+    {
+        var allies = new List<EntityUid>();
+        var query = EntityQueryEnumerator<TypanWarFactionComponent>();
+        while (query.MoveNext(out var uid, out var faction))
+        {
+            if (faction.Side == side)
+                allies.Add(uid);
+        }
+
+        return allies;
     }
 }

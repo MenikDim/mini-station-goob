@@ -18,13 +18,9 @@ typan-war-prep-announce = Station war declared. Preparation time — FTL jumps d
 
 typan-war-manifest =
     {"[bold]Station War Manifest[/bold]"}
-    {"\n"}
     {"Factions: [color=#A8C8FF][bold]NanoTrasen[/bold][/color] vs [color=#FFB0B0][bold]Syndicate[/bold][/color]."}
-    {"\n"}
     {"[color=#A8C8FF]NT[/color] objective: eliminate all combat-capable [color=#FFB0B0]Syndicate[/color] forces."}
-    {"\n"}
     {"[color=#FFB0B0]Syndicate[/color] objective: eliminate all combat-capable [color=#A8C8FF]NT[/color] forces."}
-    {"\n"}
     {"Anti-friendly-fire on the action bar — your shots pass through allies."}
 
 typan-war-ff-action-name = Anti-friendly-fire
