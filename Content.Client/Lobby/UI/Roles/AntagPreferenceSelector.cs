@@ -2,21 +2,17 @@ using System.Numerics;
 using Content.Client.Lobby.UI;
 using Content.Client.Resources;
 using Content.Client.Stylesheets;
-using Content.Client.UserInterface;
 using Content.Client.UserInterface.Controls;
 using Content.Shared.Guidebook;
 using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
-using Robust.Shared.Input;
 using Robust.Shared.IoC;
 using Robust.Shared.Maths;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using static Robust.Client.UserInterface.Controls.BoxContainer;
-using static Robust.Client.UserInterface.Controls.LayoutContainer;
 
 namespace Content.Client.Lobby.UI.Roles;
 
@@ -26,12 +22,12 @@ namespace Content.Client.Lobby.UI.Roles;
 public sealed class AntagPreferenceCard : PanelContainer
 {
     private const float IconSize = 36f;
-    private const float RowHeight = 68f;
+    private const float RowHeight = 58f;
 
     private static readonly Color RowBackground = Color.FromHex("#1e1a26").WithAlpha(0.65f);
 
     private readonly Label _title;
-    private readonly PixelAntagToggle _toggle;
+    private readonly AntagYesNoButtons _yesNoButtons;
     private readonly RoleLockIcon _lockIcon;
     private readonly Button _unlockButton;
     private readonly TextureButton _help;
@@ -45,7 +41,7 @@ public sealed class AntagPreferenceCard : PanelContainer
     public event Action<List<ProtoId<GuideEntryPrototype>>>? OnOpenGuidebook;
 
     /// <summary>0 = yes, 1 = no.</summary>
-    public int Selected => _toggle.Selected;
+    public int Selected => _yesNoButtons.Selected;
 
     public AntagPreferenceCard()
     {
@@ -100,14 +96,9 @@ public sealed class AntagPreferenceCard : PanelContainer
         };
         row.AddChild(controls);
 
-        _toggle = new PixelAntagToggle();
-        _toggle.OnSelected += value => OnSelected?.Invoke(value);
-        controls.AddChild(new Control
-        {
-            MinSize = new Vector2(PixelAntagToggle.PreferredWidth + 8, 0),
-            VerticalAlignment = VAlignment.Center,
-            Children = { _toggle },
-        });
+        _yesNoButtons = new AntagYesNoButtons();
+        _yesNoButtons.OnSelected += value => OnSelected?.Invoke(value);
+        controls.AddChild(_yesNoButtons);
 
         _lockIcon = new RoleLockIcon
         {
@@ -194,7 +185,7 @@ public sealed class AntagPreferenceCard : PanelContainer
     {
         _lockIcon.SetRequirements(requirements);
         _lockIcon.Visible = true;
-        _toggle.Visible = false;
+        _yesNoButtons.Visible = false;
     }
 
     public void ShowUnlock(int cost, Action onUnlock)
@@ -217,333 +208,96 @@ public sealed class AntagPreferenceCard : PanelContainer
     public void UnlockRequirements()
     {
         _lockIcon.Visible = false;
-        _toggle.Visible = true;
+        _yesNoButtons.Visible = true;
         HideUnlock();
     }
 
     /// <param name="id">0 = yes, 1 = no.</param>
-    public void Select(int id) => _toggle.Select(id);
+    public void Select(int id) => _yesNoButtons.Select(id);
 }
 
 /// <summary>
-/// Two-position yes/no toggle using a white scroll track and colored pointer.
+/// Semi-transparent colored yes/no buttons for antagonist preferences.
 /// </summary>
-public sealed class PixelAntagToggle : PanelContainer
+public sealed class AntagYesNoButtons : BoxContainer
 {
-    private const string TrackTexturePath = MiniSliderStyles.PlainTrackPath;
-    private const string PointerTexturePath = MiniSliderStyles.PointerPath;
+    private const float ButtonWidth = 56f;
+    private const float ButtonHeight = 30f;
 
-    private const float NativeTrackWidth = MiniSliderStyles.NativePlainTrackWidth;
-    private const float NativeTrackHeight = MiniSliderStyles.NativeTrackHeight;
-    private const float NativePointerWidth = MiniSliderStyles.NativePointerWidth;
-    private const float NativePointerHeight = MiniSliderStyles.NativePointerHeight;
+    private static readonly Color YesColor = Color.FromHex("#4A8F62");
+    private static readonly Color NoColor = Color.FromHex("#A84848");
+    private static readonly Color ActiveText = Color.FromHex("#F4FFF6");
+    private static readonly Color InactiveText = Color.FromHex("#C8C4D8");
 
-    private const float Scale = MiniSliderStyles.AntagScale;
-    private const float FramePadding = 4f;
-    private const float ClickToggleThreshold = 8f;
-    private const float SnapLerpSpeed = 18f;
+    private readonly Button _yesButton;
+    private readonly Button _noButton;
 
-    public static float PreferredWidth => ScaledTrackWidth + FramePadding * 2;
-
-    private static readonly Color FrameBackground = Color.FromHex("#121018");
-    private static readonly Color FrameBorder = Color.FromHex("#6E6A82");
-    private static readonly Color TrackColor = Color.FromHex("#E2E0EA").WithAlpha(0.35f);
-    private static readonly Color YesZoneColor = Color.FromHex("#2A5C34").WithAlpha(0.55f);
-    private static readonly Color NoZoneColor = Color.FromHex("#6C2424").WithAlpha(0.55f);
-    private static readonly Color YesPointerColor = Color.FromHex("#6FDB7E");
-    private static readonly Color NoPointerColor = Color.FromHex("#F05858");
-    private static readonly Color YesLabelActive = Color.FromHex("#EFFFF1");
-    private static readonly Color YesLabelInactive = Color.FromHex("#8BC995");
-    private static readonly Color NoLabelActive = Color.FromHex("#FFF0F0");
-    private static readonly Color NoLabelInactive = Color.FromHex("#D89090");
-
-    private static float ScaledTrackWidth => NativeTrackWidth * Scale;
-    private static float ScaledTrackHeight => NativeTrackHeight * Scale;
-    private static float ScaledPointerWidth => NativePointerWidth * Scale;
-    private static float ScaledPointerHeight => NativePointerHeight * Scale;
-    private static float ControlHeight => Math.Max(ScaledTrackHeight, ScaledPointerHeight);
-
-    [Dependency] private readonly IResourceCache _cache = default!;
-
-    private readonly LayoutContainer _layout;
-    private readonly PanelContainer _yesZone;
-    private readonly PanelContainer _noZone;
-    private readonly TextureRect _track;
-    private readonly TextureRect _pointer;
-    private readonly Label _yesLabel;
-    private readonly Label _noLabel;
-
-    private float _displayValue;
-    private float _targetValue;
     private int _selected;
-    private bool _dragging;
-    private float _dragStartX;
-    private bool _movedWhileDragging;
 
     public event Action<int>? OnSelected;
-    public event Action<int>? OnPreview;
 
+    /// <summary>0 = yes, 1 = no.</summary>
     public int Selected => _selected;
 
-    public PixelAntagToggle()
+    public AntagYesNoButtons()
     {
-        IoCManager.InjectDependencies(this);
-
-        MouseFilter = MouseFilterMode.Stop;
-        MinSize = new Vector2(PreferredWidth, ControlHeight + FramePadding * 2);
-        MaxSize = new Vector2(PreferredWidth, ControlHeight + FramePadding * 2);
+        Orientation = LayoutOrientation.Horizontal;
+        SeparationOverride = 4;
         VerticalAlignment = VAlignment.Center;
-        PanelOverride = new StyleBoxFlat
-        {
-            BackgroundColor = FrameBackground,
-            BorderThickness = new Thickness(1),
-            BorderColor = FrameBorder,
-            ContentMarginLeftOverride = FramePadding,
-            ContentMarginRightOverride = FramePadding,
-            ContentMarginTopOverride = FramePadding,
-            ContentMarginBottomOverride = FramePadding,
-        };
 
-        _layout = new LayoutContainer
-        {
-            MinSize = new Vector2(ScaledTrackWidth, ControlHeight),
-        };
+        _yesButton = CreateButton(Loc.GetString("humanoid-profile-editor-antag-preference-yes-button"));
+        _yesButton.OnPressed += _ => Select(0, notify: true);
 
-        _yesZone = new PanelContainer
-        {
-            PanelOverride = new StyleBoxFlat { BackgroundColor = YesZoneColor },
-            MouseFilter = MouseFilterMode.Ignore,
-        };
-        _noZone = new PanelContainer
-        {
-            PanelOverride = new StyleBoxFlat { BackgroundColor = NoZoneColor },
-            MouseFilter = MouseFilterMode.Ignore,
-        };
+        _noButton = CreateButton(Loc.GetString("humanoid-profile-editor-antag-preference-no-button"));
+        _noButton.OnPressed += _ => Select(1, notify: true);
 
-        _track = new TextureRect
-        {
-            Stretch = TextureRect.StretchMode.Keep,
-            TextureScale = new Vector2(Scale, Scale),
-            MouseFilter = MouseFilterMode.Ignore,
-        };
+        AddChild(_yesButton);
+        AddChild(_noButton);
 
-        _pointer = new TextureRect
-        {
-            Stretch = TextureRect.StretchMode.Keep,
-            TextureScale = new Vector2(Scale, Scale),
-            MouseFilter = MouseFilterMode.Ignore,
-        };
+        Select(1, notify: false);
+    }
 
-        _layout.AddChild(_yesZone);
-        _layout.AddChild(_noZone);
-        _layout.AddChild(_track);
-        _layout.AddChild(_pointer);
+    public void Select(int value, bool notify = false)
+    {
+        _selected = Math.Clamp(value, 0, 1);
+        UpdateVisuals();
 
-        _yesLabel = new Label
+        if (notify && OnSelected != null)
+            OnSelected.Invoke(_selected);
+    }
+
+    private static Button CreateButton(string text)
+    {
+        return new Button
         {
-            Text = Loc.GetString("humanoid-profile-editor-antag-preference-yes-button"),
-            Align = Label.AlignMode.Center,
-            VAlign = Label.VAlignMode.Center,
-            MouseFilter = MouseFilterMode.Ignore,
+            Text = text,
+            MinWidth = ButtonWidth,
+            MaxWidth = ButtonWidth,
+            MinHeight = ButtonHeight,
+            MaxHeight = ButtonHeight,
             StyleClasses = { StyleNano.StyleClassLabelSmall },
-            FontColorOverride = YesLabelActive,
         };
-        _noLabel = new Label
+    }
+
+    private void UpdateVisuals()
+    {
+        ApplyButtonStyle(_yesButton, YesColor, _selected == 0);
+        ApplyButtonStyle(_noButton, NoColor, _selected == 1);
+    }
+
+    private static void ApplyButtonStyle(Button button, Color color, bool active)
+    {
+        button.ModulateSelfOverride = Color.White;
+        button.StyleBoxOverride = new StyleBoxFlat
         {
-            Text = Loc.GetString("humanoid-profile-editor-antag-preference-no-button"),
-            Align = Label.AlignMode.Center,
-            VAlign = Label.VAlignMode.Center,
-            MouseFilter = MouseFilterMode.Ignore,
-            StyleClasses = { StyleNano.StyleClassLabelSmall },
-            FontColorOverride = NoLabelActive,
+            BackgroundColor = color.WithAlpha(active ? 0.72f : 0.28f),
+            BorderThickness = new Thickness(active ? 1 : 0),
+            BorderColor = color.WithAlpha(active ? 0.95f : 0f),
+            ContentMarginLeftOverride = 6,
+            ContentMarginRightOverride = 6,
+            ContentMarginTopOverride = 2,
+            ContentMarginBottomOverride = 2,
         };
-        _layout.AddChild(_yesLabel);
-        _layout.AddChild(_noLabel);
-
-        AddChild(_layout);
-
-        SetAnchorPreset(_yesZone, LayoutPreset.TopLeft);
-        SetAnchorPreset(_noZone, LayoutPreset.TopLeft);
-        SetAnchorPreset(_track, LayoutPreset.TopLeft);
-        SetAnchorPreset(_pointer, LayoutPreset.TopLeft);
-        SetAnchorPreset(_yesLabel, LayoutPreset.TopLeft);
-        SetAnchorPreset(_noLabel, LayoutPreset.TopLeft);
-
-        var trackMarginTop = (ControlHeight - ScaledTrackHeight) / 2f;
-        SetMarginTop(_track, trackMarginTop);
-
-        var trackCenterY = trackMarginTop + ScaledTrackHeight / 2f;
-        SetMarginTop(_pointer, trackCenterY - ScaledPointerHeight / 2f);
-
-        var labelWidth = ScaledTrackWidth / 2f;
-        _yesZone.MinSize = new Vector2(labelWidth, ScaledTrackHeight);
-        _yesZone.MaxSize = new Vector2(labelWidth, ScaledTrackHeight);
-        _noZone.MinSize = new Vector2(labelWidth, ScaledTrackHeight);
-        _noZone.MaxSize = new Vector2(labelWidth, ScaledTrackHeight);
-        _yesLabel.MinSize = new Vector2(labelWidth, ScaledTrackHeight);
-        _yesLabel.MaxSize = new Vector2(labelWidth, ScaledTrackHeight);
-        _noLabel.MinSize = new Vector2(labelWidth, ScaledTrackHeight);
-        _noLabel.MaxSize = new Vector2(labelWidth, ScaledTrackHeight);
-
-        SetMarginTop(_yesZone, trackMarginTop);
-        SetMarginTop(_noZone, trackMarginTop);
-        SetMarginTop(_yesLabel, trackMarginTop);
-        SetMarginTop(_noLabel, trackMarginTop);
-        SetMarginLeft(_noZone, labelWidth);
-        SetMarginLeft(_noLabel, labelWidth);
-
-        _track.Texture = _cache.GetTexture(TrackTexturePath);
-        _track.ModulateSelfOverride = TrackColor;
-        _pointer.Texture = _cache.GetTexture(PointerTexturePath);
-
-        UpdatePointerVisuals();
-    }
-
-    protected override void KeyBindDown(GUIBoundKeyEventArgs args)
-    {
-        base.KeyBindDown(args);
-
-        if (args.Function != EngineKeyFunctions.UIClick)
-            return;
-
-        _dragging = true;
-        _dragStartX = args.RelativePosition.X;
-        _movedWhileDragging = false;
-        SetValueFromMouse(GetLocalTrackMouseX(args.RelativePosition.X));
-    }
-
-    protected override void KeyBindUp(GUIBoundKeyEventArgs args)
-    {
-        base.KeyBindUp(args);
-
-        if (args.Function != EngineKeyFunctions.UIClick || !_dragging)
-            return;
-
-        _dragging = false;
-
-        if (!_movedWhileDragging && Math.Abs(args.RelativePosition.X - _dragStartX) < ClickToggleThreshold)
-        {
-            Toggle();
-            return;
-        }
-
-        SnapToNearest();
-    }
-
-    protected override void MouseMove(GUIMouseMoveEventArgs args)
-    {
-        if (!_dragging)
-            return;
-
-        if (Math.Abs(args.RelativePosition.X - _dragStartX) >= ClickToggleThreshold)
-            _movedWhileDragging = true;
-
-        SetValueFromMouse(GetLocalTrackMouseX(args.RelativePosition.X));
-    }
-
-    private float GetLocalTrackMouseX(float mouseX) => mouseX - FramePadding;
-
-    protected override void FrameUpdate(FrameEventArgs args)
-    {
-        base.FrameUpdate(args);
-
-        if (_dragging)
-            return;
-
-        if (Math.Abs(_displayValue - _targetValue) < 0.001f)
-            return;
-
-        _displayValue = MathHelper.Lerp(_displayValue, _targetValue, args.DeltaSeconds * SnapLerpSpeed);
-
-        if (Math.Abs(_displayValue - _targetValue) < 0.01f)
-            _displayValue = _targetValue;
-
-        UpdatePointerVisuals();
-        OnPreview?.Invoke((int) Math.Round(_displayValue));
-    }
-
-    public void Select(int value, bool animate = false)
-    {
-        value = Math.Clamp(value, 0, 1);
-        _selected = value;
-        _targetValue = value;
-
-        if (animate)
-        {
-            OnPreview?.Invoke(value);
-            return;
-        }
-
-        _displayValue = value;
-        UpdatePointerVisuals();
-        OnPreview?.Invoke(value);
-    }
-
-    private void SetValueFromMouse(float mouseX)
-    {
-        var ratio = GetRatioFromMouse(mouseX);
-        _displayValue = ratio;
-
-        UpdatePointerVisuals();
-        OnPreview?.Invoke((int) Math.Round(_displayValue));
-    }
-
-    private float GetRatioFromMouse(float mouseX)
-    {
-        var travel = GetThumbTravel();
-        if (travel <= 0f)
-            return 0f;
-
-        var thumbLeft = mouseX - ScaledPointerWidth / 2f;
-        return Math.Clamp(thumbLeft / travel, 0f, 1f);
-    }
-
-    private float GetThumbTravel() =>
-        Math.Max(0f, ScaledTrackWidth - ScaledPointerWidth);
-
-    private void SnapToNearest()
-    {
-        var snapped = (int) Math.Clamp(Math.Round(_displayValue), 0, 1);
-        _targetValue = snapped;
-
-        if (snapped != _selected)
-        {
-            _selected = snapped;
-            OnSelected?.Invoke(snapped);
-        }
-
-        OnPreview?.Invoke(snapped);
-    }
-
-    private void Toggle()
-    {
-        var next = _selected == 0 ? 1 : 0;
-        Select(next, animate: true);
-        OnSelected?.Invoke(next);
-    }
-
-    private void UpdatePointerVisuals()
-    {
-        var travel = GetThumbTravel();
-        var ratio = Math.Clamp(_displayValue, 0f, 1f);
-        var thumbLeft = travel * ratio;
-
-        SetMarginLeft(_pointer, thumbLeft);
-
-        var preview = (int) Math.Clamp(Math.Round(_displayValue), 0, 1);
-        _pointer.ModulateSelfOverride = preview == 0 ? YesPointerColor : NoPointerColor;
-
-        var yesSelected = preview == 0;
-        _yesLabel.FontColorOverride = yesSelected ? YesLabelActive : YesLabelInactive;
-        _noLabel.FontColorOverride = yesSelected ? NoLabelInactive : NoLabelActive;
-
-        _yesZone.PanelOverride = new StyleBoxFlat
-        {
-            BackgroundColor = yesSelected ? YesZoneColor.WithAlpha(0.85f) : YesZoneColor.WithAlpha(0.35f),
-        };
-        _noZone.PanelOverride = new StyleBoxFlat
-        {
-            BackgroundColor = yesSelected ? NoZoneColor.WithAlpha(0.35f) : NoZoneColor.WithAlpha(0.85f),
-        };
+        button.Label.FontColorOverride = active ? ActiveText : InactiveText;
     }
 }
