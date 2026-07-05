@@ -14,6 +14,7 @@ public static class MiniSliderStyles
     public const string WhiteTrackPath = "/Textures/_Mini/Interface/white_scroll_line.png";
     public const string PlainTrackPath = "/Textures/_Mini/Interface/plain_scroll_line.png";
     public const string LongPlainTrackPath = "/Textures/_Mini/Interface/long_plain_scroll_line.png";
+    public const string LongWhiteTrackPath = "/Textures/_Mini/Interface/long_white_scroll_line.png";
     public const string MarkedTrackPath = "/Textures/_Mini/Interface/scroll_line.png";
     public const string GreenPlainTrackPath = "/Textures/_Mini/Interface/green_plain_scroll_line.png";
     public const string PointerPath = "/Textures/_Mini/Interface/pointer.png";
@@ -26,6 +27,9 @@ public static class MiniSliderStyles
     public const float NativeTrackHeight = 7f;
     public const float NativePointerWidth = 7f;
     public const float NativePointerHeight = 11f;
+
+    /// <summary>Compact sliders for Typan war HUD track.</summary>
+    public const float WarHudTrackScale = 1.25f;
 
     /// <summary>Compact sliders for settings and general UI.</summary>
     public const float UiScale = 2f;

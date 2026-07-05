@@ -1,0 +1,18 @@
+- type: entity
+  parent: BaseAction
+  id: ActionTypanWarFriendlyFire
+  name: typan-war-ff-action-name
+  description: typan-war-ff-action-desc
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Action
+    priority: -10
+    useDelay: 0.5
+    icon:
+      sprite: ADT/Interface/Actions/friendly_fire.rsi
+      state: off
+    iconOn:
+      sprite: ADT/Interface/Actions/friendly_fire.rsi
+      state: on
+  - type: InstantAction
+    event: !type:ToggleActionEvent

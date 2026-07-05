@@ -8,6 +8,7 @@
 using System.Linq;
 using Content.Goobstation.Common.CCVar;
 using Content.Goobstation.Server.StationEvents.Components;
+using Content.Server._Mini.TypanWar;
 using Content.Goobstation.Shared.StationEvents;
 using Content.Server.Antag;
 using Content.Server.Antag.Components;
@@ -187,6 +188,9 @@ public sealed class SecretPlusSystem : GameRuleSystem<SecretPlusComponent>
     /// </summary>
     protected override void ActiveTick(EntityUid uid, SecretPlusComponent scheduler, GameRuleComponent gameRule, float frameTime)
     {
+        if (TypanStationWarRuleSystem.IsModeActive)
+            return;
+
         var count = CountActivePlayers();
         var ramp = GetRamping((uid, scheduler));
         var speedup = _event.EventSpeedup;

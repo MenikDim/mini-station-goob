@@ -1,0 +1,29 @@
+- type: entity
+  id: TypanStationWar
+  parent: BaseGameRule
+  components:
+  - type: GameRule
+    minPlayers: 11
+    chaosScore: 900
+  - type: Tag
+    tags:
+    - LoneRunRule
+  - type: TypanStationWarRule
+    announcementDelaySeconds: 15
+    warStartDelaySeconds: 30
+    warDurationSeconds: 1800
+    minNtAlive: 8
+    minTypanAlive: 3
+
+- type: gamePreset
+  id: TypanStationWar
+  alias:
+  - typanwar
+  - typan-station-war
+  name: game-presets-typan-station-war
+  showInVote: false
+  description: game-presets-typan-station-war-description
+  rules:
+  - TypanStationWar
+  - SpaceTrafficControlFriendlyEventScheduler
+  - BasicRoundstartVariation

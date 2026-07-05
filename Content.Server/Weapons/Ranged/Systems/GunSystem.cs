@@ -127,6 +127,7 @@ using Content.Server.Atmos.EntitySystems;
 using Content.Server.Cargo.Systems;
 using Content.Server.Power.EntitySystems;
 using Content.Server.Weapons.Ranged.Components;
+using Content.Shared._Mini.TypanWar;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Database;
@@ -179,6 +180,8 @@ public sealed partial class GunSystem : SharedGunSystem
 
     private const float DamagePitchVariation = 0.05f;
     private float _crawlHitzoneSize; // Goobstation
+
+    [Dependency] private readonly TypanWarFriendlyFireSystem _typanWarFf = default!;
 
     private const float SpreadWithoutSkill = MathHelper.PiOver6; // CorvaxGoob-Skills
 
@@ -323,30 +326,33 @@ public sealed partial class GunSystem : SharedGunSystem
                             if (!rayCastResults.Any())
                                 break;
 
-                            var result = rayCastResults[0];
+                            var inContainer = _container.IsEntityOrParentInContainer(lastUser);
+                            RayCastResults? result = null;
 
-                            // Check if laser is shot from in a container
-                            if (!_container.IsEntityOrParentInContainer(lastUser))
+                            foreach (var collide in rayCastResults)
                             {
-                                // Checks if the laser should pass over unless targeted by its user
-                                foreach (var collide in rayCastResults)
-                                {
-                                    if (collide.HitEntity != gun.Target &&
-                                        CompOrNull<RequireProjectileTargetComponent>(collide.HitEntity)?.Active == true &&
-                                        (_transform.GetMapCoordinates(collide.HitEntity).Position - toMapBeforeRecoil).Length() > _crawlHitzoneSize)
-                                    {
-                                        continue;
-                                    }
+                                if (_typanWarFf.ShouldPassThrough(lastUser, collide.HitEntity))
+                                    continue;
 
-                                    result = collide;
-                                    break;
+                                if (!inContainer &&
+                                    collide.HitEntity != gun.Target &&
+                                    CompOrNull<RequireProjectileTargetComponent>(collide.HitEntity)?.Active == true &&
+                                    (_transform.GetMapCoordinates(collide.HitEntity).Position - toMapBeforeRecoil).Length() > _crawlHitzoneSize)
+                                {
+                                    continue;
                                 }
+
+                                result = collide;
+                                break;
                             }
 
-                            var hit = result.HitEntity;
+                            if (result == null)
+                                break;
+
+                            var hit = result.Value.HitEntity;
                             lastHit = hit;
 
-                            FireEffects(fromEffect, result.Distance, dir.Normalized().ToAngle(), hitscan, hit);
+                            FireEffects(fromEffect, result.Value.Distance, dir.Normalized().ToAngle(), hitscan, hit);
 
                             var ev = new HitScanReflectAttemptEvent(user, gunUid, hitscan.Reflective, dir, false, hitscan.Damage); // WD EDIT
                             RaiseLocalEvent(hit, ref ev);

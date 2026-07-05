@@ -14,6 +14,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Server._Mini.TypanWar;
 using Content.Server.Administration;
 using Content.Server.GameTicking;
 using Content.Server.GameTicking.Rules;
@@ -66,6 +67,9 @@ namespace Content.Server.StationEvents
             while (query.MoveNext(out var uid, out var eventScheduler, out var gameRule))
             {
                 if (!GameTicker.IsGameRuleActive(uid, gameRule))
+                    continue;
+
+                if (TypanStationWarRuleSystem.IsModeActive)
                     continue;
 
                 if (eventScheduler.TimeUntilNextEvent > 0)

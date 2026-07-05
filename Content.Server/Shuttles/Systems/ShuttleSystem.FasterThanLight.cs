@@ -456,6 +456,12 @@ public sealed partial class ShuttleSystem
             return false;
         }
 
+        var attemptEv = new ShuttleFTLAttemptEvent(uid, false, string.Empty);
+        RaiseLocalEvent(ref attemptEv);
+
+        if (attemptEv.Cancelled)
+            return false;
+
         _thruster.DisableLinearThrusters(shuttle);
         _thruster.EnableLinearThrustDirection(shuttle, DirectionFlag.North);
         _thruster.SetAngularThrust(shuttle, false);
