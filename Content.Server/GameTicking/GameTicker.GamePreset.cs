@@ -94,6 +94,13 @@ public sealed partial class GameTicker
     /// </summary>
     public int? ResetCountdown;
 
+    /// <summary>
+    /// Game rule entities added by <see cref="AddGamePresetRules"/> for the current preset.
+    /// Tracked so a stale preset's rules can be swapped out without ending unrelated rules,
+    /// such as rules queued by admins in the lobby via addgamerule.
+    /// </summary>
+    private readonly List<EntityUid> _addedPresetRules = new();
+
     private bool StartPreset(ICommonSession[] origReadyPlayers, bool force)
     {
         var startAttempt = new RoundStartAttemptEvent(origReadyPlayers, force);
@@ -252,13 +259,35 @@ public sealed partial class GameTicker
         if (DummyTicker || Preset == null)
             return false;
 
+        _addedPresetRules.Clear();
         CurrentPreset = Preset;
         foreach (var rule in Preset.Rules)
         {
-            AddGameRule(rule);
+            _addedPresetRules.Add(AddGameRule(rule));
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Swaps the added preset rules for the current preset's rules if the selected preset
+    /// changed after they were added (e.g. forcepreset or a preset vote finishing after map
+    /// preload). Only the stale preset's rules are ended, so rules added separately (such as
+    /// admin-queued rules) still start with the round.
+    /// </summary>
+    private void RefreshGamePresetRules()
+    {
+        if (DummyTicker || CurrentPreset == Preset)
+            return;
+
+        foreach (var rule in _addedPresetRules)
+        {
+            if (!Deleted(rule))
+                EndGameRule(rule);
+        }
+
+        _addedPresetRules.Clear();
+        AddGamePresetRules();
     }
 
     private void TryResetPreset()
