@@ -216,7 +216,6 @@ namespace Content.Server.Administration.Systems
 
         private int _maxAdditionalChars;
         private readonly Dictionary<NetUserId, DateTime> _activeConversations = new();
-        private readonly HashSet<NetUserId> _introSent = new();
 
         public override void Initialize()
         {
@@ -248,7 +247,6 @@ namespace Content.Server.Administration.Systems
             SubscribeLocalEvent<RoundRestartCleanupEvent>(_ =>
             {
                 _activeConversations.Clear();
-                _introSent.Clear();
             });
             _rankIcons = _prototypeManager.EnumeratePrototypes<AdminRankIconPrototype>()
             .ToDictionary(p => p.Rank, p => p.Icon);
@@ -1033,12 +1031,7 @@ namespace Content.Server.Administration.Systems
 
         private void OnAHelpOpenRequest(BwoinkAHelpOpenRequestEvent ev, EntitySessionEventArgs args)
         {
-            var userId = args.SenderSession.UserId;
-            if (!_introSent.Add(userId))
-                return;
-
-            _activeConversations[userId] = DateTime.Now;
-            SendPlayerChannelSystemMessage(userId, Loc.GetString("bwoink-system-introductory-message"));
+            _activeConversations[args.SenderSession.UserId] = DateTime.Now;
         }
 
         private void EnqueueSystemWebhookMessage(NetUserId userId, string markupText)

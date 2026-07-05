@@ -40,6 +40,7 @@ namespace Content.Server.StationEvents
     {
         [Dependency] private readonly IRobustRandom _random = default!;
         [Dependency] private readonly EventManagerSystem _event = default!;
+        [Dependency] private readonly TypanStationWarRuleSystem _typanWar = default!;
 
         protected override void Started(EntityUid uid, BasicStationEventSchedulerComponent component, GameRuleComponent gameRule,
             GameRuleStartedEvent args)
@@ -69,7 +70,7 @@ namespace Content.Server.StationEvents
                 if (!GameTicker.IsGameRuleActive(uid, gameRule))
                     continue;
 
-                if (TypanStationWarRuleSystem.IsModeActive)
+                if (_typanWar.IsTypanWarBlocking())
                     continue;
 
                 if (eventScheduler.TimeUntilNextEvent > 0)

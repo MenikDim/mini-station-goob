@@ -74,12 +74,14 @@ public sealed class TypanWarFriendlyFireSystem : EntitySystem
         if (args.Handled)
             return;
 
+        if (ent.Comp.ActionEntity is not { } ffAction || args.Action.Owner != ffAction)
+            return;
+
         args.Handled = true;
 
         ent.Comp.Enabled = !ent.Comp.Enabled;
 
-        if (ent.Comp.ActionEntity is { } action)
-            _actions.SetToggled(action, ent.Comp.Enabled);
+        _actions.SetToggled(ffAction, ent.Comp.Enabled);
 
         Dirty(ent);
 

@@ -655,6 +655,7 @@ public sealed class UserAHelpUIHandler : IAHelpUIHandler
         _chatPanel = new BwoinkPanel(text => SendMessageAction?.Invoke(_ownerId, text, true, false));
         _chatPanel.InputTextChanged += text => InputTextChanged?.Invoke(_ownerId, text);
         _chatPanel.RelayedToDiscordLabel.Visible = relayActive;
+        _chatPanel.ShowIntroductoryMessageIfNeeded();
 
         _ratingPanel = new AHelpRatingPanel();
         if (_ratingSystem != null)

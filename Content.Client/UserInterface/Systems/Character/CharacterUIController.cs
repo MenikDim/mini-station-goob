@@ -119,6 +119,10 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
             _window = null;
         }
 
+        _dailyQuestSlots.Clear();
+        _dailyQuestCards.Clear();
+        _dailyQuestLayoutCache.Clear();
+
         CommandBinds.Unregister<CharacterUIController>();
     }
 
@@ -497,6 +501,8 @@ public sealed class CharacterUIController : UIController, IOnStateEntered<Gamepl
             {
                 _dailyQuestSlots[i].HorizontalExpand = true;
                 _dailyQuestSlots[i].VerticalExpand = false;
+                if (_dailyQuestSlots[i].Parent != null)
+                    _dailyQuestSlots[i].Orphan();
                 _window.DailyQuests.AddChild(_dailyQuestSlots[i]);
             }
 

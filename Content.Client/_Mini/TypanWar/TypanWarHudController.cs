@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controllers;
 using Robust.Client.UserInterface.Controls;
+using Robust.Shared.Timing;
 
 namespace Content.Client._Mini.TypanWar;
 
@@ -13,7 +14,12 @@ public sealed class TypanWarHudController : UIController,
     IOnStateEntered<GameplayState>,
     IOnSystemChanged<TypanWarUiSystem>
 {
+    private const float EndedFlashDuration = 3f;
+
+    [Dependency] private readonly IGameTiming _timing = default!;
     [UISystemDependency] private readonly TypanWarUiSystem _war = default!;
+
+    private TimeSpan? _endedFlashUntil;
 
     public override void Initialize()
     {
@@ -21,6 +27,17 @@ public sealed class TypanWarHudController : UIController,
 
         var gameplayStateLoad = UIManager.GetUIController<GameplayStateLoadController>();
         gameplayStateLoad.OnScreenLoad += OnScreenLoad;
+    }
+
+    public override void FrameUpdate(FrameEventArgs args)
+    {
+        base.FrameUpdate(args);
+
+        if (_endedFlashUntil != null && _timing.CurTime >= _endedFlashUntil)
+        {
+            _endedFlashUntil = null;
+            Refresh();
+        }
     }
 
     private void OnScreenLoad()
@@ -37,13 +54,21 @@ public sealed class TypanWarHudController : UIController,
 
     public void OnSystemLoaded(TypanWarUiSystem system)
     {
-        system.StatusUpdated += Refresh;
+        system.StatusUpdated += OnStatusUpdated;
         Refresh();
     }
 
     public void OnSystemUnloaded(TypanWarUiSystem system)
     {
-        system.StatusUpdated -= Refresh;
+        system.StatusUpdated -= OnStatusUpdated;
+    }
+
+    private void OnStatusUpdated()
+    {
+        if (_war.Phase == TypanWarPhase.Ended && _war.Winner != TypanWarWinner.None)
+            _endedFlashUntil = _timing.CurTime + TimeSpan.FromSeconds(EndedFlashDuration);
+
+        Refresh();
     }
 
     private void Refresh()
@@ -55,8 +80,11 @@ public sealed class TypanWarHudController : UIController,
         if (hud == null)
             return;
 
+        var showEnded = _war.Phase == TypanWarPhase.Ended && _endedFlashUntil != null;
+
         hud.Update(
-            _war.Phase,
+            showEnded ? TypanWarPhase.Ended : _war.Phase,
+            _war.Winner,
             _war.NtAlive,
             _war.TypanAlive,
             _war.TimeRemainingSeconds);

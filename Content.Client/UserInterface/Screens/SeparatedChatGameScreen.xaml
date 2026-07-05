@@ -36,6 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <SplitContainer Name="ScreenContainer" HorizontalExpand="True" VerticalExpand="True" SplitWidth="0" StretchDirection="TopLeft">
         <LayoutContainer Name="ViewportContainer" HorizontalExpand="True" VerticalExpand="True">
             <controls:MainViewport Name="MainViewport"/>
+            <typan:TypanWarHudControl Name="TypanWarHud" Access="Protected" MinWidth="580" MaxWidth="580" />
             <widgets:GhostGui Name="Ghost" Access="Protected" />
             <inventory:InventoryGui Name="Inventory" Access="Protected"/>
             <hotbar:HotbarGui Name="Hotbar" Access="Protected"/>
@@ -45,7 +46,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 <BoxContainer Name="VoteMenu" Access="Public" Orientation="Vertical"/>
             </BoxContainer>
             <alerts:AlertsUI Name="Alerts" Access="Protected" />
-            <typan:TypanWarHudControl Name="TypanWarHud" Access="Protected" MinWidth="580" MaxWidth="580" />
         </LayoutContainer>
         <PanelContainer Name="SeparatedChatPanel" MinWidth="300">
             <PanelContainer.PanelOverride>

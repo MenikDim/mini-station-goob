@@ -1,0 +1,147 @@
+# Syndicate uplink magazine bundles — cheaper calibers sold in boxes, not singles.
+
+- type: entity
+  parent: [BoxMagazine, BaseSyndicateContraband]
+  id: BaseSyndicateUplinkMagazineBundle
+  abstract: true
+  components:
+  - type: Sprite
+    layers:
+    - state: box_of_doom
+    - state: magazine
+
+- type: entity
+  parent: BaseSyndicateUplinkMagazineBundle
+  id: BoxSyndicateMagazinePistol
+  name: syndicate magazine box (.35 auto)
+  description: A syndicate-branded box with three .35 auto pistol magazines.
+  components:
+  - type: StorageFill
+    contents:
+    - id: MagazinePistol
+      amount: 3
+
+- type: entity
+  parent: BaseSyndicateUplinkMagazineBundle
+  id: BoxSyndicateMagazinePistolSubMachineGun
+  name: syndicate magazine box (SMG .35 auto)
+  description: A syndicate-branded box with three .35 auto SMG magazines.
+  components:
+  - type: StorageFill
+    contents:
+    - id: MagazinePistolSubMachineGun
+      amount: 3
+
+- type: entity
+  parent: BaseSyndicateUplinkMagazineBundle
+  id: BoxSyndicateMagazinePistolCaselessRifle
+  name: syndicate magazine box (9.5mm HP)
+  description: A syndicate-branded box with three 9.5mm hollow-point pistol magazines.
+  components:
+  - type: StorageFill
+    contents:
+    - id: MagazinePistolCaselessRifle
+      amount: 3
+
+- type: entity
+  parent: BaseSyndicateUplinkMagazineBundle
+  id: BoxSyndicateSpeedLoaderMagnumAP
+  name: syndicate speed loader box (.45 magnum AP)
+  description: A syndicate-branded box with two .45 magnum armor-piercing speed loaders.
+  components:
+  - type: StorageFill
+    contents:
+    - id: SpeedLoaderMagnumAP
+      amount: 2
+  - type: Sprite
+    layers:
+    - state: box_of_doom
+    - state: magazine
+
+- type: entity
+  parent: BaseSyndicateUplinkMagazineBundle
+  id: BoxSyndicateMagazineRifle
+  name: syndicate magazine box (.20 rifle)
+  description: A syndicate-branded box with three .20 rifle magazines.
+  components:
+  - type: StorageFill
+    contents:
+    - id: MagazineRifle
+      amount: 3
+
+- type: entity
+  parent: BaseSyndicateUplinkMagazineBundle
+  id: BoxSyndicateMagazineShotgun
+  name: syndicate drum box (.50 pellet)
+  description: A syndicate-branded box with three .50 pellet shotgun drums.
+  components:
+  - type: StorageFill
+    contents:
+    - id: MagazineShotgun
+      amount: 3
+
+- type: entity
+  parent: BaseSyndicateUplinkMagazineBundle
+  id: BoxSyndicateMagazineShotgunSlug
+  name: syndicate drum box (.50 slug)
+  description: A syndicate-branded box with three .50 slug shotgun drums.
+  components:
+  - type: StorageFill
+    contents:
+    - id: MagazineShotgunSlug
+      amount: 3
+
+- type: entity
+  parent: BaseSyndicateUplinkMagazineBundle
+  id: BoxSyndicateMagazineLowCaliberM7S
+  name: syndicate magazine box (5x23mm)
+  description: A syndicate-branded box with three 5x23mm SMG magazines.
+  components:
+  - type: StorageFill
+    contents:
+    - id: MagazineLowCaliberM7S
+      amount: 3
+
+- type: entity
+  parent: BaseSyndicateUplinkMagazineBundle
+  id: BoxSyndicateMagazineNailgunArmorPiercing
+  name: syndicate nailgun magazine box
+  description: A syndicate-branded box with three armor-piercing nailgun magazines.
+  components:
+  - type: StorageFill
+    contents:
+    - id: MagazineNailgunArmorPiercing
+      amount: 3
+
+- type: entity
+  parent: BaseSyndicateUplinkMagazineBundle
+  id: BoxSyndicateMagazineCaselessRifle
+  name: syndicate magazine box (9.5mm rifle)
+  description: A syndicate-branded box with two 9.5mm rifle magazines.
+  components:
+  - type: StorageFill
+    contents:
+    - id: MagazineCaselessRifle
+      amount: 2
+
+- type: entity
+  parent: BaseSyndicateUplinkMagazineBundle
+  id: BoxSyndicateMagazinePistolHighCapacity
+  name: syndicate magazine box (machine pistol .35 auto)
+  description: A syndicate-branded box with two high-capacity .35 auto pistol magazines.
+  components:
+  - type: StorageFill
+    contents:
+    - id: MagazinePistolHighCapacity
+      amount: 2
+
+- type: entity
+  parent: BaseSyndicateUplinkMagazineBundle
+  id: BoxSyndicateMagazinePistolCaselessRifleSAPHE
+  name: syndicate magazine box (9.5mm SAP-HE)
+  description: A syndicate-branded box with two 9.5mm SAP-HE pistol magazines.
+  components:
+  - type: StorageFill
+    contents:
+    - id: MagazinePistolCaselessRifleSAPHE
+      amount: 2

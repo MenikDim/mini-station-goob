@@ -11,6 +11,18 @@
       state: icon
 
 - type: entity
+  id: NtStationGoalObjective
+  parent: BaseFreeObjective
+  components:
+  - type: Objective
+    difficulty: 1
+    issuer: typan-station-goal-objective-issuer
+    unique: false
+    icon:
+      sprite: Objects/Weapons/Guns/Battery/laser_gun.rsi
+      state: icon
+
+- type: entity
   id: TypanWarObjective
   parent: BaseFreeObjective
   components:

@@ -1,4 +1,7 @@
 - type: Tag
+  id: TypanWarArmory
+
+- type: Tag
   id: TypanRipleyEquipment
 
 - type: Tag

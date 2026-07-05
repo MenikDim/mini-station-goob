@@ -23,17 +23,46 @@ public sealed class TTStationHandleJobSystem : EntitySystem
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly SharedJobSystem _jobs = default!;
 
+    private readonly Dictionary<ProtoId<JobPrototype>, EntityUid> _jobStations = new();
+    private readonly HashSet<EntityUid> _handledStations = new();
+
     public override void Initialize()
     {
         base.Initialize();
 
+        SubscribeLocalEvent<TTStationHandleJobComponent, ComponentStartup>(OnHandleJobStartup);
+        SubscribeLocalEvent<TTStationHandleJobComponent, ComponentShutdown>(OnHandleJobShutdown);
         SubscribeLocalEvent<PlayerSpawningEvent>(OnPlayerSpawning, before: [typeof(ArrivalsSystem), typeof(ContainerSpawnPointSystem), typeof(SpawnPointSystem)]);
+    }
+
+    private void OnHandleJobStartup(EntityUid uid, TTStationHandleJobComponent component, ComponentStartup args)
+    {
+        _handledStations.Add(uid);
+        RegisterStationJobs(uid, component);
+    }
+
+    private void OnHandleJobShutdown(EntityUid uid, TTStationHandleJobComponent component, ComponentShutdown args)
+    {
+        _handledStations.Remove(uid);
+        UnregisterStationJobs(component);
+    }
+
+    private void RegisterStationJobs(EntityUid station, TTStationHandleJobComponent component)
+    {
+        foreach (var job in component.Jobs)
+            _jobStations[job] = station;
+    }
+
+    private void UnregisterStationJobs(TTStationHandleJobComponent component)
+    {
+        foreach (var job in component.Jobs)
+            _jobStations.Remove(job);
     }
 
     /// <summary>
     /// Returns true if the job belongs to a TTStationHandleJob station (e.g. Typan roles).
     /// </summary>
-    public bool IsHandledJob(ProtoId<JobPrototype> job) => GetStation(job) != null;
+    public bool IsHandledJob(ProtoId<JobPrototype> job) => TryGetHandledStation(job, out _);
 
     public bool MindHasHandledJob(EntityUid mindId)
     {
@@ -42,14 +71,38 @@ public sealed class TTStationHandleJobSystem : EntitySystem
                && IsHandledJob(jobId.Value);
     }
 
+    public bool TryGetHandledStation(ProtoId<JobPrototype> job, out EntityUid station)
+    {
+        EnsureCacheBuilt();
+        return _jobStations.TryGetValue(job, out station);
+    }
+
+    /// <summary>
+    /// Ensures dedicated job stations (e.g. Typan) participate in roundstart job assignment.
+    /// </summary>
+    public void EnsureHandledStationsIncluded(List<EntityUid> stations)
+    {
+        EnsureCacheBuilt();
+
+        foreach (var station in _handledStations)
+        {
+            if (!HasComp<StationJobsComponent>(station) || !HasComp<StationSpawningComponent>(station))
+                continue;
+
+            if (!stations.Contains(station))
+                stations.Add(station);
+        }
+    }
+
     /// <summary>
     /// Ensures handled jobs are assigned to their dedicated station at roundstart,
     /// and that non-handled jobs are not assigned to handled-only stations.
     /// </summary>
     public void FixJobStationAssignments(ref Dictionary<NetUserId, (ProtoId<JobPrototype>?, EntityUid)> assignedJobs)
     {
-        var handledStations = GetHandledStations();
-        var defaultStation = FindDefaultStation(assignedJobs, handledStations);
+        EnsureCacheBuilt();
+
+        var defaultStation = FindDefaultStation(assignedJobs, _handledStations);
 
         foreach (var userId in assignedJobs.Keys.ToList())
         {
@@ -57,14 +110,14 @@ public sealed class TTStationHandleJobSystem : EntitySystem
             if (job == null)
                 continue;
 
-            if (GetStation(job.Value) is { } requiredStation)
+            if (TryGetHandledStation(job.Value, out var requiredStation))
             {
                 if (station != requiredStation)
                     assignedJobs[userId] = (job, requiredStation);
                 continue;
             }
 
-            if (station == EntityUid.Invalid || !handledStations.Contains(station))
+            if (station == EntityUid.Invalid || !_handledStations.Contains(station))
                 continue;
 
             if (defaultStation is { } fallback)
@@ -72,8 +125,26 @@ public sealed class TTStationHandleJobSystem : EntitySystem
         }
     }
 
+    private void EnsureCacheBuilt()
+    {
+        if (_jobStations.Count > 0 && _handledStations.Count > 0)
+            return;
+
+        _jobStations.Clear();
+        _handledStations.Clear();
+
+        var query = EntityQueryEnumerator<TTStationHandleJobComponent>();
+        while (query.MoveNext(out var uid, out var component))
+        {
+            _handledStations.Add(uid);
+            RegisterStationJobs(uid, component);
+        }
+    }
+
     private void OnPlayerSpawning(PlayerSpawningEvent ev)
     {
+        EnsureCacheBuilt();
+
         if (ev.SpawnResult is not null)
         {
             Log.Error("The spawn result has already been received");
@@ -86,13 +157,12 @@ public sealed class TTStationHandleJobSystem : EntitySystem
             return;
         }
 
-        var handledStation = GetStation(job);
-        var requestedStation = ev.Station;
-        var requestedIsHandledStation = requestedStation is { } requestedStationUid &&
-            HasComp<TTStationHandleJobComponent>(requestedStationUid);
-
-        if (handledStation is null)
+        if (!TryGetHandledStation(job, out var handledStation))
         {
+            var requestedStation = ev.Station;
+            var requestedIsHandledStation = requestedStation is { } requestedStationUid &&
+                _handledStations.Contains(requestedStationUid);
+
             if (requestedIsHandledStation)
             {
                 AbortSpawn(ev,
@@ -103,16 +173,13 @@ public sealed class TTStationHandleJobSystem : EntitySystem
             return;
         }
 
-        if (requestedStation is { } req && req != handledStation.Value)
+        if (ev.Station is { } req && req != handledStation)
         {
             Log.Warning(
-                $"Redirecting spawn for job {job} from {GetStationName(requestedStation)} to {GetStationName(handledStation)}.");
+                $"Redirecting spawn for job {job} from {GetStationName(ev.Station)} to {GetStationName(handledStation)}.");
         }
 
-        var possiblePositions = CollectSpawnLocations(handledStation.Value, job, lateJoin: _gameTicker.RunLevel == GameRunLevel.InRound);
-
-        if (possiblePositions.Count == 0 && _gameTicker.RunLevel != GameRunLevel.InRound)
-            possiblePositions = CollectSpawnLocations(handledStation.Value, job, lateJoin: true);
+        var possiblePositions = CollectSpawnLocations(handledStation, job);
 
         if (possiblePositions.Count == 0)
         {
@@ -130,10 +197,19 @@ public sealed class TTStationHandleJobSystem : EntitySystem
             handledStation);
     }
 
-    private List<EntityCoordinates> CollectSpawnLocations(EntityUid handledStation, ProtoId<JobPrototype> job, bool lateJoin)
+    private List<EntityCoordinates> CollectSpawnLocations(EntityUid handledStation, ProtoId<JobPrototype> job)
+    {
+        var possiblePositions = CollectSpawnLocations(handledStation, job, SpawnPointType.Job);
+
+        if (possiblePositions.Count == 0)
+            possiblePositions = CollectSpawnLocations(handledStation, job, SpawnPointType.LateJoin);
+
+        return possiblePositions;
+    }
+
+    private List<EntityCoordinates> CollectSpawnLocations(EntityUid handledStation, ProtoId<JobPrototype> job, SpawnPointType spawnType)
     {
         var possiblePositions = new List<EntityCoordinates>();
-        var expectedSpawnType = lateJoin ? SpawnPointType.LateJoin : SpawnPointType.Job;
 
         var query = EntityQueryEnumerator<SpawnPointComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var spawnPoint, out var xform))
@@ -144,7 +220,7 @@ public sealed class TTStationHandleJobSystem : EntitySystem
             if (spawnPoint.Job != job)
                 continue;
 
-            if (spawnPoint.SpawnType != expectedSpawnType)
+            if (spawnPoint.SpawnType != spawnType)
                 continue;
 
             possiblePositions.Add(xform.Coordinates);
@@ -173,15 +249,6 @@ public sealed class TTStationHandleJobSystem : EntitySystem
         return false;
     }
 
-    private HashSet<EntityUid> GetHandledStations()
-    {
-        var stations = new HashSet<EntityUid>();
-        var query = EntityQueryEnumerator<TTStationHandleJobComponent>();
-        while (query.MoveNext(out var uid, out _))
-            stations.Add(uid);
-        return stations;
-    }
-
     private EntityUid? FindDefaultStation(
         Dictionary<NetUserId, (ProtoId<JobPrototype>?, EntityUid)> assignedJobs,
         HashSet<EntityUid> handledStations)
@@ -198,20 +265,6 @@ public sealed class TTStationHandleJobSystem : EntitySystem
         while (query.MoveNext(out var uid, out _))
         {
             if (handledStations.Contains(uid))
-                continue;
-
-            return uid;
-        }
-
-        return null;
-    }
-
-    private EntityUid? GetStation(ProtoId<JobPrototype> job)
-    {
-        var query = EntityQueryEnumerator<TTStationHandleJobComponent>();
-        while (query.MoveNext(out var uid, out var component))
-        {
-            if (!component.Jobs.Contains(job))
                 continue;
 
             return uid;

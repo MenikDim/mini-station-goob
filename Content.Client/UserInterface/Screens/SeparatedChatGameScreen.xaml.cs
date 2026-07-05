@@ -39,7 +39,6 @@ public sealed partial class SeparatedChatGameScreen : InGameScreen
         SetAnchorAndMarginPreset(Targeting, LayoutPreset.BottomRight, margin: 5);
         SetAnchorAndMarginPreset(TypanWarHud, LayoutPreset.CenterBottom, margin: 153);
         SetMarginLeft(TypanWarHud, TypanWarHud.GetValue<float>(MarginLeftProperty) - 290);
-        TypanWarHud.SetPositionLast();
 
         ScreenContainer.OnSplitResizeFinished += () =>
             OnChatResized?.Invoke(new Vector2(ScreenContainer.SplitFraction, 0));

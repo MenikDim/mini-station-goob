@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2026 Casha
 // Мини-станция/Freaky-station, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/ministation/mini-station-goob/master/LICENSE.TXT
 using System.Linq;
+using Content.Server._TT.StationHandleJob;
 using Content.Server.Administration.Managers;
 using Content.Server.Sponsors;
 using Content.Server._Mini.AntagTokens;
@@ -31,6 +32,7 @@ using Content.Shared.Humanoid;
 using Content.Shared.Inventory;
 using Content.Shared.Mind;
 using Content.Shared.Players;
+using Content.Shared.Preferences;
 using Content.Shared.Roles;
 using Content.Shared.Whitelist;
 using Robust.Server.Audio;
@@ -66,6 +68,7 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
     [Dependency] private readonly SkillsSystem _skills = default!; // CorvaxGoob-Skills
     [Dependency] private readonly SponsorSystem _sponsor = default!; // mini-station donate privellege
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
+    [Dependency] private readonly TTStationHandleJobSystem _ttStationHandleJob = default!;
 
     // arbitrary random number to give late joining some mild interest.
     public const float LateJoinRandomChance = 0.5f;
@@ -649,6 +652,10 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
         if (ent.Comp.AssignedSessions.Contains(session))
             return false;
 
+        // Typan-only job prefs (all non-Never jobs are on Typan station) cannot become roundstart antags.
+        if (mind == null && SessionPrefersOnlyHandledStationJobs(session))
+            return false;
+
         mind ??= session.GetMind();
 
         //todo: we need some way to check that we're not getting the same role twice. (double picking thieves or zombies through midrounds)
@@ -678,6 +685,31 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
             return false;
 
         return true;
+    }
+
+    /// <summary>
+    /// True when every non-Never job in the player's profile belongs to a handled station (e.g. Typan).
+    /// </summary>
+    private bool SessionPrefersOnlyHandledStationJobs(ICommonSession session)
+    {
+        if (!_pref.TryGetCachedPreferences(session.UserId, out var prefs))
+            return false;
+
+        if (prefs.SelectedCharacter is not HumanoidCharacterProfile profile)
+            return false;
+
+        var hasEligibleJob = false;
+        foreach (var (jobId, priority) in profile.JobPriorities)
+        {
+            if (priority == JobPriority.Never)
+                continue;
+
+            hasEligibleJob = true;
+            if (!_ttStationHandleJob.IsHandledJob(jobId))
+                return false;
+        }
+
+        return hasEligibleJob;
     }
 
     /// <summary>

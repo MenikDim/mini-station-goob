@@ -226,7 +226,7 @@
   name: uplink-pistol-magazine-name
   description: uplink-pistol-magazine-desc
   icon: { sprite: /Textures/Objects/Weapons/Guns/Ammunition/Magazine/Pistol/pistol_mag.rsi, state: red-icon }
-  productEntity: MagazinePistol
+  productEntity: BoxSyndicateMagazinePistol
   cost:
     Telecrystal: 1
   categories:
@@ -237,7 +237,7 @@
   name: uplink-highcap-pistol-mag-name
   description: uplink-highcap-pistol-mag-desc
   icon: { sprite: /Textures/Objects/Weapons/Guns/Ammunition/Magazine/Pistol/pistol_high_capacity_mag.rsi, state: base }
-  productEntity: MagazinePistolHighCapacity
+  productEntity: BoxSyndicateMagazinePistolHighCapacity
   cost:
     Telecrystal: 2
   categories:
@@ -249,7 +249,7 @@
   name: uplink-pistol-magazine-c20r-name
   description: uplink-pistol-magazine-c20r-desc
   icon: { sprite: /Textures/Objects/Weapons/Guns/Ammunition/Magazine/Pistol/smg_mag.rsi, state: red-icon }
-  productEntity: MagazinePistolSubMachineGun
+  productEntity: BoxSyndicateMagazinePistolSubMachineGun
   cost:
     Telecrystal: 2
   categories:
@@ -261,7 +261,7 @@
   name: uplink-pistol-magazine-caseless-name
   description: uplink-pistol-magazine-caseless-desc
   icon: { sprite: /Textures/Objects/Weapons/Guns/Ammunition/Magazine/CaselessRifle/caseless_pistol_mag.rsi, state: red-icon }
-  productEntity: MagazinePistolCaselessRifle
+  productEntity: BoxSyndicateMagazinePistolCaselessRifle
   cost:
     Telecrystal: 1
   categories:
@@ -273,7 +273,7 @@
   name: uplink-speedloader-magnum-name
   description: uplink-speedloader-magnu-desc
   icon: { sprite: /Textures/Objects/Weapons/Guns/Ammunition/SpeedLoaders/Magnum/magnum_speed_loader.rsi, state: icon }
-  productEntity: SpeedLoaderMagnumAP
+  productEntity: BoxSyndicateSpeedLoaderMagnumAP
   cost:
     Telecrystal: 3
   categories:
@@ -1672,7 +1672,7 @@
   name: uplink-rifle-caseless-mag-name
   description: uplink-rifle-caseless-mag-desc
   icon: { sprite: /Textures/Objects/Weapons/Guns/Ammunition/Magazine/CaselessRifle/caseless_rifle_mag.rsi, state: base }
-  productEntity: MagazineCaselessRifle
+  productEntity: BoxSyndicateMagazineCaselessRifle
   cost:
     Telecrystal: 2 # Much more damage than C20 or M90 (780, 98 dmg per TC), but hollow-point
   categories:
@@ -1683,7 +1683,7 @@
   name: uplink-m7s-mag-name
   description: uplink-m7s-mag-desc
   icon: { sprite: _Goobstation/Objects/Weapons/Guns/Ammunition/Magazine/M7S_magazine.rsi, state: icon }
-  productEntity: MagazineLowCaliberM7S
+  productEntity: BoxSyndicateMagazineLowCaliberM7S
   cost:
     Telecrystal: 3 # 105 dmg per TC which seems huge, but you're missing half of your shots
   categories:
@@ -1715,7 +1715,7 @@
   name: uplink-pistol-magazine-caseless-saphe-name
   description: uplink-pistol-magazine-caseless-saphe-desc
   icon: { sprite: /Textures/Objects/Weapons/Guns/Ammunition/Magazine/CaselessRifle/caseless_pistol_mag.rsi, state: yellow-icon }
-  productEntity: MagazinePistolCaselessRifleSAPHE
+  productEntity: BoxSyndicateMagazinePistolCaselessRifleSAPHE
   cost:
     Telecrystal: 3 # 23 damage but ~1/3 of a rifle magazine and semi armor piercing, remember the damage is 13 pierce 10.5 explosive
   categories:

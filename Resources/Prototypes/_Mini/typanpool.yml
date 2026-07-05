@@ -14,16 +14,6 @@
     - Typan
 
 - type: additionalMap
-  id: CorvaxSilly
-  maps:
-    - Typan
-
-- type: additionalMap
-  id: MiniSilly
-  maps:
-    - Typan
-
-- type: additionalMap
   id: MiniCluster
   maps:
     - Typan

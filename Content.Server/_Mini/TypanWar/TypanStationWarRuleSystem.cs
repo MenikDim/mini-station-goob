@@ -1,5 +1,5 @@
 using Content.Server._Mini.Typan.StationGoal;
-using Content.Server._Mini.TypanWar;
+using Robust.Shared.Prototypes;
 using Content.Server._TT.StationHandleJob;
 using Content.Server.AlertLevel;
 using Content.Server.Antag.Components;
@@ -10,8 +10,8 @@ using Content.Server.GameTicking;
 using Content.Server.GameTicking.Rules;
 using Content.Server.Mind;
 using Content.Server.RoundEnd;
-using Content.Server.StationEvents;
 using Content.Server.StationEvents.Components;
+using Content.Server.Shuttles.Components;
 using Content.Server.Shuttles.Events;
 using Content.Shared.Chat;
 using Content.Shared.GameTicking;
@@ -23,6 +23,8 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Roles.Jobs;
 using Content.Server.Station.Systems;
+using Content.Shared.Silicons.Borgs.Components;
+using Content.Shared._EinsteinEngines.Silicon.Components;
 using Content.Shared.Station.Components;
 using Robust.Server.Player;
 using Robust.Shared.Audio;
@@ -59,6 +61,9 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
     [Dependency] private readonly SharedJobSystem _jobs = default!;
     [Dependency] private readonly TTStationHandleJobSystem _typanJobs = default!;
     [Dependency] private readonly TypanWarFriendlyFireSystem _friendlyFire = default!;
+    [Dependency] private readonly TypanWarBalanceSystem _warBalance = default!;
+    [Dependency] private readonly TypanStationGoalObjectiveSystem _typanGoals = default!;
+    [Dependency] private readonly NtStationGoalObjectiveSystem _ntGoals = default!;
     [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
@@ -74,8 +79,48 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         SubscribeLocalEvent<ConsoleFTLAttemptEvent>(OnConsoleFtlAttempt);
         SubscribeLocalEvent<ShuttleFTLAttemptEvent>(OnShuttleFtlAttempt);
         SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawnComplete);
+        SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestart);
 
         _playerManager.PlayerStatusChanged += OnPlayerStatusChanged;
+    }
+
+    /// <summary>
+    /// True while the war isolates the round from antags and station events.
+    /// </summary>
+    public bool IsTypanWarBlocking()
+    {
+        return IsTypanWarRoundIsolated();
+    }
+
+    private bool IsTypanWarRoundIsolated()
+    {
+        var query = EntityQueryEnumerator<TypanStationWarRuleComponent, GameRuleComponent>();
+        while (query.MoveNext(out var uid, out var component, out var gameRule))
+        {
+            if (!GameTicker.IsGameRuleActive(uid, gameRule))
+                continue;
+
+            return component.Phase is TypanWarPhase.Pending or TypanWarPhase.Active;
+        }
+
+        return false;
+    }
+
+    private void OnRoundRestart(RoundRestartCleanupEvent ev)
+    {
+        IsWarActive = false;
+        IsModeActive = false;
+
+        var query = EntityQueryEnumerator<TypanStationWarRuleComponent>();
+        while (query.MoveNext(out _, out var component))
+            StopWarMusic(component);
+
+        BroadcastInactiveStatus();
+    }
+
+    private void BroadcastInactiveStatus()
+    {
+        RaiseNetworkEvent(new TypanWarStatusEvent(TypanWarPhase.Inactive, 0, 0, 0), Filter.Broadcast());
     }
 
     public override void Shutdown()
@@ -86,7 +131,7 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
 
     private void OnPlayerStatusChanged(object? sender, SessionStatusEventArgs args)
     {
-        if (!IsModeActive || args.NewStatus != SessionStatus.InGame)
+        if (args.NewStatus != SessionStatus.InGame)
             return;
 
         SendStatusToSession(args.Session);
@@ -94,9 +139,6 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
 
     private void OnStatusRequest(TypanWarStatusRequestEvent ev, EntitySessionEventArgs args)
     {
-        if (!IsModeActive)
-            return;
-
         SendStatusToSession(args.SenderSession);
     }
 
@@ -108,8 +150,13 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         if (!_mind.TryGetMind(args.Mob, out var mindId, out var mind))
             return;
 
-        if (TryGetWarSide((mindId, mind), out var side))
+        if (TryGetWarSide((mindId, mind), out var side) && !IsSilicon(args.Mob))
             _friendlyFire.SetupCombatant(args.Mob, side);
+    }
+
+    private bool IsSilicon(EntityUid uid)
+    {
+        return HasComp<SiliconComponent>(uid) || HasComp<BorgChassisComponent>(uid);
     }
 
     private void OnConsoleFtlAttempt(ref ConsoleFTLAttemptEvent ev)
@@ -126,12 +173,16 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         if (ev.Cancelled || !ShouldBlockFtl())
             return;
 
+        // Arrivals shuttles must keep cycling during prep so late-join players reach the station.
+        if (HasComp<ArrivalsShuttleComponent>(ev.ShuttleUid))
+            return;
+
         ev.Cancelled = true;
         ev.Reason = Loc.GetString("typan-war-ftl-blocked");
     }
 
     /// <summary>
-    /// FTL is blocked during the prep phase only.
+    /// Bluespace travel is blocked during the prep phase only.
     /// </summary>
     private bool ShouldBlockFtl()
     {
@@ -153,6 +204,7 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
 
         if (!TryResolveStations(component, out var ntStation, out var typanStation))
         {
+            Log.Warning("Typan station war cancelled: could not resolve NT and Typan stations (is Typan map loaded?)");
             ForceEndSelf(uid, gameRule);
             return;
         }
@@ -166,7 +218,6 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         component.WarEndTime = component.WarStartTime + TimeSpan.FromSeconds(component.WarDurationSeconds);
 
         IsModeActive = true;
-        BlockStationEvents(component);
         BroadcastStatus(component);
     }
 
@@ -179,6 +230,7 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         component.Phase = TypanWarPhase.Inactive;
         StopWarMusic(component);
         ClearWarCombatants();
+        _warBalance.NotifyCombatPhaseEnded();
         BroadcastStatus(component);
     }
 
@@ -195,6 +247,18 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
             if (component.Phase == TypanWarPhase.Ended || component.Phase == TypanWarPhase.Inactive)
                 continue;
 
+            if (component.Phase == TypanWarPhase.Pending)
+            {
+                TryPlayPrepCountdown(component);
+                TryCheckInsufficientForces(uid, component, gameRule, frameTime);
+
+                if (component.WarStartTime != null &&
+                    _timing.CurTime >= component.WarStartTime)
+                {
+                    StartWar(uid, component);
+                }
+            }
+
             if (component.Phase == TypanWarPhase.Pending &&
                 !component.AnnouncementSent &&
                 component.AnnouncementTime != null &&
@@ -203,16 +267,11 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
                 SendPrepAnnouncement(component);
             }
 
-            if (component.Phase == TypanWarPhase.Pending &&
-                component.WarStartTime != null &&
-                _timing.CurTime >= component.WarStartTime)
-            {
-                StartWar(uid, component);
-            }
-
             if (component.Phase == TypanWarPhase.Active)
             {
                 TryStartWarMusic(component);
+                TryPlayWarEndWarning(component);
+                TryRunWarEvents(component);
 
                 var ntAliveNow = CountNtAlive();
                 var typanAliveNow = CountTypanAlive();
@@ -261,6 +320,28 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
             ("nt", ntAlive),
             ("typan", typanAlive)));
 
+        var ntLossPct = component.InitialNtAlive > 0
+            ? (int) Math.Round((component.InitialNtAlive - ntAlive) * 100f / component.InitialNtAlive)
+            : 0;
+        var typanLossPct = component.InitialTypanAlive > 0
+            ? (int) Math.Round((component.InitialTypanAlive - typanAlive) * 100f / component.InitialTypanAlive)
+            : 0;
+        args.AddLine(Loc.GetString("typan-war-round-end-losses",
+            ("ntLoss", ntLossPct),
+            ("typanLoss", typanLossPct)));
+
+        if (component.NtStation is { } ntStation
+            && _ntGoals.TryGetActiveGoalTitle(ntStation, out var ntGoal))
+        {
+            args.AddLine(Loc.GetString("typan-war-round-end-nt-goal", ("goal", ntGoal)));
+        }
+
+        if (component.TypanStation is { } typanStation
+            && _typanGoals.TryGetActiveGoalTitle(typanStation, out var typanGoal))
+        {
+            args.AddLine(Loc.GetString("typan-war-round-end-typan-goal", ("goal", typanGoal)));
+        }
+
         var winnerKey = component.Winner switch
         {
             TypanWarWinner.Nanotrasen => "typan-war-round-end-winner-nt",
@@ -302,19 +383,13 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         var ntAlive = CountNtAlive();
         var typanAlive = CountTypanAlive();
 
-        if (ntAlive < 1 || typanAlive < 1)
+        if (!HasSufficientForces(component, ntAlive, typanAlive))
         {
-            component.Phase = TypanWarPhase.Ended;
-            component.Winner = TypanWarWinner.Stalemate;
-            _chat.DispatchGlobalAnnouncement(
-                Loc.GetString("typan-war-start-cancelled"),
-                Loc.GetString("typan-war-sender"),
-                colorOverride: Color.Orange);
-            BroadcastStatus(component);
-            ForceEndSelf(ruleUid);
+            CancelWarInsufficient(ruleUid, component, ntAlive, typanAlive);
             return;
         }
 
+        CacheStationGoalTitles(component);
         component.InitialNtAlive = ntAlive;
         component.InitialTypanAlive = typanAlive;
         component.Phase = TypanWarPhase.Active;
@@ -333,6 +408,125 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         AssignWarObjectives(component);
         SetupWarCombatants();
         BroadcastStatus(component);
+
+        if (component.NtStation is { } ntStation && component.TypanStation is { } typanStation)
+            RaiseLocalEvent(new TypanWarStartedEvent(ruleUid, ntStation, typanStation));
+    }
+
+    private void CancelWarInsufficient(EntityUid ruleUid, TypanStationWarRuleComponent component, int ntAlive, int typanAlive)
+    {
+        component.Phase = TypanWarPhase.Ended;
+        component.Winner = TypanWarWinner.Stalemate;
+
+        var locKey = ntAlive < component.MinNtAlive
+            ? "typan-war-start-cancelled-nt"
+            : typanAlive < component.MinTypanAlive
+                ? "typan-war-start-cancelled-typan"
+                : "typan-war-start-cancelled";
+
+        _chat.DispatchGlobalAnnouncement(
+            Loc.GetString(locKey,
+                ("nt", ntAlive),
+                ("ntMin", component.MinNtAlive),
+                ("typan", typanAlive),
+                ("typanMin", component.MinTypanAlive)),
+            Loc.GetString("typan-war-sender"),
+            colorOverride: Color.Orange);
+        BroadcastStatus(component);
+        _warBalance.NotifyCombatPhaseEnded();
+        ForceEndSelf(ruleUid);
+    }
+
+    private static bool HasSufficientForces(TypanStationWarRuleComponent component, int ntAlive, int typanAlive)
+    {
+        return ntAlive >= component.MinNtAlive && typanAlive >= component.MinTypanAlive;
+    }
+
+    private void CacheStationGoalTitles(TypanStationWarRuleComponent component)
+    {
+        component.NtStationGoalTitle = null;
+        component.TypanStationGoalTitle = null;
+
+        if (component.NtStation is { } nt && _ntGoals.TryGetActiveGoalTitle(nt, out var ntGoal))
+            component.NtStationGoalTitle = ntGoal;
+
+        if (component.TypanStation is { } typan && _typanGoals.TryGetActiveGoalTitle(typan, out var typanGoal))
+            component.TypanStationGoalTitle = typanGoal;
+    }
+
+    private void TryCheckInsufficientForces(EntityUid ruleUid, TypanStationWarRuleComponent component, GameRuleComponent gameRule, float frameTime)
+    {
+        component.PrepInsufficientCheckAccumulator += frameTime;
+        if (component.PrepInsufficientCheckAccumulator < component.PrepInsufficientCheckIntervalSeconds)
+            return;
+
+        component.PrepInsufficientCheckAccumulator = 0f;
+
+        var ntAlive = CountNtAlive();
+        var typanAlive = CountTypanAlive();
+        if (HasSufficientForces(component, ntAlive, typanAlive))
+            return;
+
+        CancelWarInsufficient(ruleUid, component, ntAlive, typanAlive);
+    }
+
+    private void TryPlayPrepCountdown(TypanStationWarRuleComponent component)
+    {
+        if (component.PrepCountdownPlayed || component.WarStartTime == null)
+            return;
+
+        var remaining = (component.WarStartTime.Value - _timing.CurTime).TotalSeconds;
+        if (remaining > component.PrepCountdownSoundSeconds || remaining <= 0)
+            return;
+
+        component.PrepCountdownPlayed = true;
+        _audio.PlayGlobal(WarDeclarationSound, Filter.Broadcast(), false, AudioParams.Default.WithVolume(-4f));
+    }
+
+    private void TryPlayWarEndWarning(TypanStationWarRuleComponent component)
+    {
+        if (component.WarEndWarningPlayed || component.WarEndTime == null)
+            return;
+
+        var remaining = (component.WarEndTime.Value - _timing.CurTime).TotalSeconds;
+        if (remaining > component.WarEndWarningSeconds || remaining <= 0)
+            return;
+
+        component.WarEndWarningPlayed = true;
+        _chat.DispatchGlobalAnnouncement(
+            Loc.GetString("typan-war-end-warning"),
+            Loc.GetString("typan-war-sender"),
+            colorOverride: Color.OrangeRed);
+    }
+
+    private void TryRunWarEvents(TypanStationWarRuleComponent component)
+    {
+        if (component.WarStartTime == null)
+            return;
+
+        var elapsed = (_timing.CurTime - component.WarStartTime.Value).TotalSeconds;
+
+        if (!component.WarSupplyEventSent && elapsed >= component.WarSupplyEventDelaySeconds)
+        {
+            component.WarSupplyEventSent = true;
+            _chat.DispatchGlobalAnnouncement(
+                Loc.GetString("typan-war-event-supply"),
+                Loc.GetString("typan-war-sender"),
+                colorOverride: Color.Gold);
+        }
+
+        if (!component.WarIntelEventSent && elapsed >= component.WarIntelEventDelaySeconds)
+        {
+            component.WarIntelEventSent = true;
+            var ntAlive = CountNtAlive();
+            var typanAlive = CountTypanAlive();
+            _chat.DispatchGlobalAnnouncement(
+                Loc.GetString("typan-war-event-intel",
+                    ("nt", ntAlive),
+                    ("typan", typanAlive)),
+                Loc.GetString("typan-war-sender"),
+                colorOverride: Color.Cyan);
+        }
     }
 
     private void EndWar(EntityUid ruleUid, TypanStationWarRuleComponent component, bool elimination = false)
@@ -342,7 +536,9 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
 
         component.Phase = TypanWarPhase.Ended;
         IsWarActive = false;
+        IsModeActive = false;
         StopWarMusic(component);
+        ClearWarCombatants();
 
         var ntAlive = CountNtAlive();
         var typanAlive = CountTypanAlive();
@@ -363,6 +559,7 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         SendMarkupGlobalAnnouncement(Loc.GetString(winnerKey));
 
         BroadcastStatus(component);
+        _warBalance.NotifyCombatPhaseEnded();
         _roundEnd.EndRound(TimeSpan.FromSeconds(component.RoundEndDelaySeconds));
     }
 
@@ -383,11 +580,14 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         if (component.Phase != TypanWarPhase.Active)
             return;
 
-        _audio.PlayGlobal(
+        var result = _audio.PlayGlobal(
             StationWarMusic,
             Filter.Broadcast(),
             false,
             AudioParams.Default.WithVolume(-4f));
+
+        if (result != null)
+            component.WarMusicAudio = result.Value.Entity;
 
         component.WarMusicLoopCancel?.Cancel();
         component.WarMusicLoopCancel = new CancellationTokenSource();
@@ -407,6 +607,12 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         component.WarMusicLoopCancel?.Cancel();
         component.WarMusicLoopCancel = null;
         component.WarMusicStarted = false;
+
+        if (component.WarMusicAudio is { } audio)
+        {
+            _audio.Stop(audio);
+            component.WarMusicAudio = null;
+        }
     }
 
     private static TypanWarWinner DetermineWinner(TypanStationWarRuleComponent component, int ntAlive, int typanAlive)
@@ -422,6 +628,11 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
 
         if (Math.Abs(ntLoss - typanLoss) < 0.001f)
         {
+            if (component.TypanStationGoalTitle != null && component.NtStationGoalTitle == null)
+                return TypanWarWinner.Typan;
+            if (component.NtStationGoalTitle != null && component.TypanStationGoalTitle == null)
+                return TypanWarWinner.Nanotrasen;
+
             if (ntAlive > typanAlive)
                 return TypanWarWinner.Nanotrasen;
             if (typanAlive > ntAlive)
@@ -469,7 +680,7 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
             if (!IsMindAlive(mind) || mind.CurrentEntity is not { } mob)
                 continue;
 
-            if (!TryGetWarSide((mindId, mind), out var side))
+            if (!TryGetWarSide((mindId, mind), out var side) || IsSilicon(mob))
                 continue;
 
             _friendlyFire.SetupCombatant(mob, side);
@@ -501,6 +712,11 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
 
         return false;
     }
+
+    /// <summary>
+    /// Living faction headcounts used by war logic and late-join balance (includes silicons).
+    /// </summary>
+    public (int Nt, int Typan) CountFactionAlive() => (CountNtAlive(), CountTypanAlive());
 
     private int CountTypanAlive()
     {
@@ -567,7 +783,7 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
 
         remaining = Math.Max(0f, remaining);
 
-        RaiseNetworkEvent(new TypanWarStatusEvent(phase, ntAlive, typanAlive, remaining), Filter.Broadcast());
+        RaiseNetworkEvent(new TypanWarStatusEvent(phase, ntAlive, typanAlive, remaining, component.Winner), Filter.Broadcast());
     }
 
     public void SendStatusToSession(ICommonSession session)
@@ -594,39 +810,41 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
             remaining = Math.Max(0f, remaining);
 
             RaiseNetworkEvent(
-                new TypanWarStatusEvent(phase, ntAlive, typanAlive, remaining),
+                new TypanWarStatusEvent(phase, ntAlive, typanAlive, remaining, component.Winner),
                 session);
             return;
         }
+
+        RaiseNetworkEvent(
+            new TypanWarStatusEvent(TypanWarPhase.Inactive, 0, 0, 0),
+            session);
     }
 
-    private void BlockStationEvents(TypanStationWarRuleComponent component)
+    private bool TryResolveStations(TypanStationWarRuleComponent component, out EntityUid ntStation, out EntityUid typanStation)
     {
-        if (component.EventsBlocked)
-            return;
+        ntStation = EntityUid.Invalid;
+        typanStation = EntityUid.Invalid;
 
-        component.EventsBlocked = true;
-
-        var query = EntityQueryEnumerator<GameRuleComponent>();
-        while (query.MoveNext(out var uid, out var rule))
+        var stations = EntityQueryEnumerator<StationDataComponent>();
+        while (stations.MoveNext(out var uid, out _))
         {
-            if (!GameTicker.IsGameRuleActive(uid, rule))
-                continue;
-
-            if (HasComp<TypanStationWarRuleComponent>(uid))
-                continue;
-
-            if (HasComp<BasicStationEventSchedulerComponent>(uid) ||
-                HasComp<RampingStationEventSchedulerComponent>(uid))
+            if (HasComp<TTStationHandleJobComponent>(uid))
             {
-                GameTicker.EndGameRule(uid, rule);
+                if (!typanStation.IsValid())
+                    typanStation = uid;
+                continue;
             }
+
+            if (!ntStation.IsValid())
+                ntStation = uid;
         }
+
+        return ntStation.IsValid() && typanStation.IsValid();
     }
 
     private void OnGameRuleAdded(ref GameRuleAddedEvent args)
     {
-        if (!IsModeActive)
+        if (!IsTypanWarBlocking())
             return;
 
         if (HasComp<TypanStationWarRuleComponent>(args.RuleEntity))
@@ -640,22 +858,5 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         {
             GameTicker.EndGameRule(args.RuleEntity, rule);
         }
-    }
-
-    private bool TryResolveStations(TypanStationWarRuleComponent component, out EntityUid ntStation, out EntityUid typanStation)
-    {
-        ntStation = EntityUid.Invalid;
-        typanStation = EntityUid.Invalid;
-
-        var stations = EntityQueryEnumerator<StationDataComponent>();
-        while (stations.MoveNext(out var uid, out _))
-        {
-            if (HasComp<TTStationHandleJobComponent>(uid))
-                typanStation = uid;
-            else
-                ntStation = uid;
-        }
-
-        return ntStation.IsValid() && typanStation.IsValid();
     }
 }

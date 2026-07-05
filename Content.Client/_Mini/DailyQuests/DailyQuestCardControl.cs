@@ -384,16 +384,24 @@ public sealed class DailyQuestCardControl : BoxContainer
         if (_compact)
             return;
 
+        var nextQuestText = TryFormatNextQuestTimer(quest);
+
         if (quest.IsClaimed)
         {
-            _statusLabel.Text = Loc.GetString("daily-quest-status-claimed", ("amount", quest.RewardCoins));
+            var claimedText = Loc.GetString("daily-quest-status-claimed", ("amount", quest.RewardCoins));
+            _statusLabel.Text = nextQuestText == null
+                ? claimedText
+                : Loc.GetString("daily-quest-status-claimed-timer", ("status", claimedText), ("time", nextQuestText));
             _statusLabel.Modulate = ClaimReadyColor;
             return;
         }
 
         if (quest.IsCompleted)
         {
-            _statusLabel.Text = Loc.GetString("daily-quest-status-complete");
+            var completeText = Loc.GetString("daily-quest-status-complete");
+            _statusLabel.Text = nextQuestText == null
+                ? completeText
+                : Loc.GetString("daily-quest-status-complete-timer", ("status", completeText), ("time", nextQuestText));
             _statusLabel.Modulate = ClaimReadyColor;
             return;
         }
@@ -402,8 +410,38 @@ public sealed class DailyQuestCardControl : BoxContainer
         _statusLabel.Modulate = Color.FromHex("#e8eef8");
     }
 
+    private static string? TryFormatNextQuestTimer(DailyQuestEntry quest)
+    {
+        if (quest.NextQuestResetUtc is not { } resetUtc)
+            return null;
+
+        var remaining = resetUtc - DateTime.UtcNow;
+        if (remaining <= TimeSpan.Zero)
+            return null;
+
+        return FormatDuration((float)remaining.TotalSeconds);
+    }
+
     private void UpdateProgressDisplay(DailyQuestEntry quest, float smoothTimeExtra = 0f)
     {
+        if (_compact && (quest.IsClaimed || quest.IsCompleted))
+        {
+            var nextQuestText = TryFormatNextQuestTimer(quest);
+            _progressBar.Value = 1f;
+            if (nextQuestText == null)
+            {
+                _progressLabel.Text = quest.IsClaimed
+                    ? Loc.GetString("daily-quest-status-claimed", ("amount", quest.RewardCoins))
+                    : Loc.GetString("daily-quest-status-complete");
+            }
+            else
+            {
+                _progressLabel.Text = Loc.GetString("daily-quest-status-next-quest", ("time", nextQuestText));
+            }
+
+            return;
+        }
+
         var current = GetDisplayProgress(quest, smoothTimeExtra);
         var progressRatio = quest.TargetProgress <= 0
             ? 1f

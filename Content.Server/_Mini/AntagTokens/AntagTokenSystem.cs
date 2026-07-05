@@ -71,6 +71,7 @@ public sealed class AntagTokenSystem : EntitySystem
     [Dependency] private readonly TransformSystem _transform = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly IServerPreferencesManager _preferences = default!;
+    [Dependency] private readonly TypanStationWarRuleSystem _typanWar = default!;
 
     private readonly Dictionary<NetUserId, PlayerTokenState> _states = new();
     private readonly Dictionary<NetUserId, int?> _sponsorLevelOverrides = new();
@@ -2030,7 +2031,7 @@ private void NormalizeMonthlyState(PlayerTokenState state, DateTime nowUtc, NetU
 
     private bool IsRoundstartRoleBlockedByPreset()
     {
-        if (TypanStationWarRuleSystem.IsModeActive)
+        if (_typanWar.IsTypanWarBlocking())
             return true;
 
         var preset = _gameTicker.RunLevel == GameRunLevel.PreRoundLobby

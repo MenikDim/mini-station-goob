@@ -15,6 +15,7 @@ public sealed class DailyQuestUiSystem : EntitySystem
     private readonly List<DailyQuestEntry> _quests = new();
     private float _interpSeconds;
     private bool _hasActiveTimeQuest;
+    private bool _hasClaimedQuestTimer;
 
     public event Action<IReadOnlyList<DailyQuestEntry>, float>? QuestsUpdated;
 
@@ -32,7 +33,7 @@ public sealed class DailyQuestUiSystem : EntitySystem
     {
         base.Update(frameTime);
 
-        if (!_hasActiveTimeQuest || _quests.Count == 0)
+        if ((!_hasActiveTimeQuest && !_hasClaimedQuestTimer) || _quests.Count == 0)
             return;
 
         _interpSeconds += frameTime;
@@ -52,12 +53,17 @@ public sealed class DailyQuestUiSystem : EntitySystem
 
         _interpSeconds = 0;
         _hasActiveTimeQuest = false;
+        _hasClaimedQuestTimer = false;
         foreach (var quest in _quests)
         {
             if (quest.IsTimeBased && !quest.IsCompleted && !quest.IsClaimed)
-            {
                 _hasActiveTimeQuest = true;
-                break;
+
+            if ((quest.IsCompleted || quest.IsClaimed)
+                && quest.NextQuestResetUtc is { } resetUtc
+                && resetUtc > DateTime.UtcNow)
+            {
+                _hasClaimedQuestTimer = true;
             }
         }
 

@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2026 Casha
 // Мини-станция/Freaky-station, Licensed under custom terms with restrictions on public hosting and commercial use, full text: https://raw.githubusercontent.com/ministation/mini-station-goob/master/LICENSE.TXT
+using System;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared._Mini.DailyQuests;
@@ -22,6 +23,8 @@ public sealed class DailyQuestEntry
     public bool IsTimeBased { get; set; }
     public bool CanReplace { get; set; }
     public DailyQuestRarity Rarity { get; set; }
+    /// <summary>UTC time when the next daily quest assignment becomes available.</summary>
+    public DateTime? NextQuestResetUtc { get; set; }
 
     public DailyQuestEntry()
     {
@@ -42,7 +45,8 @@ public sealed class DailyQuestEntry
         string? iconState,
         bool isTimeBased,
         bool canReplace,
-        DailyQuestRarity rarity = DailyQuestRarity.Rare)
+        DailyQuestRarity rarity = DailyQuestRarity.Rare,
+        DateTime? nextQuestResetUtc = null)
     {
         QuestId = questId;
         Title = title;
@@ -59,6 +63,7 @@ public sealed class DailyQuestEntry
         IsTimeBased = isTimeBased;
         CanReplace = canReplace;
         Rarity = rarity;
+        NextQuestResetUtc = nextQuestResetUtc;
     }
 }
 

@@ -13,23 +13,42 @@ typan-war-hud-typan = Syndicate
 typan-war-hud-pending = Preparation
 typan-war-hud-active = War
 typan-war-hud-ended = End
+typan-war-hud-winner-nt = NT Victory
+typan-war-hud-winner-typan = Syndicate Victory
 
-typan-war-prep-announce = A war has been declared between the NanoTrasen and Typan stations. Bluespace jumps are blocked. Follow combat readiness protocols — hostilities begin in five minutes.
+typan-war-end-warning = One minute remains until the station war ends.
+typan-war-event-supply = [color=#F0D890]Station War:[/color] supply caches unlocked on both stations — check war armories.
+typan-war-event-intel = [color=#A8C8FF]NT intel:[/color] {$nt} combat-ready. [color=#FFB0B0]Syndicate:[/color] {$typan} combat-ready.
+
+typan-war-prep-announce = A war has been declared between the NanoTrasen and Typan stations. Console bluespace jumps are blocked until hostilities begin. Follow combat readiness protocols — hostilities begin in five minutes.
 
 typan-war-manifest =
-    {"[bold]Station War Manifest[/bold]"}
-    {"Factions: [color=#A8C8FF][bold]NanoTrasen[/bold][/color] vs [color=#FFB0B0][bold]Syndicate[/bold][/color]."}
-    {"[color=#A8C8FF]NT[/color] objective: eliminate all combat-capable [color=#FFB0B0]Syndicate[/color] forces."}
-    {"[color=#FFB0B0]Syndicate[/color] objective: eliminate all combat-capable [color=#A8C8FF]NT[/color] forces."}
-    {"Targeting systems are configured not to harm allies."}
+    {"[font size=16][color=#F0D890][bold]Station War Manifest[/bold][/color][/font]"}
+    {"[color=#C8C4D8][color=#A8C8FF][bold]NanoTrasen[/bold][/color] is engaged in open hostilities against [color=#FFB0B0][bold]Syndicate[/bold][/color] forces at [color=#FFB0B0][bold]Typan Station[/bold][/color].[/color]"}
+    {"[color=#A8C8FF]▸[/color] [color=#A8C8FF][bold]NanoTrasen[/bold][/color]: eliminate all combat-capable [color=#FFB0B0]Syndicate[/color] forces."}
+    {"[color=#FFB0B0]▸[/color] [color=#FFB0B0][bold]Syndicate[/bold][/color]: eliminate all combat-capable [color=#A8C8FF]NanoTrasen[/color] forces."}
+    {"[color=#85C97A]▸[/color] Targeting systems are configured [bold]not to harm allies[/bold] with [bold]ranged[/bold] weapons. Use [color=#F0D890]Ally Protection[/color] when needed."}
 
-typan-war-ff-action-name = Friendly fire
+typan-war-ff-action-name = Ally protection
 typan-war-ff-action-desc = Do not harm allies with ranged weapons.
-typan-war-ff-enabled = Friendly fire disabled — you will not hit allies.
-typan-war-ff-disabled = Friendly fire enabled.
+typan-war-ff-enabled = Ally protection enabled — you will not hit allies.
+typan-war-ff-disabled = Ally protection disabled.
 
-typan-war-ftl-blocked = Bluespace jumps are impossible for the duration of the station war.
-typan-war-start-cancelled = Station war cancelled — one side has no combat-ready personnel.
+typan-war-ftl-blocked = Bluespace jumps are blocked until hostilities begin.
+
+typan-war-drop-shuttle-docked-nt = A NanoTrasen reinforcement shuttle has docked {$direction} of the station at {$location}.
+typan-war-drop-shuttle-docked-typan = A Syndicate reinforcement shuttle has docked {$direction} of the station at {$location}.
+
+typan-war-balance-lobby-wait = Station war: NT is overpopulated. You remain in the lobby — late join on the Typan station instead.
+typan-war-balance-lobby-wait-typan = Station war: Typan is overpopulated. You remain in the lobby — late join on the NT station instead.
+typan-war-balance-latejoin-nt-full = NT station has too many players. Only Typan station entry is available right now.
+typan-war-balance-latejoin-typan-full = Typan station has too many players. Only NT station entry is available right now.
+typan-war-balance-latejoin-both-full = Both factions are full — wait until the balance recovers.
+typan-war-balance-job-denied = This faction is full. Choose the side with fewer players.
+
+typan-war-start-cancelled = Station war cancelled — insufficient combat-ready personnel on one side.
+typan-war-start-cancelled-nt = Station war cancelled — NT has only {$nt} combat-ready personnel ({$ntMin} required).
+typan-war-start-cancelled-typan = Station war cancelled — Typan has only {$typan} combat-ready personnel ({$typanMin} required).
 
 typan-war-end-announce-nt = The station war has ended. [color=#A8C8FF]NanoTrasen[/color] wins with fewer relative losses.
 typan-war-end-announce-typan = The station war has ended. [color=#FFB0B0]Syndicate[/color] wins with fewer relative losses.
@@ -37,9 +56,12 @@ typan-war-end-announce-nt-elimination = The station war has ended. [color=#A8C8F
 typan-war-end-announce-typan-elimination = The station war has ended. [color=#FFB0B0]Syndicate[/color] wins — all [color=#A8C8FF]NanoTrasen[/color] forces eliminated.
 typan-war-end-announce-stalemate = The station war has ended in a stalemate.
 
-typan-war-round-end-header = === Station War ===
+typan-war-round-end-header = [color=#F0D890][bold]Station War[/bold][/color]
 typan-war-round-end-initial = Initial roster: NT {$nt}, Typan {$typan}
 typan-war-round-end-final = Survivors: NT {$nt}, Typan {$typan}
+typan-war-round-end-losses = Losses: NT {$ntLoss}%, Typan {$typanLoss}%
+typan-war-round-end-nt-goal = NT station goal: {$goal}
+typan-war-round-end-typan-goal = Typan station goal: {$goal}
 typan-war-round-end-winner-nt = Winner: NanoTrasen
 typan-war-round-end-winner-typan = Winner: Typan
 typan-war-round-end-stalemate = Result: stalemate

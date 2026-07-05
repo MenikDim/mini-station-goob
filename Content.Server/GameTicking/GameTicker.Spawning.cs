@@ -126,7 +126,6 @@ namespace Content.Server.GameTicking
         [Dependency] private readonly AdminSystem _admin = default!;
         [Dependency] private readonly SkillsSystem _skills = default!; // CorvaxGoob-Skills
         [Dependency] private readonly TTStationHandleJobSystem _ttStationHandleJob = default!;
-
         public static readonly EntProtoId ObserverPrototypeName = "MobObserver";
         public static readonly EntProtoId AdminObserverPrototypeName = "AdminObserver";
 
@@ -181,11 +180,14 @@ namespace Content.Server.GameTicking
             }
 
             var spawnableStations = GetSpawnableStations();
+            _ttStationHandleJob.EnsureHandledStationsIncluded(spawnableStations);
             var assignedJobs = _stationJobs.AssignJobs(profiles, spawnableStations);
 
             _ttStationHandleJob.FixJobStationAssignments(ref assignedJobs);
 
             _stationJobs.AssignOverflowJobs(ref assignedJobs, playerNetIds, profiles, spawnableStations);
+
+            _ttStationHandleJob.FixJobStationAssignments(ref assignedJobs);
 
             // Calculate extended access for stations.
             var stationJobCounts = spawnableStations.ToDictionary(e => e, _ => 0);
@@ -201,6 +203,9 @@ namespace Content.Server.GameTicking
                 }
                 else
                 {
+                    if (!stationJobCounts.ContainsKey(station))
+                        stationJobCounts[station] = 0;
+
                     stationJobCounts[station] += 1;
                 }
             }
@@ -216,7 +221,13 @@ namespace Content.Server.GameTicking
 
                 var session = _playerManager.GetSessionById(player);
                 if (SpawnPlayer(session, profiles[player], station, job, false))
+                {
                     spawnedPlayers.Add(session);
+                }
+                else
+                {
+                    HandleFailedSpawn(session);
+                }
             }
 
             RefreshLateJoinAllowed();
@@ -240,7 +251,7 @@ namespace Content.Server.GameTicking
             if (jobBans == null || jobId != null && jobBans.Contains(jobId))
                 return false;
 
-            if (jobId != null)
+            if (jobId != null && lateJoin)
             {
                 var jobs = new List<ProtoId<JobPrototype>> {jobId};
                 var ev = new IsRoleAllowedEvent(player, jobs, null);

@@ -1,10 +1,11 @@
 using Content.Shared._Mini.TypanWar;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
+using Robust.Shared.Utility;
 using System.Threading;
 
 namespace Content.Server._Mini.TypanWar;
 
-[RegisterComponent, Access(typeof(TypanStationWarRuleSystem))]
+[RegisterComponent, Access(typeof(TypanStationWarRuleSystem), typeof(TypanWarBalanceSystem))]
 public sealed partial class TypanStationWarRuleComponent : Component
 {
     [DataField]
@@ -27,10 +28,43 @@ public sealed partial class TypanStationWarRuleComponent : Component
     public float RoundEndDelaySeconds = 120f;
 
     [DataField]
-    public int MinNtAlive = 8;
+    public int MinNtAlive = 0;
 
     [DataField]
-    public int MinTypanAlive = 3;
+    public int MinTypanAlive = 0;
+
+    /// <summary>Max allowed faction headcount ratio (e.g. 2 means at most 2× players on one side).</summary>
+    [DataField]
+    public int MaxFactionRatio = 2;
+
+    [DataField]
+    public float PrepInsufficientCheckIntervalSeconds = 30f;
+
+    [DataField]
+    public float WarIntelEventDelaySeconds = 900f;
+
+    [DataField]
+    public float WarSupplyEventDelaySeconds = 600f;
+
+    /// <summary>Shuttle map spawned and docked to Typan when combat begins.</summary>
+    [DataField]
+    public ResPath DropShuttlePath = new("/Maps/_Mini/Shuttles/typan_drop_shuttle.yml");
+
+    /// <summary>Shuttle map spawned and docked to NanoTrasen when combat begins.</summary>
+    [DataField]
+    public ResPath NtDropShuttlePath = new("/Maps/_Mini/Shuttles/nt_drop_shuttle.yml");
+
+    [DataField]
+    public float WarEndWarningSeconds = 60f;
+
+    [DataField]
+    public float PrepCountdownSoundSeconds = 10f;
+
+    [DataField]
+    public string? NtStationGoalTitle;
+
+    [DataField]
+    public string? TypanStationGoalTitle;
 
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))]
     public TimeSpan? AnnouncementTime;
@@ -63,10 +97,24 @@ public sealed partial class TypanStationWarRuleComponent : Component
     public TypanWarWinner Winner = TypanWarWinner.None;
 
     [DataField]
-    public bool EventsBlocked;
+    public bool WarMusicStarted;
 
     [DataField]
-    public bool WarMusicStarted;
+    public bool PrepCountdownPlayed;
+
+    [DataField]
+    public bool WarEndWarningPlayed;
+
+    [DataField]
+    public bool WarIntelEventSent;
+
+    [DataField]
+    public bool WarSupplyEventSent;
+
+    [DataField]
+    public float PrepInsufficientCheckAccumulator;
+
+    public EntityUid? WarMusicAudio;
 
     public CancellationTokenSource? WarMusicLoopCancel;
 }

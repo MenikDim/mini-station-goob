@@ -14,6 +14,7 @@
         <cc:VSeparator StyleClasses="LowDivider"/>
         <ScrollContainer  SizeFlagsStretchRatio="1" HorizontalExpand="True">
             <BoxContainer Name="JobList" Orientation="Vertical" Margin="4 4" HorizontalExpand="True" SizeFlagsStretchRatio="1">
+                <Label Name="BalanceNotice" Visible="False" HorizontalExpand="True" Margin="4 0 4 8"/>
                 <Button Name="CrewManifestButton" Text="Манифест экипажа" HorizontalAlignment="Center" Visible="False"/>
             </BoxContainer>
         </ScrollContainer>

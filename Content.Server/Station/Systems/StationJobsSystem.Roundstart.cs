@@ -21,6 +21,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Server._TT.StationHandleJob;
 using Content.Server.Administration.Managers;
 using Content.Server.Antag;
 using Content.Server.Antag.Components;
@@ -44,6 +45,7 @@ public sealed partial class StationJobsSystem
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IBanManager _banManager = default!;
     [Dependency] private readonly AntagSelectionSystem _antag = default!;
+    [Dependency] private readonly TTStationHandleJobSystem _ttStationHandleJob = default!;
 
     private Dictionary<int, HashSet<string>> _jobsByWeight = default!;
     private List<int> _orderedWeights = default!;
@@ -421,7 +423,9 @@ public sealed partial class StationJobsSystem
                         continue;
                 }
 
-                if (!job.CanBeAntag && (!_player.TryGetSessionById(player, out session) || antagBlocked.Contains(session)))
+                if (!job.CanBeAntag
+                    && (!_player.TryGetSessionById(player, out session) || antagBlocked.Contains(session))
+                    && !_ttStationHandleJob.IsHandledJob(jobId))
                     continue;
 
                 if (weight is not null && job.Weight != weight.Value)

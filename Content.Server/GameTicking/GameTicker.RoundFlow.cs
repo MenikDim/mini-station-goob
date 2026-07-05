@@ -184,8 +184,6 @@ namespace Content.Server.GameTicking
             if (_mapManager.MapExists(DefaultMap))
                 return;
 
-            AddGamePresetRules();
-
             var maps = new List<GameMapPrototype>();
 
             // the map might have been force-set by something
@@ -466,8 +464,10 @@ namespace Content.Server.GameTicking
             var autoDeAdmin = _cfg.GetCVar(CCVars.AdminDeadminOnJoin);
             foreach (var (userId, status) in _playerGameStatuses)
             {
-                if (LobbyEnabled && status != PlayerGameStatus.ReadyToPlay) continue;
-                if (!_playerManager.TryGetSessionById(userId, out var session)) continue;
+                if (LobbyEnabled && status != PlayerGameStatus.ReadyToPlay)
+                    continue;
+                if (!_playerManager.TryGetSessionById(userId, out var session))
+                    continue;
 
                 if (autoDeAdmin && _adminManager.IsAdmin(session))
                 {
@@ -499,6 +499,9 @@ namespace Content.Server.GameTicking
             // applies to players who didn't ready up
             UpdateInfoText();
 
+            // Preset may change after map preload (e.g. forcepreset) — always refresh rules.
+            ClearGameRules();
+            AddGamePresetRules();
             StartGamePresetRules();
 
             RoundLengthMetric.Set(0);

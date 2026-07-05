@@ -32,6 +32,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     HorizontalAlignment="Center">
     <LayoutContainer Name="ViewportContainer" HorizontalExpand="True" VerticalExpand="True">
         <controls:MainViewport Name="MainViewport"/>
+        <typan:TypanWarHudControl Name="TypanWarHud" Access="Protected" MinWidth="580" MaxWidth="580" />
     </LayoutContainer>
     <BoxContainer Name="TopLeft" Access="Protected" Orientation="Vertical">
         <BoxContainer Orientation="Horizontal">
@@ -48,5 +49,4 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <targeting:TargetingControl Name="Targeting" Access="Protected"/> <!-- Shitmed Change -->
     <chat:ResizableChatBox Name="Chat" Access="Protected" />
     <alerts:AlertsUI Name="Alerts" Access="Protected" />
-    <typan:TypanWarHudControl Name="TypanWarHud" Access="Protected" MinWidth="580" MaxWidth="580" />
 </screens:DefaultGameScreen>

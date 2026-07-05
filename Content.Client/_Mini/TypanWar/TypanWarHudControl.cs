@@ -10,6 +10,7 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.IoC;
 using Robust.Shared.Maths;
+using Robust.Shared.Timing;
 
 namespace Content.Client._Mini.TypanWar;
 
@@ -17,6 +18,7 @@ public sealed class TypanWarHudControl : PanelContainer
 {
     public const float PreferredWidth = 580f;
     private const float BarWidth = 240f;
+    private const int LowCountPulseThreshold = 5;
 
     private static readonly Color PanelBackground = Color.FromHex("#14141C").WithAlpha(0.72f);
 
@@ -28,6 +30,8 @@ public sealed class TypanWarHudControl : PanelContainer
 
     public TypanWarHudControl()
     {
+        IoCManager.InjectDependencies(this);
+
         MinHeight = 42;
         MaxHeight = 42;
         HorizontalAlignment = HAlignment.Center;
@@ -96,7 +100,12 @@ public sealed class TypanWarHudControl : PanelContainer
         Visible = false;
     }
 
-    public void Update(TypanWarPhase phase, int ntAlive, int typanAlive, float timeRemainingSeconds)
+    public void Update(
+        TypanWarPhase phase,
+        TypanWarWinner winner,
+        int ntAlive,
+        int typanAlive,
+        float timeRemainingSeconds)
     {
         Visible = phase is TypanWarPhase.Pending or TypanWarPhase.Active or TypanWarPhase.Ended;
         if (!Visible)
@@ -105,9 +114,23 @@ public sealed class TypanWarHudControl : PanelContainer
         _titleLabel.Text = phase switch
         {
             TypanWarPhase.Pending => Loc.GetString("typan-war-hud-pending"),
-            TypanWarPhase.Ended => Loc.GetString("typan-war-hud-ended"),
+            TypanWarPhase.Ended => winner switch
+            {
+                TypanWarWinner.Nanotrasen => Loc.GetString("typan-war-hud-winner-nt"),
+                TypanWarWinner.Typan => Loc.GetString("typan-war-hud-winner-typan"),
+                _ => Loc.GetString("typan-war-hud-ended"),
+            },
             _ => Loc.GetString("typan-war-hud-active"),
         };
+
+        _titleLabel.FontColorOverride = phase == TypanWarPhase.Ended
+            ? winner switch
+            {
+                TypanWarWinner.Nanotrasen => Color.FromHex("#A8C8FF"),
+                TypanWarWinner.Typan => Color.FromHex("#FFB0B0"),
+                _ => Color.FromHex("#E8E6F0"),
+            }
+            : Color.FromHex("#E8E6F0");
 
         var ntLabel = Loc.GetString("typan-war-hud-nt");
         var syndicateLabel = Loc.GetString("typan-war-hud-typan");
@@ -127,6 +150,11 @@ public sealed class TypanWarHudControl : PanelContainer
 
         var span = TimeSpan.FromSeconds(Math.Max(0, timeRemainingSeconds));
         _timerLabel.Text = $"{(int) span.TotalMinutes:00}:{(int) (span.TotalSeconds % 60):00}";
+        _timerLabel.Visible = phase != TypanWarPhase.Ended;
+
+        _bar.SetLowCountPulse(
+            phase == TypanWarPhase.Active
+            && (ntAlive < LowCountPulseThreshold || typanAlive < LowCountPulseThreshold));
     }
 }
 
@@ -142,11 +170,13 @@ public sealed class TypanWarScrollBarControl : Control
     private static readonly Color EmptyModulate = Color.FromHex("#252530").WithAlpha(0.55f);
 
     [Dependency] private readonly IResourceCache _cache = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     private readonly StyleBoxTexture _trackStyle;
     private readonly float _width;
     private int _ntCount = 1;
     private int _typanCount = 1;
+    private bool _lowCountPulse;
 
     public TypanWarScrollBarControl(float width)
     {
@@ -168,6 +198,11 @@ public sealed class TypanWarScrollBarControl : Control
         _typanCount = Math.Max(0, typan);
     }
 
+    public void SetLowCountPulse(bool enabled)
+    {
+        _lowCountPulse = enabled;
+    }
+
     protected override void Draw(DrawingHandleScreen handle)
     {
         base.Draw(handle);
@@ -175,6 +210,8 @@ public sealed class TypanWarScrollBarControl : Control
         var box = PixelSizeBox;
         if (box.Width <= 0 || box.Height <= 0)
             return;
+
+        var pulse = _lowCountPulse ? 0.75f + 0.25f * (float) Math.Sin(_timing.RealTime.TotalSeconds * 6) : 1f;
 
         var empty = new StyleBoxTexture(_trackStyle) { Modulate = EmptyModulate };
         empty.Draw(handle, box, UIScale);
@@ -186,13 +223,13 @@ public sealed class TypanWarScrollBarControl : Control
         var ntWidth = box.Width * (_ntCount / (float) total);
         if (ntWidth > 0.5f)
         {
-            var fill = new StyleBoxTexture(_trackStyle) { Modulate = NtColor };
+            var fill = new StyleBoxTexture(_trackStyle) { Modulate = NtColor.WithAlpha(NtColor.A * pulse) };
             fill.Draw(handle, UIBox2.FromDimensions(box.Left, box.Top, ntWidth, box.Height), UIScale);
         }
 
         if (box.Width - ntWidth > 0.5f)
         {
-            var fill = new StyleBoxTexture(_trackStyle) { Modulate = TypanColor };
+            var fill = new StyleBoxTexture(_trackStyle) { Modulate = TypanColor.WithAlpha(TypanColor.A * pulse) };
             fill.Draw(handle, UIBox2.FromDimensions(box.Left + ntWidth, box.Top, box.Width - ntWidth, box.Height), UIScale);
         }
     }

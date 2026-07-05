@@ -20,6 +20,7 @@ namespace Content.Client.Administration.UI.Bwoink
         public int Unread { get; private set; } = 0;
         public DateTime LastMessage { get; private set; } = DateTime.MinValue;
         private List<string> PeopleTyping { get; set; } = new();
+        private bool _introShown;
         public event Action<string>? InputTextChanged;
 
         public BwoinkPanel(Action<string> messageSender)
@@ -70,6 +71,20 @@ namespace Content.Client.Administration.UI.Bwoink
         private void Input_OnTextChanged(LineEdit.LineEditEventArgs args)
         {
             InputTextChanged?.Invoke(args.Text);
+        }
+
+        public void ShowIntroductoryMessageIfNeeded()
+        {
+            if (_introShown)
+                return;
+
+            _introShown = true;
+
+            var formatted = new FormattedMessage();
+            formatted.PushColor(Color.LightGray);
+            formatted.AddText(Loc.GetString("bwoink-system-introductory-message"));
+            formatted.Pop();
+            TextOutput.AddMessage(formatted);
         }
 
         public void ReceiveLine(SharedBwoinkSystem.BwoinkTextMessage message)

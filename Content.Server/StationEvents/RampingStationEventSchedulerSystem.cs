@@ -11,6 +11,7 @@
 
 using Content.Server.GameTicking;
 using Content.Server.GameTicking.Rules;
+using Content.Server._Mini.TypanWar;
 using Content.Server.StationEvents.Components;
 using Content.Shared.GameTicking.Components;
 using Robust.Shared.Random;
@@ -22,6 +23,7 @@ public sealed class RampingStationEventSchedulerSystem : GameRuleSystem<RampingS
     [Dependency] private readonly IRobustRandom _random = default!;
     [Dependency] private readonly EventManagerSystem _event = default!;
     [Dependency] private readonly GameTicker _gameTicker = default!;
+    [Dependency] private readonly TypanStationWarRuleSystem _typanWar = default!;
 
     /// <summary>
     /// Returns the ChaosModifier which increases as round time increases to a point.
@@ -61,6 +63,9 @@ public sealed class RampingStationEventSchedulerSystem : GameRuleSystem<RampingS
         while (query.MoveNext(out var uid, out var scheduler, out var gameRule))
         {
             if (!GameTicker.IsGameRuleActive(uid, gameRule))
+                continue;
+
+            if (_typanWar.IsTypanWarBlocking())
                 continue;
 
             if (scheduler.TimeUntilNextEvent > 0f)

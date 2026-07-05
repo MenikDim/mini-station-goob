@@ -10,15 +10,19 @@ public sealed class TypanWarStatusEvent : EntityEventArgs
     public int TypanAlive;
     public float TimeRemainingSeconds;
 
+    public TypanWarWinner Winner;
+
     public TypanWarStatusEvent(
         TypanWarPhase phase,
         int ntAlive,
         int typanAlive,
-        float timeRemainingSeconds)
+        float timeRemainingSeconds,
+        TypanWarWinner winner = TypanWarWinner.None)
     {
         Phase = phase;
         NtAlive = ntAlive;
         TypanAlive = typanAlive;
         TimeRemainingSeconds = timeRemainingSeconds;
+        Winner = winner;
     }
 }
