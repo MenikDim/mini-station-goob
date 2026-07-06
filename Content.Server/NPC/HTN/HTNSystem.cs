@@ -215,11 +215,12 @@ public sealed partial class HTNSystem : EntitySystem // Goob - Partials
             {
                 if (comp.PlanningJob.Exception != null)
                 {
-                    Log.Fatal($"Received exception on planning job for {uid}!");
+                    Log.Error($"Received exception on planning job for {uid}: {comp.PlanningJob.Exception}");
                     _npc.SleepNPC(uid);
-                    var exc = comp.PlanningJob.Exception;
-                    RemComp<HTNComponent>(uid);
-                    throw exc;
+                    comp.PlanningJob = null;
+                    comp.PlanningToken?.Cancel();
+                    comp.PlanningToken = null;
+                    continue;
                 }
 
                 // If a new planning job has finished then handle it.
@@ -487,6 +488,9 @@ public sealed partial class HTNSystem : EntitySystem // Goob - Partials
     private void RequestPlan(HTNComponent component)
     {
         if (component.PlanningJob != null)
+            return;
+
+        if (!component.Blackboard.TryGetValue<EntityUid>(NPCBlackboard.Owner, out _, EntityManager))
             return;
 
         component.PlanAccumulator = component.PlanCooldown;

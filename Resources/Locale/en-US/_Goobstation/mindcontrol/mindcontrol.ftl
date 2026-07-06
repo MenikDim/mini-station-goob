@@ -11,6 +11,9 @@ mindcontrol-briefing-start = You are mindcontrolled. Obey {$master}
 mindcontrol-briefing-get = YOU ARE MINDCONTROLLED
 mindcontrol-briefing-get-master = Obey {$master}
 
+antag-name-mindcontrolled = Mindcontrolled
+antag-objective-mindcontrolled = Help your Master
+
 ## uplink shop
 uplink-mindcontrol-implant-name = Mind-Control Implant
 uplink-mindcontrol-implant-desc = When all you need is a friend.

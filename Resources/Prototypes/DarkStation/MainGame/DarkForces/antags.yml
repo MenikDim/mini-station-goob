@@ -4,7 +4,7 @@
   name: antag-name-RatvarRighteous
   antagonist: true
   setPreference: true
-  objective: "Освободите Ратвара из заточения"
+  objective: antag-objective-RatvarRighteous
   requirements:
   - !type:OverallPlaytimeRequirement
     time: 18000 # 5h

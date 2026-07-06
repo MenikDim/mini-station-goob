@@ -132,7 +132,7 @@ namespace Content.Shared.Roles
         public string Name { get; private set; } = string.Empty;
 
         [ViewVariables(VVAccess.ReadOnly)]
-        public string LocalizedName => Loc.GetString(Name);
+        public string LocalizedName => Loc.TryGetString(Name, out var name) ? name : Name;
 
         /// <summary>
         ///     The name of this job as displayed to players.
@@ -141,7 +141,9 @@ namespace Content.Shared.Roles
         public string? Description { get; private set; }
 
         [ViewVariables(VVAccess.ReadOnly)]
-        public string? LocalizedDescription => Description is null ? null : Loc.GetString(Description);
+        public string? LocalizedDescription => Description is null
+            ? null
+            : Loc.TryGetString(Description, out var description) ? description : Description;
 
         /// <summary>
         ///     Requirements for the job.

@@ -7,6 +7,7 @@ job-name-typan-rd = директор исследований
 job-name-typan-science = учёный Синдиката
 job-name-typan-patrol = патрульный Синдиката
 job-name-typan-command = офицер телекоммуникаций
+job-name-typan-borg = киборг синдиката
 JobTypanAtmosTech = атмостех Синдиката
 JobTypanBotanist = ботаник Синдиката
 JobTypanCargotech = карготехник Синдиката

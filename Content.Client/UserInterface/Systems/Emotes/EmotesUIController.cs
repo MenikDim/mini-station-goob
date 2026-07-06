@@ -175,7 +175,7 @@ public sealed class EmotesUIController : UIController, IOnStateChanged<GameplayS
             var actionOption = new RadialMenuActionOption<EmotePrototype>(HandleRadialButtonClick, emote)
             {
                 Sprite = emote.Icon,
-                ToolTip = Loc.GetString(emote.Name)
+                ToolTip = emote.LocalizedName
             };
             list.Add(actionOption);
         }

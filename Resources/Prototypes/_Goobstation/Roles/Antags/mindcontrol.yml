@@ -7,7 +7,7 @@
 
 - type: antag
   id: Mindcontrolled
-  name: mindcontrolled
+  name: antag-name-mindcontrolled
   antagonist: true
   setPreference: false
-  objective: "Help your Master"
+  objective: antag-objective-mindcontrolled

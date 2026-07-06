@@ -959,7 +959,7 @@ namespace Content.Client.Lobby.UI
 
             var resourceCache = IoCManager.Resolve<IResourceCache>();
 
-            foreach (var antag in _prototypeManager.EnumeratePrototypes<AntagPrototype>().OrderBy(a => Loc.GetString(a.Name)))
+            foreach (var antag in _prototypeManager.EnumeratePrototypes<AntagPrototype>().OrderBy(a => a.LocalizedName))
             {
                 if (!antag.SetPreference)
                     continue;
@@ -967,8 +967,8 @@ namespace Content.Client.Lobby.UI
                 var card = new AntagPreferenceCard();
                 card.OnOpenGuidebook += OnOpenGuidebook;
 
-                var title = Loc.GetString(antag.Name);
-                var description = Loc.GetString(antag.Objective);
+                var title = antag.LocalizedName;
+                var description = antag.LocalizedObjective;
 
                 Texture? iconTexture = null;
                 if (AntagLobbyIcons.TryResolveIconPath(antag, out var iconPath) &&

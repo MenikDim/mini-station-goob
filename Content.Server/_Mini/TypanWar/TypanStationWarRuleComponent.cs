@@ -118,4 +118,9 @@ public sealed partial class TypanStationWarRuleComponent : Component
     public EntityUid? WarMusicAudio;
 
     public CancellationTokenSource? WarMusicLoopCancel;
+
+    /// <summary>Waiting for both NT and Typan stations to exist after map load.</summary>
+    public bool AwaitingStations;
+
+    public float AwaitingStationsAccumulator;
 }

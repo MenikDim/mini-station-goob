@@ -1,4 +1,14 @@
 - type: additionalMap
+  id: Dev
+  maps:
+    - Typan
+
+- type: additionalMap
+  id: Typan
+  maps:
+    - Empty
+
+- type: additionalMap
   id: Atlas
   maps:
     - Typan

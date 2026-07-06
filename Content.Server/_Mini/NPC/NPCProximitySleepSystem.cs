@@ -5,6 +5,7 @@ using System.Numerics;
 using Content.Server.NPC.Components;
 using Content.Server.NPC.HTN;
 using Content.Server.NPC.Systems;
+using Content.Server.GameTicking.Events;
 using Content.Shared._Mini.MiniCCVars;
 using Content.Shared.Mind.Components;
 using Robust.Server.Player;
@@ -38,6 +39,22 @@ public sealed class NPCProximitySleepSystem : EntitySystem
 
         Subs.CVar(_cfg, MiniCCVars.NPCDisableWithoutPlayers, v => _enabled = v, true);
         Subs.CVar(_cfg, MiniCCVars.NPCDisableDistance, v => _distanceSq = v * v, true);
+
+        SubscribeLocalEvent<RoundStartingEvent>(OnRoundStarting);
+        SubscribeLocalEvent<PlayerAttachedEvent>(OnPlayerAttached);
+    }
+
+    private void OnRoundStarting(RoundStartingEvent ev)
+    {
+        _nextCheck = TimeSpan.Zero;
+    }
+
+    private void OnPlayerAttached(PlayerAttachedEvent ev)
+    {
+        if (!_enabled)
+            return;
+
+        _nextCheck = TimeSpan.Zero;
     }
 
     public override void Update(float frameTime)
@@ -67,6 +84,9 @@ public sealed class NPCProximitySleepSystem : EntitySystem
         var query = EntityQueryEnumerator<HTNComponent, TransformComponent, MetaDataComponent>();
         while (query.MoveNext(out var uid, out var htn, out var xform, out var meta))
         {
+            if (meta.EntityLifeStage < EntityLifeStage.MapInitialized)
+                continue;
+
             if (meta.EntityLifeStage >= EntityLifeStage.Terminating)
                 continue;
 

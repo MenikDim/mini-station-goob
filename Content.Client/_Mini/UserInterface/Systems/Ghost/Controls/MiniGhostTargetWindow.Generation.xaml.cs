@@ -240,7 +240,7 @@ public sealed partial class MiniGhostTargetWindow
                     HorizontalAlignment = HAlignment.Center,
                     VerticalAlignment = VAlignment.Center,
                     SizeFlagsStretchRatio = 1,
-                    ToolTip = GenerateGenericTooltip(antag.Name, Loc.GetString(antag.AntagonistDescription)),
+                    ToolTip = GenerateGenericTooltip(antag.Name, LocalizeOrRaw(antag.AntagonistDescription)),
                     TooltipDelay = DefaultTooltipDelay,
                     SetWidth = DefaultButtonWidth,
                     SetHeight = DefaultButtonHeight,
@@ -264,5 +264,13 @@ public sealed partial class MiniGhostTargetWindow
         }
 
         GhostTeleportContainer.AddChild(bigGrid);
+    }
+
+    private static string LocalizeOrRaw(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return string.Empty;
+
+        return Loc.TryGetString(value, out var localized) ? localized : value;
     }
 }

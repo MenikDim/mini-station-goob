@@ -74,7 +74,7 @@ public sealed partial class EmotesTabControl : BaseTabControl
 
     private IconButton CreateEmoteButton(EmotePrototype emote)
     {
-        var button = new IconButton(Loc.GetString(emote.Name));
+        var button = new IconButton(emote.LocalizedName);
         button.Icon.Texture = emote.Icon.Frame0();
         button.OnPressed += _ => OnPlayEmote(new ProtoId<EmotePrototype>(emote.ID));
 

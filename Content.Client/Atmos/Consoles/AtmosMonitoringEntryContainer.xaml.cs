@@ -16,6 +16,7 @@ using Robust.Client.Graphics;
 using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.XAML;
+using Robust.Shared.Localization;
 using System.Linq;
 
 namespace Content.Client.Atmos.Consoles;
@@ -66,7 +67,7 @@ public sealed partial class AtmosMonitoringEntryContainer : BoxContainer
             NetworkNameLabel.Text = Loc.GetString("atmos-alerts-window-alarm-label", ("name", updatedData.EntityName), ("address", updatedData.Address));
 
         else
-            NetworkNameLabel.Text = Loc.GetString(updatedData.EntityName);
+            NetworkNameLabel.Text = LocalizeOrRaw(updatedData.EntityName);
 
         Data = updatedData;
 
@@ -170,5 +171,13 @@ public sealed partial class AtmosMonitoringEntryContainer : BoxContainer
         FocusButton.RemoveStyleClass(StyleNano.StyleClassButtonColorGreen);
         ArrowTexture.TexturePath = "/Textures/Interface/Nano/triangle_right.png";
         FocusContainer.Visible = false;
+    }
+
+    private static string LocalizeOrRaw(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return string.Empty;
+
+        return Loc.TryGetString(value, out var localized) ? localized : value;
     }
 }

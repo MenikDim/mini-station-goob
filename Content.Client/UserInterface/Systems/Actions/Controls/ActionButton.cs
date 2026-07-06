@@ -220,8 +220,12 @@ public sealed class ActionButton : Control, IEntityControl
         if (!_entities.TryGetComponent(Action, out MetaDataComponent? metadata))
             return null;
 
-        var name = FormattedMessage.FromMarkupPermissive(Loc.GetString(metadata.EntityName));
-        var decr = FormattedMessage.FromMarkupPermissive(Loc.GetString(metadata.EntityDescription));
+        var name = FormattedMessage.FromMarkupPermissive(
+            Loc.TryGetString(metadata.EntityName, out var localizedName) ? localizedName : metadata.EntityName);
+        var decr = string.IsNullOrEmpty(metadata.EntityDescription)
+            ? FormattedMessage.FromUnformatted(string.Empty)
+            : FormattedMessage.FromMarkupPermissive(
+                Loc.TryGetString(metadata.EntityDescription, out var localizedDesc) ? localizedDesc : metadata.EntityDescription);
         FormattedMessage? chargesText = null;
 
         // TODO: Don't touch this use an event make callers able to add their own shit for actions or I kill you.

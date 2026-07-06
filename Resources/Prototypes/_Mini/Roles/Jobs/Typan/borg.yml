@@ -1,6 +1,6 @@
 - type: job
   id: TypanBorg
-  name: киборг синдиката
+  name: job-name-typan-borg
   description: job-description-borg
   playTimeTracker: JobBorgTypan
   requirements:

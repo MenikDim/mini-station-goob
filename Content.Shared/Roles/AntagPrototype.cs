@@ -77,8 +77,20 @@ public sealed partial class AntagPrototype : IPrototype
     /// Optional list of guides associated with this antag. If the guides are opened, the first entry in this list
     /// will be used to select the currently selected guidebook.
     /// </summary>
-    [DataField]
+    [DataField("guides")]
     public List<ProtoId<GuideEntryPrototype>>? Guides;
+
+    /// <summary>
+    ///     Localized antag name for UI. Falls back to the raw prototype value when no Fluent entry exists.
+    /// </summary>
+    public string LocalizedName => string.IsNullOrEmpty(Name)
+        ? string.Empty
+        : Loc.TryGetString(Name, out var name) ? name : Name;
+
+    /// <summary>
+    ///     Localized antag objective for UI. Falls back to the raw prototype value when no Fluent entry exists.
+    /// </summary>
+    public string LocalizedObjective => Loc.TryGetString(Objective, out var objective) ? objective : Objective;
 
     /// <summary>
     /// Lobby preference menu icon, same format as <see cref="JobPrototype.Icon"/>.

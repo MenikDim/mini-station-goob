@@ -28,7 +28,7 @@
   - typan-station-war
   name: game-presets-typan-station-war
   showInVote: true
-  minPlayers: 20
+  minPlayers: 0
   description: game-presets-typan-station-war-description
   rules:
   - TypanStationWar

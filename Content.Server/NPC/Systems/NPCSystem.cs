@@ -30,6 +30,7 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.NPC;
 using Content.Shared.NPC.Systems;
+using Content.Shared._Mini.MiniCCVars;
 using Prometheus;
 using Robust.Server.GameObjects;
 using Robust.Shared.Configuration;
@@ -55,6 +56,8 @@ namespace Content.Server.NPC.Systems
         /// </summary>
         public bool Enabled { get; set; } = true;
 
+        private bool _sleepWithoutPlayers = true;
+
         private int _maxUpdates;
 
         private int _count;
@@ -66,6 +69,7 @@ namespace Content.Server.NPC.Systems
 
             Subs.CVar(_configurationManager, CCVars.NPCEnabled, value => Enabled = value, true);
             Subs.CVar(_configurationManager, CCVars.NPCMaxUpdates, obj => _maxUpdates = obj, true);
+            Subs.CVar(_configurationManager, MiniCCVars.NPCDisableWithoutPlayers, value => _sleepWithoutPlayers = value, true);
         }
 
         public void OnPlayerNPCAttach(EntityUid uid, HTNComponent component, PlayerAttachedEvent args)
@@ -82,13 +86,18 @@ namespace Content.Server.NPC.Systems
             if (TryComp<MindContainerComponent>(uid, out var mindContainer) && mindContainer.HasMind)
                 return;
 
-            WakeNPC(uid, component);
+            if (!_sleepWithoutPlayers)
+                WakeNPC(uid, component);
         }
 
         public void OnNPCMapInit(EntityUid uid, HTNComponent component, MapInitEvent args)
         {
             component.Blackboard.SetValue(NPCBlackboard.Owner, uid);
-            WakeNPC(uid, component);
+
+            if (_sleepWithoutPlayers)
+                SleepNPC(uid, component);
+            else
+                WakeNPC(uid, component);
         }
 
         public void OnNPCShutdown(EntityUid uid, HTNComponent component, ComponentShutdown args)
@@ -127,6 +136,9 @@ namespace Content.Server.NPC.Systems
             {
                 return;
             }
+
+            if (!component.Blackboard.TryGetValue<EntityUid>(NPCBlackboard.Owner, out _, EntityManager))
+                component.Blackboard.SetValue(NPCBlackboard.Owner, uid);
 
             Log.Debug($"Waking {ToPrettyString(uid)}");
             EnsureComp<ActiveNPCComponent>(uid);
@@ -177,7 +189,8 @@ namespace Content.Server.NPC.Systems
             switch (args.NewMobState)
             {
                 case MobState.Alive:
-                    WakeNPC(uid, component);
+                    if (!_sleepWithoutPlayers)
+                        WakeNPC(uid, component);
                     break;
                 case MobState.Critical:
                 case MobState.Dead:

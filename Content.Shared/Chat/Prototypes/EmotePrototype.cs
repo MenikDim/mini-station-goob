@@ -14,6 +14,7 @@
 
 using Content.Shared._CorvaxGoob.Events;
 using Content.Shared.Whitelist;
+using Robust.Shared.Localization;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 using Robust.Shared.Utility;
@@ -35,6 +36,10 @@ public sealed partial class EmotePrototype : IPrototype
     /// </summary>
     [DataField(required: true)]
     public string Name = default!;
+
+    public string LocalizedName => string.IsNullOrEmpty(Name)
+        ? ID
+        : Loc.TryGetString(Name, out var name) ? name : Name;
 
     /// <summary>
     ///     Determines if emote available to all by default
