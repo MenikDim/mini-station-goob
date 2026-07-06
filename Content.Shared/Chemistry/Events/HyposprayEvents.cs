@@ -10,7 +10,7 @@ namespace Content.Shared.Chemistry.Hypospray.Events;
 
 public abstract partial class BeforeHyposprayInjectsTargetEvent : CancellableEntityEventArgs, IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots { get; } = SlotFlags.WITHOUT_POCKET;
+    public SlotFlags TargetSlots { get; private set; } = SlotFlags.WITHOUT_POCKET;
     public EntityUid EntityUsingHypospray;
     public readonly EntityUid Hypospray;
     public EntityUid TargetGettingInjected;

@@ -32,7 +32,7 @@ public sealed class TypingChangedEvent : EntityEventArgs
 [Serializable, NetSerializable]
 public sealed class BeforeShowTypingIndicatorEvent : IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots { get; } = SlotFlags.WITHOUT_POCKET;
+    public SlotFlags TargetSlots { get; private set; } = SlotFlags.WITHOUT_POCKET;
 
     private ProtoId<TypingIndicatorPrototype>? _overrideIndicator = null;
     private TimeSpan? _latestEquipTime = null;

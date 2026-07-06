@@ -64,7 +64,7 @@ namespace Content.Shared.Strip.Components
 
         public TimeSpan Time => TimeSpan.FromSeconds(MathF.Max(InitialTime.Seconds * Multiplier + Additive.Seconds, 0f));
 
-        public SlotFlags TargetSlots { get; } = SlotFlags.GLOVES;
+        public SlotFlags TargetSlots { get; private set; } = SlotFlags.GLOVES;
     }
 
     /// <summary>

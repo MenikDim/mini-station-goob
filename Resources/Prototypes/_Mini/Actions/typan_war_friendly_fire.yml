@@ -1,8 +1,8 @@
 - type: entity
   parent: BaseAction
   id: ActionTypanWarFriendlyFire
-  name: typan-war-ff-action-name
-  description: typan-war-ff-action-desc
+  name: Ally protection
+  description: Do not harm allies with ranged weapons.
   categories: [ HideSpawnMenu ]
   components:
   - type: Action

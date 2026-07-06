@@ -1100,6 +1100,6 @@ public sealed partial class ChatUIController : UIController
         /// </summary>
         public float TimeLeft { get; set; }
 
-        public Queue<SpeechBubbleData> MessageQueue { get; } = new();
+        public Queue<SpeechBubbleData> MessageQueue { get; private set; } = new();
     }
 }

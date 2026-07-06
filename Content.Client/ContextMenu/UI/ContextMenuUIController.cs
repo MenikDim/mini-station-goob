@@ -109,7 +109,7 @@ namespace Content.Client.ContextMenu.UI
         ///     Root menu of the entire context menu.
         /// </summary>
         public ContextMenuPopup RootMenu = default!;
-        public Stack<ContextMenuPopup> Menus { get; } = new();
+        public Stack<ContextMenuPopup> Menus { get; private set; } = new();
 
         /// <summary>
         ///     Used to cancel the timer that opens menus.

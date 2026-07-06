@@ -36,7 +36,7 @@ public sealed class PartStatusExaminedEvent : EntityEventArgs
     /// <summary>
     ///     Parts of the examine message that will later be sorted by priority and pushed onto <see cref="Message"/>.
     /// </summary>
-    private List<ExamineMessagePart> Parts { get; } = new();
+    private List<ExamineMessagePart> Parts { get; set; } = new();
 
     /// <summary>
     ///     The entity performing the examining.

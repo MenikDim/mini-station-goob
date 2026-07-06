@@ -9,5 +9,5 @@ namespace Content.Goobstation.Common.Administration.Notifications;
 [Serializable, NetSerializable]
 public sealed class AdminNotificationEvent(SoundSpecifier sound) : EntityEventArgs
 {
-    public SoundSpecifier Sound { get; } = sound;
+    public SoundSpecifier Sound { get; private set; } = sound;
 }

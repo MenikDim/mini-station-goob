@@ -75,7 +75,7 @@ public sealed partial class ToolComponent : Component
 /// </summary>
 public sealed class ToolUseAttemptEvent(EntityUid user, float fuel) : CancellableEntityEventArgs
 {
-    public EntityUid User { get; } = user;
+    public EntityUid User { get; private set; } = user;
     public float Fuel = fuel;
 }
 

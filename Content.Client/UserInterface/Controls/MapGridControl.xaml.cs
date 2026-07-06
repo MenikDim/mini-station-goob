@@ -32,7 +32,7 @@ public partial class MapGridControl : LayoutContainer
     private Font _largerFont;
 
     /* Dragging */
-    protected virtual bool Draggable { get; } = false;
+    protected virtual bool Draggable { get; private set; } = false;
 
     /// <summary>
     /// Control offset from whatever is being tracked.

@@ -12,7 +12,7 @@ namespace Content.Shared.Weapons.Ranged.Events;
 /// </summary>
 public sealed partial class SelfBeforeGunShotEvent : CancellableEntityEventArgs, IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots { get; } = SlotFlags.WITHOUT_POCKET;
+    public SlotFlags TargetSlots { get; private set; } = SlotFlags.WITHOUT_POCKET;
     public readonly EntityUid Shooter;
     public readonly Entity<GunComponent> Gun;
     public readonly List<(EntityUid? Entity, IShootable Shootable)> Ammo;

@@ -76,7 +76,7 @@ public sealed class MaxTimeRestartRuleSystem : GameRuleSystem<MaxTimeRestartRule
         while (query.MoveNext(out var uid, out var timer, out var gameRule))
         {
             if (!GameTicker.IsGameRuleActive(uid, gameRule))
-                return;
+                continue;
 
             switch (args.New)
             {

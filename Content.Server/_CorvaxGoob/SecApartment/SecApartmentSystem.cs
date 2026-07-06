@@ -650,6 +650,6 @@ public sealed partial class SecApartmentSystem : EntitySystem
 
 public sealed class StationData
 {
-    public List<Squad> Squads { get; } = new();
+    public List<Squad> Squads { get; private set; } = new();
     public readonly HashSet<NetEntity> TrackedTimers = new();
 }

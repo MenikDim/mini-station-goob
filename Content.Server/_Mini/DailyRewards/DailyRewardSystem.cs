@@ -743,7 +743,7 @@ public sealed class DailyRewardSystem : EntitySystem
 
     private sealed class SessionRewardState(DailyRewardProgress progress)
     {
-        public DailyRewardProgress Progress { get; } = progress;
+        public DailyRewardProgress Progress { get; private set; } = progress;
         public TimeSpan? ActiveSince { get; set; }
         public DateTime? ActiveStartedAtUtc { get; set; }
         public int LocalMutationCount { get; private set; }

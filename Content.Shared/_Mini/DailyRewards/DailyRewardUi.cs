@@ -29,19 +29,19 @@ public sealed class DailyRewardUpdateMessage(
     List<TimeSpan> onlineGrantedThresholds,
     List<DailyQuestEntry> dailyQuests) : BoundUserInterfaceState
 {
-    public int CurrentStreak { get; } = currentStreak;
-    public int NextRewardDay { get; } = nextRewardDay;
-    public bool CanClaim { get; } = canClaim;
-    public bool IsTrackingActiveTime { get; } = isTrackingActiveTime;
-    public bool HasLastClaim { get; } = hasLastClaim;
-    public TimeSpan TimeUntilExpiration { get; } = timeUntilExpiration;
-    public TimeSpan TimeUntilNextClaim { get; } = timeUntilNextClaim;
-    public TimeSpan CurrentActiveTime { get; } = currentActiveTime;
-    public TimeSpan RequiredActiveTime { get; } = requiredActiveTime;
-    public List<DailyRewardEntry> Rewards { get; } = rewards;
-    public TimeSpan OnlineElapsed { get; } = onlineElapsed;
-    public List<TimeSpan> OnlineGrantedThresholds { get; } = onlineGrantedThresholds;
-    public List<DailyQuestEntry> DailyQuests { get; } = dailyQuests;
+    public int CurrentStreak { get; private set; } = currentStreak;
+    public int NextRewardDay { get; private set; } = nextRewardDay;
+    public bool CanClaim { get; private set; } = canClaim;
+    public bool IsTrackingActiveTime { get; private set; } = isTrackingActiveTime;
+    public bool HasLastClaim { get; private set; } = hasLastClaim;
+    public TimeSpan TimeUntilExpiration { get; private set; } = timeUntilExpiration;
+    public TimeSpan TimeUntilNextClaim { get; private set; } = timeUntilNextClaim;
+    public TimeSpan CurrentActiveTime { get; private set; } = currentActiveTime;
+    public TimeSpan RequiredActiveTime { get; private set; } = requiredActiveTime;
+    public List<DailyRewardEntry> Rewards { get; private set; } = rewards;
+    public TimeSpan OnlineElapsed { get; private set; } = onlineElapsed;
+    public List<TimeSpan> OnlineGrantedThresholds { get; private set; } = onlineGrantedThresholds;
+    public List<DailyQuestEntry> DailyQuests { get; private set; } = dailyQuests;
 }
 
 [Serializable, NetSerializable]
@@ -100,7 +100,7 @@ public sealed class DailyQuestReplaceDeniedEvent : EntityEventArgs
 [Serializable, NetSerializable]
 public sealed class DailyRewardStateEvent(DailyRewardUpdateMessage state) : EntityEventArgs
 {
-    public DailyRewardUpdateMessage State { get; } = state;
+    public DailyRewardUpdateMessage State { get; private set; } = state;
 }
 
 [Serializable, NetSerializable]
@@ -112,10 +112,10 @@ public sealed class DailyRewardEntry(
     bool isClaimed,
     bool isCurrent)
 {
-    public int Day { get; } = day;
-    public string? RewardName { get; } = rewardName;
-    public bool HasReward { get; } = hasReward;
-    public string IconPath { get; } = iconPath;
-    public bool IsClaimed { get; } = isClaimed;
-    public bool IsCurrent { get; } = isCurrent;
+    public int Day { get; private set; } = day;
+    public string? RewardName { get; private set; } = rewardName;
+    public bool HasReward { get; private set; } = hasReward;
+    public string IconPath { get; private set; } = iconPath;
+    public bool IsClaimed { get; private set; } = isClaimed;
+    public bool IsCurrent { get; private set; } = isCurrent;
 }

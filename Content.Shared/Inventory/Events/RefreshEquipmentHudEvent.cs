@@ -13,7 +13,7 @@ public record struct RefreshEquipmentHudEvent<T>(SlotFlags TargetSlots, bool Wor
     where T : IComponent
 {
     public bool WorksInHands = WorksInHands; // Goobstation
-    public SlotFlags TargetSlots { get; } = TargetSlots;
+    public SlotFlags TargetSlots { get; private set; } = TargetSlots;
     public bool Active = false;
     public List<T> Components = new();
 }

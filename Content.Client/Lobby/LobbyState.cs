@@ -46,7 +46,7 @@ namespace Content.Client.Lobby
         private ClientGameTicker _gameTicker = default!;
         private ContentAudioSystem _contentAudioSystem = default!;
 
-        protected override Type? LinkedScreenType { get; } = typeof(LobbyGui);
+        protected override Type? LinkedScreenType => typeof(LobbyGui);
         public LobbyGui? Lobby;
 
         protected override void Startup()

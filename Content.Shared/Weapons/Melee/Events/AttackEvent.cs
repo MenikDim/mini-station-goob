@@ -70,9 +70,9 @@ namespace Content.Shared.Weapons.Melee.Events
     // Goobstation start
     public sealed class BeforeHarmfulActionEvent(EntityUid user, HarmfulActionType type) : CancellableEntityEventArgs
     {
-        public EntityUid User { get; } = user;
+        public EntityUid User { get; private set; } = user;
 
-        public HarmfulActionType Type { get; } = type;
+        public HarmfulActionType Type { get; private set; } = type;
     }
 
     public enum HarmfulActionType : byte

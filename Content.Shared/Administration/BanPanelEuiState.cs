@@ -33,7 +33,7 @@ public static class BanPanelEuiStateMsg
     [Serializable, NetSerializable]
     public sealed class CreateBanRequest(Ban ban) : EuiMessageBase
     {
-        public Ban Ban { get; } = ban;
+        public Ban Ban { get; private set; } = ban;
     }
 
     [Serializable, NetSerializable]

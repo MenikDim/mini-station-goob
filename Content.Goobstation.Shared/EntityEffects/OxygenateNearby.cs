@@ -10,7 +10,6 @@ using System.Linq;
 using Content.Shared.Database;
 using Content.Shared.EntityEffects;
 using Robust.Shared.Prototypes;
-using SixLabors.ImageSharp.PixelFormats;
 
 namespace Content.Goobstation.Shared.EntityEffects;
 

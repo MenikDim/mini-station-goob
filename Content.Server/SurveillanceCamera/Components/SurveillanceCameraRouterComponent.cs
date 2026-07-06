@@ -25,7 +25,7 @@ public sealed partial class SurveillanceCameraRouterComponent : Component
     // camera monitors disappearing before sending a D/C packet,
     // this could probably be refreshed every time a new monitor
     // is added or removed from active routing.
-    public HashSet<string> MonitorRoutes { get; } = new();
+    public HashSet<string> MonitorRoutes { get; private set; } = new();
 
     [ViewVariables]
     // The frequency that talks to this router's subnet.

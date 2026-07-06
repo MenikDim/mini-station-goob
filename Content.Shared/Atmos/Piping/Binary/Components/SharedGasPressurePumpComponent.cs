@@ -20,11 +20,11 @@ public enum GasPressurePumpUiKey : byte
 [Serializable, NetSerializable]
 public sealed class GasPressurePumpToggleStatusMessage(bool enabled) : BoundUserInterfaceMessage
 {
-    public bool Enabled { get; } = enabled;
+    public bool Enabled { get; private set; } = enabled;
 }
 
 [Serializable, NetSerializable]
 public sealed class GasPressurePumpChangeOutputPressureMessage(float pressure) : BoundUserInterfaceMessage
 {
-    public float Pressure { get; } = pressure;
+    public float Pressure { get; private set; } = pressure;
 }

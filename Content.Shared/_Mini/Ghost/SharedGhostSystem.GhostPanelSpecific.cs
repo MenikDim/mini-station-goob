@@ -29,7 +29,7 @@ public abstract partial class SharedGhostSystem
         bool IsDead) : INamedGhostWarp
     {
         public readonly NetEntity Entity = Entity;
-        public string Name { get; } = Name;
+        public string Name { get; private set; } = Name;
 
         public readonly ProtoId<JobPrototype>? JobId = JobId;
 
@@ -60,7 +60,7 @@ public abstract partial class SharedGhostSystem
     {
         public readonly NetEntity Entity = Entity;
 
-        public string Name { get; } = Name;
+        public string Name { get; private set; } = Name;
 
         public readonly string AntagonistName = AntagonistName;
 
@@ -81,7 +81,7 @@ public abstract partial class SharedGhostSystem
     {
         public readonly NetEntity Entity = Entity;
 
-        public string Name { get; } = Name;
+        public string Name { get; private set; } = Name;
 
         public readonly string Description = Description;
 

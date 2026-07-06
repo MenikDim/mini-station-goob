@@ -34,12 +34,12 @@ public sealed class CrewMemberInfo(
     string jobIcon,
     SuitSensorStatus? suitSensor)
 {
-    public string MemberId { get; } = memberId;
+    public string MemberId { get; private set; } = memberId;
     public NetEntity? OwnerUid { get; set; } = ownerUid;
-    public string Name { get; } = name;
-    public string JobTitle { get; } = jobTitle;
-    public string JobIcon { get; } = jobIcon;
-    public SuitSensorStatus? SensorStatus { get; } = suitSensor;
+    public string Name { get; private set; } = name;
+    public string JobTitle { get; private set; } = jobTitle;
+    public string JobIcon { get; private set; } = jobIcon;
+    public SuitSensorStatus? SensorStatus { get; private set; } = suitSensor;
 }
 
 [Serializable, NetSerializable]

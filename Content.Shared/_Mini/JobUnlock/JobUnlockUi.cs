@@ -8,5 +8,5 @@ namespace Content.Shared._Mini.JobUnlock;
 [Serializable, NetSerializable]
 public sealed class JobUnlockPurchaseRequestEvent(string jobId) : EntityEventArgs
 {
-    public string JobId { get; } = jobId;
+    public string JobId { get; private set; } = jobId;
 }

@@ -123,7 +123,7 @@ namespace Content.Server.Power.Components
         public bool Recalculate;
 
         [ViewVariables]
-        public PowerState.Load NetworkLoad { get; } = new PowerState.Load
+        public PowerState.Load NetworkLoad { get; private set; } = new PowerState.Load
         {
             DesiredPower = 5
         };

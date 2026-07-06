@@ -12,7 +12,7 @@ public readonly record struct TargetDefibrillatedEvent(EntityUid User, Entity<De
 
 public abstract class BeforeDefibrillatorZapsEvent : CancellableEntityEventArgs, IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots { get; } = SlotFlags.WITHOUT_POCKET;
+    public SlotFlags TargetSlots { get; private set; } = SlotFlags.WITHOUT_POCKET;
     public EntityUid EntityUsingDefib;
     public readonly EntityUid Defib;
     public EntityUid DefibTarget;

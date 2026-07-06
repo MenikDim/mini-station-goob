@@ -10,7 +10,6 @@
 using System.Linq;
 using Content.Server.Antag.Components;
 using Content.Server.GameTicking;
-using Content.Server.GameTicking.Rules;
 using Content.Server.GameTicking.Rules.Components;
 using Content.Server.Mind;
 using Content.Server.Roles;
@@ -52,7 +51,6 @@ public sealed class TraitorRuleTest
         var mindSys = server.System<MindSystem>();
         var roleSys = server.System<RoleSystem>();
         var factionSys = server.System<NpcFactionSystem>();
-        var traitorRuleSys = server.System<TraitorRuleSystem>();
 
         // Look up the minimum player count and max total objective difficulty for the game rule
         var minPlayers = 1;
@@ -88,23 +86,30 @@ public sealed class TraitorRuleTest
         // Opt-in the player for the traitor role
         await pair.SetAntagPreference(TraitorAntagRoleName, true);
 
-        // Add the game rule
         TraitorRuleComponent traitorRule = null;
         await server.WaitPost(() =>
         {
-            var gameRuleEnt = ticker.AddGameRule(TraitorGameRuleProtoId);
-            Assert.That(entMan.TryGetComponent<TraitorRuleComponent>(gameRuleEnt, out traitorRule));
+            // StartRound clears manually added rules. Traitor must come from the preset so IntraPlayerSpawn
+            // selection runs while the rule is active during SpawnPlayers.
+            ticker.SetGamePreset("Traitor");
 
-            // Ready up
             ticker.ToggleReadyAll(true);
             Assert.That(ticker.PlayerGameStatuses.Values.All(x => x == PlayerGameStatus.ReadyToPlay));
 
-            // Start the round
             ticker.StartRound();
-            // Force traitor mode to start (skip the delay)
-            ticker.StartGameRule(gameRuleEnt);
         });
         await pair.RunTicksSync(10);
+
+        await server.WaitAssertion(() =>
+        {
+            foreach (var rule in ticker.GetActiveGameRules())
+            {
+                if (entMan.TryGetComponent<TraitorRuleComponent>(rule, out traitorRule))
+                    return;
+            }
+
+            Assert.Fail("Failed to find an active Traitor game rule after starting the round.");
+        });
 
         // Game should have started
         Assert.That(ticker.RunLevel, Is.EqualTo(GameRunLevel.InRound));

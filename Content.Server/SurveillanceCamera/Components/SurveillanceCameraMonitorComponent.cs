@@ -38,27 +38,27 @@ public sealed partial class SurveillanceCameraMonitorComponent : Component
 
     [ViewVariables]
     // Set of viewers currently looking at this monitor.
-    public HashSet<EntityUid> Viewers { get; } = new();
+    public HashSet<EntityUid> Viewers { get; private set; } = new();
 
     // Known cameras in this subnet by address with name values.
     // This is cleared when the subnet is changed.
     [ViewVariables]
-    public Dictionary<string, (string, (NetEntity, NetCoordinates))> KnownCameras { get; } = new(); //Goobstation
+    public Dictionary<string, (string, (NetEntity, NetCoordinates))> KnownCameras { get; private set; } = new(); //Goobstation
 
     // The same as KnownCameras but for MobileCameras only: sec bodycams, no pro, dragable wireless camera
     [ViewVariables]
-    public Dictionary<string, (string, (NetEntity, NetCoordinates))> KnownMobileCameras { get; } = new(); //Goobstation
+    public Dictionary<string, (string, (NetEntity, NetCoordinates))> KnownMobileCameras { get; private set; } = new(); //Goobstation
 
     // Mobile cameras should receive a heartbeat as they constantly stream their location
     [ViewVariables]
-    public Dictionary<string, float> KnownMobileCamerasLastHeartbeat { get; } = new(); //Goobstation
+    public Dictionary<string, float> KnownMobileCamerasLastHeartbeat { get; private set; } = new(); //Goobstation
 
     // Mobile cameras should receive a heartbeat as they constantly stream their location
     [ViewVariables]
-    public Dictionary<string, float> KnownMobileCamerasLastHeartbeatSent { get; } = new(); //Goobstation
+    public Dictionary<string, float> KnownMobileCamerasLastHeartbeatSent { get; private set; } = new(); //Goobstation
 
     [ViewVariables]
     // The subnets known by this camera monitor.
-    public Dictionary<string, string> KnownSubnets { get; } = new();
+    public Dictionary<string, string> KnownSubnets { get; private set; } = new();
 
 }

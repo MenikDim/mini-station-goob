@@ -6,16 +6,16 @@ using Robust.Shared.Utility;
 namespace Content.Shared._Mini.CustomGhost;
 
 [Prototype("customGhost")]
-public sealed class CustomGhostPrototype : IPrototype
+public sealed partial class CustomGhostPrototype : IPrototype
 {
     [IdDataField]
-    public string ID { get; } = default!;
+    public string ID { get; private set; } = default!;
 
     [DataField("sprite", required: true)]
-    public ResPath CustomSpritePath { get; } = default!;
+    public ResPath CustomSpritePath { get; private set; } = default!;
 
     [DataField("alpha")]
-    public float AlphaOverride { get; } = -1;
+    public float AlphaOverride { get; private set; } = -1;
 
     [DataField("ghostName")]
     public string GhostName = string.Empty;
@@ -30,19 +30,19 @@ public sealed class CustomGhostPrototype : IPrototype
     public ComponentRegistry Components = new();
 
     [DataField("price")]
-    public int Price { get; } = 0;
+    public int Price { get; private set; } = 0;
 
     [DataField]
-    public string Ckey { get; } = string.Empty;
+    public string Ckey { get; private set; } = string.Empty;
 
     [DataField("order")]
-    public int Order { get; } = 0;
+    public int Order { get; private set; } = 0;
 
     [DataField("name")]
-    public string Name { get; } = string.Empty;
+    public string Name { get; private set; } = string.Empty;
 
     [DataField("description")]
-    public string Description { get; } = string.Empty;
+    public string Description { get; private set; } = string.Empty;
 }
 
 [Serializable, NetSerializable]

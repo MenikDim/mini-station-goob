@@ -6,5 +6,5 @@ namespace Content.Goobstation.Shared.Devil.UI;
 [Serializable, NetSerializable]
 public sealed class RevivalContractMessage(bool accepted) : BoundUserInterfaceMessage
 {
-    public bool Accepted { get; } = accepted;
+    public bool Accepted { get; private set; } = accepted;
 }

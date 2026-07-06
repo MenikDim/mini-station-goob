@@ -7,8 +7,6 @@ using System.IO;
 using Lidgren.Network;
 using Robust.Shared.Network;
 using Robust.Shared.Serialization;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 
 namespace Content.Goobstation.Shared.MisandryBox.JumpScare;
 
@@ -16,7 +14,7 @@ public sealed class JumpscareMessage : NetMessage
 {
     public string ImagePath = "";
 
-    public override MsgGroups MsgGroup { get; } = MsgGroups.String;
+    public override MsgGroups MsgGroup => MsgGroups.String;
 
     public override void ReadFromBuffer(NetIncomingMessage buffer, IRobustSerializer serializer)
     {

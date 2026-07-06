@@ -16,7 +16,7 @@ namespace Content.Shared.Atmos;
 [ByRefEvent]
 public sealed class GetFireProtectionEvent : EntityEventArgs, IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots { get; } = ~SlotFlags.POCKET;
+    public SlotFlags TargetSlots { get; private set; } = ~SlotFlags.POCKET;
 
     /// <summary>
     /// What to multiply the fire damage by.

@@ -39,7 +39,7 @@ public sealed class VoiceChatServerManager : IVoiceChatServerManager, IPostInjec
     private int _port;
     private string _appIdentifier = "SS14VoiceChat";
 
-    public Dictionary<NetConnection, VoiceClientData> Clients { get; } = new();
+    public Dictionary<NetConnection, VoiceClientData> Clients { get; private set; } = new();
 
     private const int SampleRate = 48000;
     private const int Channels = 1; // Mono

@@ -240,7 +240,7 @@ public abstract class RadialMenuOption
 
 public abstract class RadialMenuActionOption(Action onPressed) : RadialMenuOption
 {
-    public Action OnPressed { get; } = onPressed;
+    public Action OnPressed { get; private set; } = onPressed;
 }
 
 public sealed class RadialMenuActionOption<T>(Action<T> onPressed, T data)
@@ -249,9 +249,9 @@ public sealed class RadialMenuActionOption<T>(Action<T> onPressed, T data)
 public sealed class RadialMenuNestedLayerOption(IReadOnlyCollection<RadialMenuOption> nested, float containerRadius = 100)
     : RadialMenuOption
 {
-    public float? ContainerRadius { get; } = containerRadius;
+    public float? ContainerRadius { get; private set; } = containerRadius;
 
-    public IReadOnlyCollection<RadialMenuOption> Nested { get; } = nested;
+    public IReadOnlyCollection<RadialMenuOption> Nested { get; private set; } = nested;
 }
 
 public sealed class SimpleRadialMenuSettings

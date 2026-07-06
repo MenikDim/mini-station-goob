@@ -266,7 +266,7 @@ namespace Content.Shared.Movement.Systems
     /// </summary>
     public sealed class RefreshMovementSpeedModifiersEvent : EntityEventArgs, IInventoryRelayEvent
     {
-        public SlotFlags TargetSlots { get; } = ~SlotFlags.POCKET;
+        public SlotFlags TargetSlots { get; private set; } = ~SlotFlags.POCKET;
 
         public float WalkSpeedModifier { get; private set; } = 1.0f;
         public float SprintSpeedModifier { get; private set; } = 1.0f;

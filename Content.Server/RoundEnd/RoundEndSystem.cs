@@ -461,7 +461,7 @@ namespace Content.Server.RoundEnd
 
     public sealed class RoundEndSystemChangedEvent : EntityEventArgs
     {
-        public static RoundEndSystemChangedEvent Default { get; } = new();
+        public static RoundEndSystemChangedEvent Default { get; private set; } = new();
     }
 
     public enum RoundEndBehavior : byte

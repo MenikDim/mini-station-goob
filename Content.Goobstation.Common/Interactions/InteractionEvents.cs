@@ -14,5 +14,5 @@ namespace Content.Goobstation.Common.Interactions;
 /// </summary>
 public sealed class UseInHandAttemptEvent(EntityUid user) : CancellableEntityEventArgs
 {
-    public EntityUid User { get; } = user;
+    public EntityUid User { get; private set; } = user;
 }

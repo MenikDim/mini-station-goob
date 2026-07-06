@@ -23,5 +23,5 @@ public sealed partial class NoiseIndexComponent : Component
     ///     Keyed by noise generator prototype ID.
     /// </summary>
     [Access(typeof(NoiseIndexSystem), Friend = AccessPermissions.ReadWriteExecute, Other = AccessPermissions.None)]
-    public Dictionary<string, NoiseGenerator> Generators { get; } = new();
+    public Dictionary<string, NoiseGenerator> Generators { get; private set; } = new();
 }

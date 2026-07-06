@@ -29,8 +29,6 @@ typan-war-manifest =
     {"[color=#FFB0B0]▸[/color] [color=#FFB0B0][bold]Syndicate[/bold][/color]: eliminate all combat-capable [color=#A8C8FF]NanoTrasen[/color] forces."}
     {"[color=#85C97A]▸[/color] Targeting systems are configured [bold]not to harm allies[/bold] with [bold]ranged[/bold] weapons. Use [color=#F0D890]Ally Protection[/color] when needed."}
 
-typan-war-ff-action-name = Ally protection
-typan-war-ff-action-desc = Do not harm allies with ranged weapons.
 typan-war-ff-enabled = Ally protection enabled — you will not hit allies.
 typan-war-ff-disabled = Ally protection disabled.
 
@@ -57,7 +55,7 @@ typan-war-end-announce-typan-elimination = The station war has ended. [color=#FF
 typan-war-end-announce-stalemate = The station war has ended in a stalemate.
 
 typan-war-round-end-header = [color=#F0D890][bold]Station War[/bold][/color]
-typan-war-round-end-initial = Initial roster: NT {$nt}, Typan {$typan}
+typan-war-round-end-initial = Total deployed: NT {$nt}, Typan {$typan}
 typan-war-round-end-final = Survivors: NT {$nt}, Typan {$typan}
 typan-war-round-end-losses = Losses: NT {$ntLoss}%, Typan {$typanLoss}%
 typan-war-round-end-nt-goal = NT station goal: {$goal}

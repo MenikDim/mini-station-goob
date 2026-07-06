@@ -1,4 +1,4 @@
-﻿using Content.Shared.Procedural;
+using Content.Shared.Procedural;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Lavaland.Procedural.Prototypes;
@@ -12,7 +12,7 @@ public sealed partial class LavalandDungeonRuinPrototype : IPrototype
 {
     /// <inheritdoc/>
     [IdDataField]
-    public string ID { get; } = default!;
+    public string ID { get; private set; } = default!;
 
     [DataField(required: true)]
     public ProtoId<DungeonConfigPrototype> Config;

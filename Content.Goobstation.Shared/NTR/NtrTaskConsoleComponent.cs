@@ -80,10 +80,10 @@ public sealed class NtrTaskConsoleState(
     HashSet<string>? locked = null)
     : BoundUserInterfaceState
 {
-    public List<NtrTaskData> AvailableTasks { get; } = available;
-    public List<NtrTaskHistoryData> History { get; } = history;
-    public TimeSpan UntilNextSkip { get; } = skipTime;
-    public HashSet<string> LockedTasks { get; } = locked ?? new HashSet<string>();
+    public List<NtrTaskData> AvailableTasks { get; private set; } = available;
+    public List<NtrTaskHistoryData> History { get; private set; } = history;
+    public TimeSpan UntilNextSkip { get; private set; } = skipTime;
+    public HashSet<string> LockedTasks { get; private set; } = locked ?? new HashSet<string>();
 }
 
 [Serializable, NetSerializable]

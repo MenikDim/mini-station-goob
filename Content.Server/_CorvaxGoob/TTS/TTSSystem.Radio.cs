@@ -174,8 +174,8 @@ public sealed partial class TTSSystem
 
     private sealed class RadioTtsRequestState(Task<byte[]?> soundTask, uint createdTick)
     {
-        public Task<byte[]?> SoundTask { get; } = soundTask;
-        public uint CreatedTick { get; } = createdTick;
-        public HashSet<EntityUid> DeliveredReceivers { get; } = new();
+        public Task<byte[]?> SoundTask { get; private set; } = soundTask;
+        public uint CreatedTick { get; private set; } = createdTick;
+        public HashSet<EntityUid> DeliveredReceivers { get; private set; } = new();
     }
 }

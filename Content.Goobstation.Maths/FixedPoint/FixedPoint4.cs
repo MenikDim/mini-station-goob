@@ -46,9 +46,9 @@ namespace Content.Goobstation.Maths.FixedPoint
         private const long Shift = 4;
         private const long ShiftConstant = 10000; // Must be equal to pow(10, Shift)
 
-        public static FixedPoint4 MaxValue { get; } = new(long.MaxValue);
-        public static FixedPoint4 Epsilon { get; } = new(1);
-        public static FixedPoint4 Zero { get; } = new(0);
+        public static FixedPoint4 MaxValue { get; private set; } = new(long.MaxValue);
+        public static FixedPoint4 Epsilon { get; private set; } = new(1);
+        public static FixedPoint4 Zero { get; private set; } = new(0);
 
         // This value isn't picked by any proper testing, don't @ me.
         private const float FloatEpsilon = 0.00001f;

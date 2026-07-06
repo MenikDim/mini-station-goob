@@ -9,7 +9,7 @@ namespace Content.Shared.Administration
 {
     public abstract class SharedBwoinkSystem : EntitySystem
     {
-        public static NetUserId SystemUserId { get; } = new NetUserId(Guid.Empty);
+        public static NetUserId SystemUserId { get; private set; } = new NetUserId(Guid.Empty);
 
         public override void Initialize()
         {

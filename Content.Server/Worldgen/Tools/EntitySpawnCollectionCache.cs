@@ -95,7 +95,7 @@ public sealed class EntitySpawnCollectionCache
 
     private sealed class OrGroup
     {
-        [ViewVariables] public List<EntitySpawnEntry> Entries { get; } = new();
+        [ViewVariables] public List<EntitySpawnEntry> Entries { get; private set; } = new();
 
         [ViewVariables] public float CumulativeProbability { get; set; }
     }

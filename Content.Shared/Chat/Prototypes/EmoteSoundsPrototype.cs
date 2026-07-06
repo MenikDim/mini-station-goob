@@ -26,12 +26,12 @@ public sealed partial class EmoteSoundsPrototype : IPrototype, IInheritingProtot
 
     /// <inheritdoc/>
     [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<EmoteSoundsPrototype>))]
-    public string[]? Parents { get; private set; }
+    public string[]? Parents { get; set; }
 
     /// <inheritdoc/>
     [AbstractDataField]
     [NeverPushInheritance]
-    public bool Abstract { get; }
+    public bool Abstract { get; set; }
 
     /// <summary>
     ///     Optional fallback sound that will play if collection

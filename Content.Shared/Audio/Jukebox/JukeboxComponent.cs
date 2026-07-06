@@ -57,13 +57,13 @@ public sealed class JukeboxStopMessage : BoundUserInterfaceMessage;
 [Serializable, NetSerializable]
 public sealed class JukeboxSelectedMessage(ProtoId<JukeboxPrototype> songId) : BoundUserInterfaceMessage
 {
-    public ProtoId<JukeboxPrototype> SongId { get; } = songId;
+    public ProtoId<JukeboxPrototype> SongId { get; private set; } = songId;
 }
 
 [Serializable, NetSerializable]
 public sealed class JukeboxSetTimeMessage(float songTime) : BoundUserInterfaceMessage
 {
-    public float SongTime { get; } = songTime;
+    public float SongTime { get; private set; } = songTime;
 }
 
 [Serializable, NetSerializable]

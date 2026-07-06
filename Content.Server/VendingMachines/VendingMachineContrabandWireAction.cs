@@ -21,7 +21,7 @@ public sealed partial class VendingMachineContrabandWireAction : BaseToggleWireA
     public override Color Color { get; set; } = Color.Green;
     public override string Name { get; set; } = "wire-name-vending-contraband";
     public override object? StatusKey { get; } = ContrabandWireKey.StatusKey;
-    public override object? TimeoutKey { get; } = ContrabandWireKey.TimeoutKey;
+    public override object? TimeoutKey { get; set; } = ContrabandWireKey.TimeoutKey;
 
     public override void Initialize()
     {

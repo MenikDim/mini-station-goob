@@ -19,6 +19,6 @@ namespace Content.Server.Atmos.Piping.Binary.Components
         public string PipeName { get; set; } = "connected";
 
         [ViewVariables(VVAccess.ReadOnly)]
-        public GasMixture Buffer { get; } = new();
+        public GasMixture Buffer { get; private set; } = new();
     }
 }

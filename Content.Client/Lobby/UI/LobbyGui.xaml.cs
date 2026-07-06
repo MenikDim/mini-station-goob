@@ -36,7 +36,7 @@ namespace Content.Client.Lobby.UI
 
         private int _prevNumberRoles;
 
-        public GhostTargetWindow TargetWindow { get; } = null!;
+        public GhostTargetWindow TargetWindow { get; private set; } = null!;
 
         public LobbyGui()
         {

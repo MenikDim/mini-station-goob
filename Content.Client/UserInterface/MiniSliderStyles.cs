@@ -101,7 +101,7 @@ public static class MiniSliderStyles
         return box;
     }
 
-    public static StyleBoxFlat Transparent { get; } = new()
+    public static StyleBoxFlat Transparent { get; private set; } = new()
     {
         BackgroundColor = Color.Transparent,
     };

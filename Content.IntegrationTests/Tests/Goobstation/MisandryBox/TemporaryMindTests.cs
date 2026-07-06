@@ -3,6 +3,7 @@ using Content.Goobstation.Server.MisandryBox.Mind;
 using Content.Goobstation.Shared.MisandryBox.Mind;
 using Content.IntegrationTests.Pair;
 using Content.Server.GameTicking;
+using Content.Shared.GameTicking;
 using Content.Shared.Ghost;
 using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
@@ -160,12 +161,20 @@ public sealed class TemporaryMindTests
             InLobby = true,
         });
 
-        var ticker = pair.Server.System<GameTicker>();
-        await pair.Server.WaitPost(() =>
+        var server = pair.Server;
+        var ticker = server.System<GameTicker>();
+        await server.WaitPost(() =>
         {
+            ticker.SetGamePreset("Sandbox");
+            ticker.ClearGameRules();
             ticker.ToggleReadyAll(true);
-            ticker.StartRound();
+            ticker.StartRound(force: true);
         });
+
+        await PoolManager.WaitUntil(server,
+            () => ticker.RunLevel == GameRunLevel.InRound && pair.Player?.AttachedEntity != null,
+            maxTicks: 600);
+
         await pair.RunTicksSync(10);
 
         return pair;
@@ -190,8 +199,9 @@ public sealed class TemporaryMindTests
 
         await server.WaitPost(() =>
         {
-            // Use the player's existing mind from the round start
-            mindSys.TryGetMind(player, out var origMindId, out _);
+            Assert.That(mindSys.TryGetMind(player, out var origMindId, out _), Is.True,
+                "Player should have a mind after round start");
+            Assert.That(origMindId, Is.Not.EqualTo(EntityUid.Invalid));
             ctx.OrigMindId = origMindId;
 
             ctx.OriginalBody = entMan.SpawnEntity(null, MapCoordinates.Nullspace);

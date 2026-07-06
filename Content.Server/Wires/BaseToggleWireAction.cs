@@ -34,8 +34,8 @@ public abstract partial class BaseToggleWireAction : BaseWireAction
     ///     be set to the opposite of what it currently is
     ///     (according to GetValue)
     /// </summary>
-    public virtual object? TimeoutKey { get; } = null;
-    public virtual int Delay { get; } = 30;
+    public virtual object? TimeoutKey { get; set; } = null;
+    public virtual int Delay { get; set; } = 30;
 
     public override bool Cut(EntityUid user, Wire wire)
     {

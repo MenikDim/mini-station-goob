@@ -12,5 +12,5 @@ public enum NameSelectorUiKey
 public sealed class NameSelectedMessage(string name)
     : BoundUserInterfaceMessage
 {
-    public string Name { get; } = name;
+    public string Name { get; private set; } = name;
 }

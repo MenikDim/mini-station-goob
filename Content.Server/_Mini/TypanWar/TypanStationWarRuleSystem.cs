@@ -21,6 +21,7 @@ using Content.Shared.Ghost;
 using Content.Shared.Mind;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Roles;
 using Content.Shared.Roles.Jobs;
 using Content.Server.Station.Systems;
 using Content.Shared.Silicons.Borgs.Components;
@@ -34,6 +35,7 @@ using Robust.Shared.Maths;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Timing;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace Content.Server._Mini.TypanWar;
@@ -144,13 +146,22 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
 
     private void OnPlayerSpawnComplete(PlayerSpawnCompleteEvent args)
     {
+        if (TryGetRunningWarRule(out var component)
+            && component.Phase is TypanWarPhase.Pending or TypanWarPhase.Active)
+        {
+            if (_mind.TryGetMind(args.Mob, out var mindId, out var mind))
+                RecordFactionJoin(component, (mindId, mind));
+            else if (args.JobId is { } jobId)
+                RecordFactionJoin(component, args.Player.UserId, jobId);
+        }
+
         if (!IsWarActive)
             return;
 
-        if (!_mind.TryGetMind(args.Mob, out var mindId, out var mind))
+        if (!_mind.TryGetMind(args.Mob, out var combatMindId, out var combatMind))
             return;
 
-        if (TryGetWarSide((mindId, mind), out var side) && !IsSilicon(args.Mob))
+        if (TryGetWarSide((combatMindId, combatMind), out var side) && !IsSilicon(args.Mob))
             _friendlyFire.SetupCombatant(args.Mob, side);
     }
 
@@ -218,6 +229,7 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         component.WarEndTime = component.WarStartTime + TimeSpan.FromSeconds(component.WarDurationSeconds);
 
         IsModeActive = true;
+        SeedJoinedRoster(component);
         BroadcastStatus(component);
     }
 
@@ -313,18 +325,21 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         var typanAlive = CountTypanAlive();
 
         args.AddLine(Loc.GetString("typan-war-round-end-header"));
+        var ntJoined = component.NtJoinedUsers.Count;
+        var typanJoined = component.TypanJoinedUsers.Count;
+
         args.AddLine(Loc.GetString("typan-war-round-end-initial",
-            ("nt", component.InitialNtAlive),
-            ("typan", component.InitialTypanAlive)));
+            ("nt", ntJoined),
+            ("typan", typanJoined)));
         args.AddLine(Loc.GetString("typan-war-round-end-final",
             ("nt", ntAlive),
             ("typan", typanAlive)));
 
-        var ntLossPct = component.InitialNtAlive > 0
-            ? (int) Math.Round((component.InitialNtAlive - ntAlive) * 100f / component.InitialNtAlive)
+        var ntLossPct = ntJoined > 0
+            ? (int) Math.Round((ntJoined - ntAlive) * 100f / ntJoined)
             : 0;
-        var typanLossPct = component.InitialTypanAlive > 0
-            ? (int) Math.Round((component.InitialTypanAlive - typanAlive) * 100f / component.InitialTypanAlive)
+        var typanLossPct = typanJoined > 0
+            ? (int) Math.Round((typanJoined - typanAlive) * 100f / typanJoined)
             : 0;
         args.AddLine(Loc.GetString("typan-war-round-end-losses",
             ("ntLoss", ntLossPct),
@@ -390,8 +405,7 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         }
 
         CacheStationGoalTitles(component);
-        component.InitialNtAlive = ntAlive;
-        component.InitialTypanAlive = typanAlive;
+        SeedJoinedRoster(component);
         component.Phase = TypanWarPhase.Active;
         IsWarActive = true;
 
@@ -509,10 +523,7 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         if (!component.WarSupplyEventSent && elapsed >= component.WarSupplyEventDelaySeconds)
         {
             component.WarSupplyEventSent = true;
-            _chat.DispatchGlobalAnnouncement(
-                Loc.GetString("typan-war-event-supply"),
-                Loc.GetString("typan-war-sender"),
-                colorOverride: Color.Gold);
+            SendMarkupGlobalAnnouncement(Loc.GetString("typan-war-event-supply"));
         }
 
         if (!component.WarIntelEventSent && elapsed >= component.WarIntelEventDelaySeconds)
@@ -520,12 +531,9 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
             component.WarIntelEventSent = true;
             var ntAlive = CountNtAlive();
             var typanAlive = CountTypanAlive();
-            _chat.DispatchGlobalAnnouncement(
-                Loc.GetString("typan-war-event-intel",
-                    ("nt", ntAlive),
-                    ("typan", typanAlive)),
-                Loc.GetString("typan-war-sender"),
-                colorOverride: Color.Cyan);
+            SendMarkupGlobalAnnouncement(Loc.GetString("typan-war-event-intel",
+                ("nt", ntAlive),
+                ("typan", typanAlive)));
         }
     }
 
@@ -623,8 +631,10 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         if (ntAlive < 1)
             return TypanWarWinner.Typan;
 
-        var ntLoss = (component.InitialNtAlive - ntAlive) / (float) Math.Max(component.InitialNtAlive, 1);
-        var typanLoss = (component.InitialTypanAlive - typanAlive) / (float) Math.Max(component.InitialTypanAlive, 1);
+        var ntJoined = component.NtJoinedUsers.Count;
+        var typanJoined = component.TypanJoinedUsers.Count;
+        var ntLoss = (ntJoined - ntAlive) / (float) Math.Max(ntJoined, 1);
+        var typanLoss = (typanJoined - typanAlive) / (float) Math.Max(typanJoined, 1);
 
         if (Math.Abs(ntLoss - typanLoss) < 0.001f)
         {
@@ -818,6 +828,55 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         RaiseNetworkEvent(
             new TypanWarStatusEvent(TypanWarPhase.Inactive, 0, 0, 0),
             session);
+    }
+
+    private void SeedJoinedRoster(TypanStationWarRuleComponent component)
+    {
+        var minds = EntityQueryEnumerator<MindComponent>();
+        while (minds.MoveNext(out var mindId, out var mind))
+            RecordFactionJoin(component, (mindId, mind));
+    }
+
+    private void RecordFactionJoin(TypanStationWarRuleComponent component, Entity<MindComponent> mind)
+    {
+        if (mind.Comp.UserId is not { } userId)
+            return;
+
+        if (_typanJobs.MindHasHandledJob(mind.Owner))
+        {
+            component.TypanJoinedUsers.Add(userId);
+            return;
+        }
+
+        if (_jobs.MindTryGetJobId(mind.Owner, out var jobId) && jobId != null)
+            component.NtJoinedUsers.Add(userId);
+    }
+
+    private void RecordFactionJoin(TypanStationWarRuleComponent component, NetUserId userId, string jobId)
+    {
+        if (_typanJobs.IsHandledJob(new ProtoId<JobPrototype>(jobId)))
+            component.TypanJoinedUsers.Add(userId);
+        else
+            component.NtJoinedUsers.Add(userId);
+    }
+
+    private bool TryGetRunningWarRule([NotNullWhen(true)] out TypanStationWarRuleComponent? component)
+    {
+        var query = EntityQueryEnumerator<TypanStationWarRuleComponent, GameRuleComponent>();
+        while (query.MoveNext(out var uid, out var comp, out var gameRule))
+        {
+            if (!GameTicker.IsGameRuleActive(uid, gameRule))
+                continue;
+
+            if (comp.Phase is TypanWarPhase.Inactive or TypanWarPhase.Ended)
+                continue;
+
+            component = comp;
+            return true;
+        }
+
+        component = null;
+        return false;
     }
 
     private bool TryResolveStations(TypanStationWarRuleComponent component, out EntityUid ntStation, out EntityUid typanStation)

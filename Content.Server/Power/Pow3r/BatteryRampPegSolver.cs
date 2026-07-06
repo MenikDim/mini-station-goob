@@ -38,7 +38,7 @@ namespace Content.Server.Power.Pow3r
 
         private sealed class HeightComparer : Comparer<Network>
         {
-            public static HeightComparer Instance { get; } = new();
+            public static HeightComparer Instance { get; private set; } = new();
 
             public override int Compare(Network? x, Network? y)
             {

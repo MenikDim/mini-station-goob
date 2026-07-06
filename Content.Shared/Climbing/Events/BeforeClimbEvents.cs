@@ -28,7 +28,7 @@ public abstract partial class BeforeClimbEvent : CancellableEntityEventArgs
 /// </summary>
 public sealed class SelfBeforeClimbEvent : BeforeClimbEvent, IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots { get; } = SlotFlags.WITHOUT_POCKET;
+    public SlotFlags TargetSlots { get; private set; } = SlotFlags.WITHOUT_POCKET;
     public SelfBeforeClimbEvent(EntityUid gettingPutOntable, EntityUid puttingOnTable, Entity<ClimbableComponent> beingClimbedOn) : base(gettingPutOntable, puttingOnTable, beingClimbedOn) { }
 }
 

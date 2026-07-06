@@ -225,7 +225,14 @@ public abstract class SharedActionsSystem : EntitySystem
 
     private void OnGetState(Entity<ActionsComponent> ent, ref ComponentGetState args)
     {
-        args.State = new ActionsComponentState(GetNetEntitySet(ent.Comp.Actions));
+        var actions = new HashSet<EntityUid>();
+        foreach (var action in ent.Comp.Actions)
+        {
+            if (Exists(action))
+                actions.Add(action);
+        }
+
+        args.State = new ActionsComponentState(GetNetEntitySet(actions));
     }
 
     /// <summary>

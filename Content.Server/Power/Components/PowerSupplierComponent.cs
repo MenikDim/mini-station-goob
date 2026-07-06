@@ -73,7 +73,7 @@ namespace Content.Server.Power.Components
         [ViewVariables] public float CurrentSupply => NetworkSupply.CurrentSupply;
 
         [ViewVariables]
-        public PowerState.Supply NetworkSupply { get; } = new();
+        public PowerState.Supply NetworkSupply { get; private set; } = new();
 
         protected override void AddSelfToNet(IBasePowerNet powerNet)
         {

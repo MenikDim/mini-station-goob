@@ -21,5 +21,5 @@ public sealed class GasPressureRegulatorChangeThresholdMessage(float pressure) :
     /// <summary>
     /// Gets the new threshold pressure value.
     /// </summary>
-    public float ThresholdPressure { get; } = pressure;
+    public float ThresholdPressure { get; private set; } = pressure;
 }

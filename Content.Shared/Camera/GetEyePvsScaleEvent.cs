@@ -39,7 +39,7 @@ public record struct GetEyePvsScaleAttemptEvent(bool Cancelled);
 [ByRefEvent]
 public sealed class GetEyePvsScaleRelayedEvent : EntityEventArgs, IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots { get; } = ~(SlotFlags.POCKET & SlotFlags.SUITSTORAGE);
+    public SlotFlags TargetSlots { get; private set; } = ~(SlotFlags.POCKET & SlotFlags.SUITSTORAGE);
 
     public float Scale;
 }

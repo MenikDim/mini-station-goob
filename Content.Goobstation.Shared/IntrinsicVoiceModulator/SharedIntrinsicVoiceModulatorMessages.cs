@@ -23,27 +23,27 @@ public sealed class IntrinsicVoiceModulatorBoundUserInterfaceState(
     ProtoId<JobIconPrototype>? jobIcon)
     : BoundUserInterfaceState
 {
-    public string CurrentName { get; } = currentName;
-    public ProtoId<SpeechVerbPrototype>? CurrentVerb { get; } = currentVerb;
-    public ProtoId<JobIconPrototype>? JobIcon { get; } = jobIcon;
+    public string CurrentName { get; private set; } = currentName;
+    public ProtoId<SpeechVerbPrototype>? CurrentVerb { get; private set; } = currentVerb;
+    public ProtoId<JobIconPrototype>? JobIcon { get; private set; } = jobIcon;
 }
 
 [NetSerializable, Serializable]
 public sealed class IntrinsicVoiceModulatorNameChangedMessage(string name) : BoundUserInterfaceMessage
 {
-    public string Name { get; } = name;
+    public string Name { get; private set; } = name;
 }
 
 [NetSerializable, Serializable]
 public sealed class IntrinsicVoiceModulatorJobIconChangedMessage(ProtoId<JobIconPrototype> jobIconProtoId)
     : BoundUserInterfaceMessage
 {
-    public ProtoId<JobIconPrototype> JobIconProtoId { get; } = jobIconProtoId;
+    public ProtoId<JobIconPrototype> JobIconProtoId { get; private set; } = jobIconProtoId;
 }
 
 [NetSerializable, Serializable]
 public sealed class IntrinsicVoicemodulatorVerbChangedMessage(ProtoId<SpeechVerbPrototype>? speechProtoId)
     : BoundUserInterfaceMessage
 {
-    public ProtoId<SpeechVerbPrototype>? SpeechProtoId { get; } = speechProtoId;
+    public ProtoId<SpeechVerbPrototype>? SpeechProtoId { get; private set; } = speechProtoId;
 }

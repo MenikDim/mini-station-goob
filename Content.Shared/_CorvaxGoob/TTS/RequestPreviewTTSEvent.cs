@@ -6,5 +6,5 @@ namespace Content.Shared._CorvaxGoob.TTS;
 [Serializable, NetSerializable]
 public sealed class RequestPreviewTTSEvent(string voiceId) : EntityEventArgs
 {
-    public string VoiceId { get; } = voiceId;
+    public string VoiceId { get; private set; } = voiceId;
 }

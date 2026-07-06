@@ -106,7 +106,7 @@ public sealed partial class ForceshieldSpellbladeEnchantmentEvent : EntityEventA
 public sealed class SpellbladeEnchantMessage(ProtoId<SpellbladeEnchantmentPrototype> protoId)
     : BoundUserInterfaceMessage
 {
-    public ProtoId<SpellbladeEnchantmentPrototype> ProtoId { get; } = protoId;
+    public ProtoId<SpellbladeEnchantmentPrototype> ProtoId { get; private set; } = protoId;
 }
 
 [Serializable, NetSerializable]

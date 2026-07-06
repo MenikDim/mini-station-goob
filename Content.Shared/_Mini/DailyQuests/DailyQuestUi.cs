@@ -70,5 +70,5 @@ public sealed class DailyQuestEntry
 [Serializable, NetSerializable]
 public sealed class DailyQuestClaimRequestEvent(string questId) : EntityEventArgs
 {
-    public string QuestId { get; } = questId;
+    public string QuestId { get; private set; } = questId;
 }

@@ -21,7 +21,7 @@ public abstract class BasePowerNet<TNetType> : BaseNetConnectorNodeGroup<TNetTyp
     public PowerNetSystem PowerNetSystem = default!;
 
     [ViewVariables]
-    public PowerState.Network NetworkNode { get; } = new();
+    public PowerState.Network NetworkNode { get; private set; } = new();
 
     public override void Initialize(Node sourceNode, IEntityManager entMan)
     {

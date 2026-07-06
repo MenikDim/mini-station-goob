@@ -49,7 +49,7 @@ namespace Content.Server.Power.Components
 
         public float LastReceived = float.NaN;
 
-        public PowerState.Load NetworkLoad { get; } = new();
+        public PowerState.Load NetworkLoad { get; private set; } = new();
 
         protected override void AddSelfToNet(IBasePowerNet powerNet)
         {

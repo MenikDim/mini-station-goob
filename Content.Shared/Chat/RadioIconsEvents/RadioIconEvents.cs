@@ -10,7 +10,7 @@ namespace Content.Shared.Chat.RadioIconsEvents;
 public sealed class TransformSpeakerJobIconEvent(EntityUid sender, ProtoId<JobIconPrototype> jobIcon, string? jobName)
     : EntityEventArgs, IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots { get; } = SlotFlags.WITHOUT_POCKET;
+    public SlotFlags TargetSlots { get; private set; } = SlotFlags.WITHOUT_POCKET;
     public EntityUid Sender = sender;
     public ProtoId<JobIconPrototype> JobIcon = jobIcon;
     public string? JobName = jobName;

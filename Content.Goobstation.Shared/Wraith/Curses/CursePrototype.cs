@@ -6,13 +6,13 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Goobstation.Shared.Wraith.Curses;
 
 [Prototype]
-public sealed class CursePrototype : IPrototype
+public sealed partial class CursePrototype : IPrototype
 {
     [IdDataField]
-    public string ID { get; } = default!;
+    public string ID { get; private set; } = default!;
 
     [DataField]
-    public string Name { get; } = string.Empty;
+    public string Name { get; private set; } = string.Empty;
 
     /// <summary>
     /// A dictionary that holds the random value that determines which list of entity effects will happen on the user.
@@ -43,10 +43,10 @@ public sealed partial class CurseStatusIconPrototype : StatusIconPrototype, IInh
 {
     /// <inheritdoc />
     [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<CurseStatusIconPrototype>))]
-    public string[]? Parents { get; private set; }
+    public string[]? Parents { get; set; }
 
     /// <inheritdoc />
     [NeverPushInheritance]
     [AbstractDataField]
-    public bool Abstract { get; private set; }
+    public bool Abstract { get; set; }
 }

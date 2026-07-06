@@ -9,10 +9,10 @@ public sealed partial class InfectionIconPrototype : StatusIconPrototype, IInher
 {
     /// <inheritdoc />
     [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<InfectionIconPrototype>))]
-    public string[]? Parents { get; }
+    public string[]? Parents { get; set; }
 
     /// <inheritdoc />
     [NeverPushInheritance]
     [AbstractDataField]
-    public bool Abstract { get; }
+    public bool Abstract { get; set; }
 }

@@ -19,5 +19,5 @@ public sealed class FootprintChangedEvent(NetEntity entity) : EntityEventArgs
 [ByRefEvent]
 public sealed class FootprintLeaveAttemptEvent(EntityUid uid) : CancellableEntityEventArgs
 {
-    public EntityUid Uid { get; } = uid;
+    public EntityUid Uid { get; private set; } = uid;
 }

@@ -26,10 +26,10 @@ public sealed class ComboAttackPerformedEvent(
     ComboAttackType type)
     : CancellableEntityEventArgs
 {
-    public EntityUid Performer { get; } = performer;
-    public EntityUid Target { get; } = target;
-    public EntityUid Weapon { get; } = weapon;
-    public ComboAttackType Type { get; } = type;
+    public EntityUid Performer { get; private set; } = performer;
+    public EntityUid Target { get; private set; } = target;
+    public EntityUid Weapon { get; private set; } = weapon;
+    public ComboAttackType Type { get; private set; } = type;
 }
 
 [Serializable, NetSerializable]

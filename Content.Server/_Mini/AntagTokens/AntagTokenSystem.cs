@@ -2158,7 +2158,7 @@ private void NormalizeMonthlyState(PlayerTokenState state, DateTime nowUtc, NetU
     private sealed class OnlineRewardState
     {
         private static readonly TimeSpan RewardCycleLength = TimeSpan.FromHours(24);
-        public HashSet<TimeSpan> GrantedThresholds { get; } = new();
+        public HashSet<TimeSpan> GrantedThresholds { get; private set; } = new();
         private TimeSpan _accumulatedOnline = TimeSpan.Zero;
         private DateTime? _onlineSinceUtc;
         private DateTime _cycleStartUtc = DateTime.MinValue;
@@ -2240,11 +2240,11 @@ private void NormalizeMonthlyState(PlayerTokenState state, DateTime nowUtc, NetU
         /// </summary>
         public bool GhostAntagConsumedMark { get; set; }
 
-        public Dictionary<string, int> RoleCredits { get; } = new();
+        public Dictionary<string, int> RoleCredits { get; private set; } = new();
 
-        public HashSet<ProtoId<JobPrototype>> JobUnlocks { get; } = new();
+        public HashSet<ProtoId<JobPrototype>> JobUnlocks { get; private set; } = new();
 
-        public HashSet<ProtoId<AntagPrototype>> AntagUnlocks { get; } = new();
+        public HashSet<ProtoId<AntagPrototype>> AntagUnlocks { get; private set; } = new();
     }
 
     private void OnGhostRoleTakenForToken(EntityUid uid, GhostRoleComponent _, ref TakeGhostRoleEvent args)

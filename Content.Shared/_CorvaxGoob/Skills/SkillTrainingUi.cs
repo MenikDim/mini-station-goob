@@ -11,11 +11,11 @@ public enum SkillTrainingUiKey : byte
 [Serializable, NetSerializable]
 public sealed class SkillTrainingBoundUserInterfaceState(List<Skills> skills) : BoundUserInterfaceState
 {
-    public List<Skills> Skills { get; } = skills;
+    public List<Skills> Skills { get; private set; } = skills;
 }
 
 [Serializable, NetSerializable]
 public sealed class SkillTrainingSelectSkillMessage(Skills skill) : BoundUserInterfaceMessage
 {
-    public Skills Skill { get; } = skill;
+    public Skills Skill { get; private set; } = skill;
 }

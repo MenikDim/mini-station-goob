@@ -32,9 +32,9 @@ public sealed partial class ListenWireAction : BaseToggleWireAction
 
     public override object? StatusKey { get; } = ListenWireActionKey.StatusKey;
 
-    public override object? TimeoutKey { get; } = ListenWireActionKey.TimeoutKey;
+    public override object? TimeoutKey { get; set; } = ListenWireActionKey.TimeoutKey;
 
-    public override int Delay { get; } = 10;
+    public override int Delay { get; set; } = 10;
 
     public override void Initialize()
     {

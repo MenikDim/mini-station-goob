@@ -43,7 +43,7 @@ public sealed class ReagentEntry
     public string SubstanceColor { get; }
 
     [JsonPropertyName("recipes")]
-    public List<string> Recipes { get; } = new();
+    public List<string> Recipes { get; private set; } = new();
 
     [JsonPropertyName("metabolisms")]
     public Dictionary<string, ReagentEffectsEntry>? Metabolisms { get; }

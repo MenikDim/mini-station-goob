@@ -4,6 +4,7 @@ using Content.Goobstation.Shared.Traitor.PenSpin;
 using Content.IntegrationTests.Pair;
 using Content.Server.GameTicking;
 using Content.Server.Traitor.Uplink;
+using Content.Shared.GameTicking;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Implants.Components;
 using Content.Shared.PDA;
@@ -40,10 +41,15 @@ public sealed class UplinkPreferenceTests
 
         await server.WaitPost(() =>
         {
+            ticker.SetGamePreset("Sandbox");
+            ticker.ClearGameRules();
             ticker.ToggleReadyAll(true);
-            ticker.StartRound();
+            ticker.StartRound(force: true);
         });
-        await _pair.RunTicksSync(10);
+
+        await PoolManager.WaitUntil(server,
+            () => ticker.RunLevel == GameRunLevel.InRound && _pair.Player?.AttachedEntity != null,
+            maxTicks: 600);
 
         _player = _pair.Player!.AttachedEntity!.Value;
     }

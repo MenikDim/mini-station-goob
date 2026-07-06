@@ -18,7 +18,7 @@ public sealed partial class ContrabandDetectorBadChanceWireAction : BaseToggleWi
     public override Color Color { get; set; } = Color.DarkOrange;
     public override string Name { get; set; } = "wire-name-contraband-detector-chance";
     public override object? StatusKey { get; } = ContrabandDetectorChanceWireKey.StatusKey;
-    public override object? TimeoutKey { get; } = ContrabandDetectorChanceWireKey.TimeoutKey;
+    public override object? TimeoutKey { get; set; } = ContrabandDetectorChanceWireKey.TimeoutKey;
 
     public override void Initialize()
     {

@@ -74,7 +74,7 @@ namespace Content.Server.GameTicking
         /// How long before RoundStartTime do we load maps.
         /// </summary>
         [ViewVariables]
-        public TimeSpan RoundPreloadTime { get; } = TimeSpan.FromSeconds(20); // Lavaland Change: make it a bit earlier
+        public TimeSpan RoundPreloadTime { get; private set; } = TimeSpan.FromSeconds(20); // Lavaland Change: make it a bit earlier
 
         [ViewVariables]
         private TimeSpan _pauseTime;

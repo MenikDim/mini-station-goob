@@ -65,7 +65,7 @@ public abstract record DiseaseSpreadAttemptEvent(float Power, float Chance, Prot
 {
     public float Power { get; set; } = Power;
     public float Chance { get; set; } = Chance;
-    public ProtoId<DiseaseSpreadPrototype> Type { get; } = Type;
+    public ProtoId<DiseaseSpreadPrototype> Type { get; private set; } = Type;
 
     public SlotFlags TargetSlots => SlotFlags.WITHOUT_POCKET;
 

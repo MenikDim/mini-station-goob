@@ -72,8 +72,8 @@ public sealed class ChangeCvarCommand : IConsoleCommand
     }
 
     public string Command => "changecvar";
-    public string Description { get; } = Loc.GetString("cmd-changecvar-desc");
-    public string Help { get; } = Loc.GetString("cmd-changecvar-help");
+    public string Description { get; private set; } = Loc.GetString("cmd-changecvar-desc");
+    public string Help { get; private set; } = Loc.GetString("cmd-changecvar-help");
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
         if (args.Length == 0)

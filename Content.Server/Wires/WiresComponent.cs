@@ -60,7 +60,7 @@ public sealed partial class WiresComponent : Component
     ///     Queue of wires saved while the wire's DoAfter event occurs, to prevent too much spam.
     /// </summary>
     [ViewVariables]
-    public List<int> WiresQueue { get; } = new();
+    public List<int> WiresQueue { get; private set; } = new();
 
     /// <summary>
     ///     If this should follow the layout saved the first time the layout dictated by the
@@ -73,7 +73,7 @@ public sealed partial class WiresComponent : Component
     ///     Per wire status, keyed by an object.
     /// </summary>
     [ViewVariables]
-    public Dictionary<object, object> Statuses { get; } = new();
+    public Dictionary<object, object> Statuses { get; private set; } = new();
 
     /// <summary>
     ///     The state data for the set of wires inside of this entity.
@@ -81,7 +81,7 @@ public sealed partial class WiresComponent : Component
     ///     entities without any issues.
     /// </summary>
     [ViewVariables]
-    public Dictionary<object, object> StateData { get; } = new();
+    public Dictionary<object, object> StateData { get; private set; } = new();
 
     [DataField]
     public SoundSpecifier PulseSound = new SoundPathSpecifier("/Audio/Effects/multitool_pulse.ogg");

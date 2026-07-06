@@ -25,8 +25,8 @@ public sealed class BanListEui : BaseEui
 
     private Guid BanListPlayer { get; set; }
     private string BanListPlayerName { get; set; } = string.Empty;
-    private List<SharedBan> Bans { get; } = new();
-    private List<SharedBan> RoleBans { get; } = new();
+    private List<SharedBan> Bans { get; set; } = new();
+    private List<SharedBan> RoleBans { get; set; } = new();
 
     public override void Opened()
     {

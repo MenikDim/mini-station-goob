@@ -18,7 +18,7 @@ public sealed partial class BiomeDummyLayer : IBiomeLayer
 {
     [DataField("id", required: true)] public string ID = string.Empty;
 
-    public FastNoiseLite Noise { get; } = new();
+    public FastNoiseLite Noise { get; private set; } = new();
     public float Threshold { get; }
     public bool Invert { get; }
 }

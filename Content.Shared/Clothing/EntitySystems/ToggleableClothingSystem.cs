@@ -841,9 +841,9 @@ public sealed partial class AttachClothingDoAfterEvent : SimpleDoAfterEvent
 public sealed class ToggleClothingAttemptEvent(EntityUid user, EntityUid target, bool multiple)
     : CancellableEntityEventArgs
 {
-    public EntityUid User { get; } = user;
-    public EntityUid Target { get; } = target;
-    public bool Multiple { get; } = multiple;
+    public EntityUid User { get; private set; } = user;
+    public EntityUid Target { get; private set; } = target;
+    public bool Multiple { get; private set; } = multiple;
 }
 
 
@@ -865,11 +865,11 @@ public sealed class OnAttachedUnequipAttemptEvent(
     bool multiple)
     : CancellableEntityEventArgs
 {
-    public EntityUid Toggleable { get; } = toggleable;
-    public EntityUid Attached { get; } = attached;
+    public EntityUid Toggleable { get; private set; } = toggleable;
+    public EntityUid Attached { get; private set; } = attached;
 
-    public EntityUid UnEquipTarget { get; } = unequiptarget;
-    public bool Multiple { get; } = multiple;
+    public EntityUid UnEquipTarget { get; private set; } = unequiptarget;
+    public bool Multiple { get; private set; } = multiple;
 }
 
 public sealed class OnToggleableUnequipAttemptEvent(
@@ -879,10 +879,10 @@ public sealed class OnToggleableUnequipAttemptEvent(
     bool multiple)
     : CancellableEntityEventArgs
 {
-    public EntityUid Toggleable { get; } = toggleable;
-    public EntityUid Attached { get; } = attached;
-    public EntityUid UnEquipTarget { get; } = unequiptarget;
-    public bool Multiple { get; } = multiple;
+    public EntityUid Toggleable { get; private set; } = toggleable;
+    public EntityUid Attached { get; private set; } = attached;
+    public EntityUid UnEquipTarget { get; private set; } = unequiptarget;
+    public bool Multiple { get; private set; } = multiple;
 }
 
 

@@ -16,7 +16,7 @@ public sealed class ListViewSelectorState(
     List<ListViewSelectorEntry> items,
     Dictionary<string, object>? metaData = null) : BoundUserInterfaceState
 {
-    public List<ListViewSelectorEntry> Items { get; } = items;
+    public List<ListViewSelectorEntry> Items { get; private set; } = items;
     public Dictionary<string, object> MetaData = metaData ?? new();
 }
 

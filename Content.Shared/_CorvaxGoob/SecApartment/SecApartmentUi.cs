@@ -17,10 +17,10 @@ public sealed class SecApartmentUpdateState(
     List<CrewMemberInfo> unassignedSecurity,
     List<Squad> squads) : BoundUserInterfaceState
 {
-    public string StationName { get; } = stationName;
-    public List<CrewMemberInfo> SecurityCrew { get; } = securityCrew;
-    public List<CrewMemberInfo> UnassignedSecurity { get; } = unassignedSecurity;
-    public List<Squad> Squads { get; } = squads;
+    public string StationName { get; private set; } = stationName;
+    public List<CrewMemberInfo> SecurityCrew { get; private set; } = securityCrew;
+    public List<CrewMemberInfo> UnassignedSecurity { get; private set; } = unassignedSecurity;
+    public List<Squad> Squads { get; private set; } = squads;
 }
 
 [Serializable, NetSerializable]
@@ -29,28 +29,28 @@ public sealed class SensorStatusUpdateState(
     Dictionary<string, (string Location, bool HasLocation)> squadLocations)
     : BoundUserInterfaceState
 {
-    public Dictionary<string, SuitSensorStatus?> MemberStatuses { get; } = memberStatuses;
-    public Dictionary<string, (string Location, bool HasLocation)> SquadLocations { get; } = squadLocations;
+    public Dictionary<string, SuitSensorStatus?> MemberStatuses { get; private set; } = memberStatuses;
+    public Dictionary<string, (string Location, bool HasLocation)> SquadLocations { get; private set; } = squadLocations;
 }
 
 [Serializable, NetSerializable]
 public sealed class CreateSquadMessage(string squadName) : BoundUserInterfaceMessage
 {
-    public string SquadName { get; } = squadName;
+    public string SquadName { get; private set; } = squadName;
 }
 
 [Serializable, NetSerializable]
 public sealed class DeleteSquadMessage(string squadId) : BoundUserInterfaceMessage
 {
-    public string SquadId { get; } = squadId;
+    public string SquadId { get; private set; } = squadId;
 
 }
 
 [Serializable, NetSerializable]
 public sealed class RenameSquadMessage(string squadId, string newName) : BoundUserInterfaceMessage
 {
-    public string SquadId { get; } = squadId;
-    public string NewName { get; } = newName;
+    public string SquadId { get; private set; } = squadId;
+    public string NewName { get; private set; } = newName;
 
 }
 
@@ -58,51 +58,51 @@ public sealed class RenameSquadMessage(string squadId, string newName) : BoundUs
 public sealed class UpdateSquadDescriptionMessage(string squadId, string description)
     : BoundUserInterfaceMessage
 {
-    public string SquadId { get; } = squadId;
-    public string Description { get; } = description;
+    public string SquadId { get; private set; } = squadId;
+    public string Description { get; private set; } = description;
 
 }
 
 [Serializable, NetSerializable]
 public sealed class AddMemberToSquadMessage(string squadId, string memberId) : BoundUserInterfaceMessage
 {
-    public string SquadId { get; } = squadId;
-    public string MemberId { get; } = memberId;
+    public string SquadId { get; private set; } = squadId;
+    public string MemberId { get; private set; } = memberId;
 
 }
 
 [Serializable, NetSerializable]
 public sealed class RemoveMemberFromSquadMessage(string squadId, string memberId) : BoundUserInterfaceMessage
 {
-    public string SquadId { get; } = squadId;
-    public string MemberId { get; } = memberId;
+    public string SquadId { get; private set; } = squadId;
+    public string MemberId { get; private set; } = memberId;
 
 }
 
 [Serializable, NetSerializable]
 public sealed class ChangeSquadIconMessage(string squadId, SquadIconNum iconId) : BoundUserInterfaceMessage
 {
-    public string SquadId { get; } = squadId;
-    public SquadIconNum IconId { get; } = iconId;
+    public string SquadId { get; private set; } = squadId;
+    public SquadIconNum IconId { get; private set; } = iconId;
 
 }
 
 [Serializable, NetSerializable]
 public sealed class ChangeSquadStatusMessage(string squadId, SquadStatus status) : BoundUserInterfaceMessage
 {
-    public string SquadId { get; } = squadId;
-    public SquadStatus Status { get; } = status;
+    public string SquadId { get; private set; } = squadId;
+    public SquadStatus Status { get; private set; } = status;
 }
 
 [Serializable, NetSerializable]
 public sealed class TimerUpdateState(List<TimerEntry> timers) : BoundUserInterfaceState
 {
-    public List<TimerEntry> Timers { get; } = timers;
+    public List<TimerEntry> Timers { get; private set; } = timers;
 
 }
 
 [Serializable, NetSerializable]
 public sealed class RemoveTimerMessage(NetEntity timerUid) : BoundUserInterfaceMessage
 {
-    public NetEntity TimerUid { get; } = timerUid;
+    public NetEntity TimerUid { get; private set; } = timerUid;
 }

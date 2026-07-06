@@ -66,12 +66,12 @@ public sealed class SlasherIncorporealObserverCheckEvent(NetEntity slasher, floa
     /// <summary>
     /// The slasher attempting to go incorporeal.
     /// </summary>
-    public NetEntity Slasher { get; } = slasher;
+    public NetEntity Slasher { get; private set; } = slasher;
 
     /// <summary>
     /// Range to check for observers with line of sight. Takes number from component.
     /// </summary>
-    public float Range { get; } = range;
+    public float Range { get; private set; } = range;
 
     /// <summary>
     /// True if the attempt should be cancelled.
@@ -88,12 +88,12 @@ public sealed class SlasherIncorporealCameraCheckEvent(NetEntity slasher, float 
     /// <summary>
     /// The slasher attempting to go incorporeal.
     /// </summary>
-    public NetEntity Slasher { get; } = slasher;
+    public NetEntity Slasher { get; private set; } = slasher;
 
     /// <summary>
     /// Range to check for active cameras with line of sight.
     /// </summary>
-    public float Range { get; } = range;
+    public float Range { get; private set; } = range;
 
     /// <summary>
     /// True if a camera can see the slasher.

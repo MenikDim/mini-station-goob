@@ -20,7 +20,7 @@ public sealed partial class SurveillanceCameraComponent : Component
     // so that when a camera shuts down, any entity viewing it
     // will immediately have their subscription revoked.
     [ViewVariables]
-    public Dictionary<EntityUid, EntityUid> ActiveViewers { get; } = new(); // Orion-Edit: Was HashSet
+    public Dictionary<EntityUid, EntityUid> ActiveViewers { get; private set; } = new(); // Orion-Edit: Was HashSet
 
     // Monitors != Viewers, as viewers are entities that are tied
     // to a player session that's viewing from this camera
@@ -29,7 +29,7 @@ public sealed partial class SurveillanceCameraComponent : Component
     // completely different monitor types (e.g., monitor console,
     // AI, etc.)
     [ViewVariables]
-    public HashSet<EntityUid> ActiveMonitors { get; } = new();
+    public HashSet<EntityUid> ActiveMonitors { get; private set; } = new();
 
     // If this camera is active or not. Deactivating a camera
     // will not allow it to obtain any new viewers.

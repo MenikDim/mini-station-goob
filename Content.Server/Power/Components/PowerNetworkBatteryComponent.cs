@@ -123,6 +123,6 @@ namespace Content.Server.Power.Components
         }
 
         [ViewVariables]
-        public PowerState.Battery NetworkBattery { get; } = new();
+        public PowerState.Battery NetworkBattery { get; private set; } = new();
     }
 }

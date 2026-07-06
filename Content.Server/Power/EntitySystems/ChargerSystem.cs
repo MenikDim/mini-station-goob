@@ -412,7 +412,7 @@ internal sealed class ChargerSystem : EntitySystem
 [ByRefEvent]
 public record struct FindBatteryEvent() : IInventoryRelayEvent
 {
-    public SlotFlags TargetSlots { get; } = SlotFlags.WITHOUT_POCKET;
+    public SlotFlags TargetSlots { get; private set; } = SlotFlags.WITHOUT_POCKET;
 
     public Entity<BatteryComponent>? FoundBattery;
 }

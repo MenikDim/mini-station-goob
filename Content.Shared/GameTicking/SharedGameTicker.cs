@@ -209,9 +209,9 @@ namespace Content.Shared.GameTicking
         /// <summary>
         /// The Status of the Player in the lobby (ready, observer, ...)
         /// </summary>
-        public Dictionary<NetEntity, Dictionary<ProtoId<JobPrototype>, int?>> JobsAvailableByStation { get; } = jobsAvailableByStation;
+        public Dictionary<NetEntity, Dictionary<ProtoId<JobPrototype>, int?>> JobsAvailableByStation { get; private set; } = jobsAvailableByStation;
 
-        public Dictionary<NetEntity, string> StationNames { get; } = stationNames;
+        public Dictionary<NetEntity, string> StationNames { get; private set; } = stationNames;
     }
 
     [Serializable, NetSerializable, DataDefinition]

@@ -8,5 +8,5 @@ namespace Content.Shared._Mini.AntagUnlock;
 [Serializable, NetSerializable]
 public sealed class AntagUnlockPurchaseRequestEvent(string antagId) : EntityEventArgs
 {
-    public string AntagId { get; } = antagId;
+    public string AntagId { get; private set; } = antagId;
 }

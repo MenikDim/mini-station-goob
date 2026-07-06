@@ -15,7 +15,7 @@ public sealed class AntagTokenOpenRequestEvent : EntityEventArgs
 [Serializable, NetSerializable]
 public sealed class AntagTokenPurchaseRequestEvent(string roleId) : EntityEventArgs
 {
-    public string RoleId { get; } = roleId;
+    public string RoleId { get; private set; } = roleId;
 }
 
 [Serializable, NetSerializable]
@@ -26,7 +26,7 @@ public sealed class AntagTokenClearRequestEvent : EntityEventArgs
 [Serializable, NetSerializable]
 public sealed class AntagTokenStateEvent(AntagTokenState state) : EntityEventArgs
 {
-    public AntagTokenState State { get; } = state;
+    public AntagTokenState State { get; private set; } = state;
 }
 
 [Serializable, NetSerializable]
@@ -37,11 +37,11 @@ public sealed class AntagTokenState(
     string? activeDepositRoleId,
     List<AntagTokenRoleEntry> roles) : BoundUserInterfaceState
 {
-    public int Balance { get; } = balance;
-    public int MonthlyEarned { get; } = monthlyEarned;
-    public int? MonthlyCap { get; } = monthlyCap;
-    public string? ActiveDepositRoleId { get; } = activeDepositRoleId;
-    public List<AntagTokenRoleEntry> Roles { get; } = roles;
+    public int Balance { get; private set; } = balance;
+    public int MonthlyEarned { get; private set; } = monthlyEarned;
+    public int? MonthlyCap { get; private set; } = monthlyCap;
+    public string? ActiveDepositRoleId { get; private set; } = activeDepositRoleId;
+    public List<AntagTokenRoleEntry> Roles { get; private set; } = roles;
 }
 
 [Serializable, NetSerializable]
@@ -59,16 +59,16 @@ public sealed class AntagTokenRoleEntry(
     int purchaseCooldownSecondsRemaining = 0,
     bool freePurchaseAvailable = false)
 {
-    public string RoleId { get; } = roleId;
-    public int Cost { get; } = cost;
-    public AntagPurchaseMode Mode { get; } = mode;
-    public bool Purchased { get; } = purchased;
-    public int FreeUnlocks { get; } = freeUnlocks;
-    public bool CanAfford { get; } = canAfford;
-    public bool Saturated { get; } = saturated;
-    public bool Available { get; } = available;
-    public string? TagLocKey { get; } = tagLocKey;
-    public string? StatusLocKey { get; } = statusLocKey;
-    public int PurchaseCooldownSecondsRemaining { get; } = purchaseCooldownSecondsRemaining;
-    public bool FreePurchaseAvailable { get; } = freePurchaseAvailable;
+    public string RoleId { get; private set; } = roleId;
+    public int Cost { get; private set; } = cost;
+    public AntagPurchaseMode Mode { get; private set; } = mode;
+    public bool Purchased { get; private set; } = purchased;
+    public int FreeUnlocks { get; private set; } = freeUnlocks;
+    public bool CanAfford { get; private set; } = canAfford;
+    public bool Saturated { get; private set; } = saturated;
+    public bool Available { get; private set; } = available;
+    public string? TagLocKey { get; private set; } = tagLocKey;
+    public string? StatusLocKey { get; private set; } = statusLocKey;
+    public int PurchaseCooldownSecondsRemaining { get; private set; } = purchaseCooldownSecondsRemaining;
+    public bool FreePurchaseAvailable { get; private set; } = freePurchaseAvailable;
 }

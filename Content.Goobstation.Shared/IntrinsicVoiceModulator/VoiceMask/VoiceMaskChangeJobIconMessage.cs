@@ -12,5 +12,5 @@ namespace Content.Goobstation.Shared.IntrinsicVoiceModulator.VoiceMask;
 [Serializable, NetSerializable]
 public sealed class VoiceMaskChangeJobIconMessage(ProtoId<JobIconPrototype> jobIconProtoId) : BoundUserInterfaceMessage
 {
-    public ProtoId<JobIconPrototype> JobIconProtoId { get; } = jobIconProtoId;
+    public ProtoId<JobIconPrototype> JobIconProtoId { get; private set; } = jobIconProtoId;
 }

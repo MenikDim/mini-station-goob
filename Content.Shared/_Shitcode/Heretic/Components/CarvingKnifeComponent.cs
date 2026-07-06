@@ -44,7 +44,7 @@ public sealed partial class CarvingKnifeComponent : Component
 [Serializable, NetSerializable]
 public sealed class RuneCarvingSelectedMessage(ProtoId<RuneCarvingPrototype> protoId) : BoundUserInterfaceMessage
 {
-    public ProtoId<RuneCarvingPrototype> ProtoId { get; } = protoId;
+    public ProtoId<RuneCarvingPrototype> ProtoId { get; private set; } = protoId;
 }
 
 [Serializable, NetSerializable]

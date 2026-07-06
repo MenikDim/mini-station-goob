@@ -29,8 +29,8 @@ namespace Content.Client.NodeContainer
 
         public bool VisEnabled { get; private set; }
 
-        public Dictionary<int, NodeVis.GroupData> Groups { get; } = new();
-        public HashSet<string> Filtered { get; } = new();
+        public Dictionary<int, NodeVis.GroupData> Groups { get; private set; } = new();
+        public HashSet<string> Filtered { get; private set; } = new();
 
         public Dictionary<EntityUid, (NodeVis.GroupData group, NodeVis.NodeDatum node)[]>
             Entities { get; private set; } = new();
