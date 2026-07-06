@@ -1,16 +1,16 @@
 # SPDX-FileCopyrightText: 2026 Casha
 
-daily-quest-section-title = Daily quests
-daily-quest-section-summary = Daily quests ({$done}/{$total} claimed)
-daily-quest-empty = No quests assigned yet today. Join a round to receive assignments.
+daily-quest-section-title = Weekly quests
+daily-quest-section-summary = Weekly quests ({$done}/{$total} claimed)
+daily-quest-empty = No quests assigned for this week yet. Join a round to receive assignments.
 daily-quest-role-hint = Role: {$role}
 daily-quest-progress = {$current} / {$target}
 daily-quest-status-active = In progress
 daily-quest-status-complete = Complete — reward granted!
 daily-quest-status-claimed = Claimed +{$amount} coins
-daily-quest-status-next-quest = New quest in {$time}
-daily-quest-status-claimed-timer = {$status} New quest in {$time}
-daily-quest-status-complete-timer = {$status} New quest in {$time}
+daily-quest-status-next-quest = New quests in {$time}
+daily-quest-status-claimed-timer = {$status} New quests in {$time}
+daily-quest-status-complete-timer = {$status} New quests in {$time}
 daily-quest-claim = Claim reward
 daily-quest-claim-success = Quest complete! Coins received: {$amount}.
 daily-quest-claim-empty = No quest reward was granted.
@@ -19,9 +19,9 @@ daily-quest-replace-pending = Replacing quest...
 daily-quest-replace-denied = This quest cannot be replaced right now.
 daily-quest-replace-denied-loading = Quest data is still loading. Try again in a few seconds.
 daily-quest-replace-denied-progress = Only quests with no progress can be replaced.
-daily-quest-replace-denied-used = Quest replacement can only be used once per day.
-daily-quest-replace-used-today = Today's quest replacement has already been used.
-daily-quest-replace-empty-pool = No more quests are available for replacement today.
+daily-quest-replace-denied-used = Quest replacement can only be used once per week.
+daily-quest-replace-used-today = This week's quest replacement has already been used.
+daily-quest-replace-empty-pool = No more quests are available for replacement this week.
 daily-quest-replace-success = Quest replaced.
 
 daily-quest-rarity-rare = Rare

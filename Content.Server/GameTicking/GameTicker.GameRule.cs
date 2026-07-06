@@ -89,9 +89,12 @@ public sealed partial class GameTicker
     /// start it yet, instead waiting until the rule is actually started by other code (usually roundstart)
     /// </summary>
     /// <returns>The entity for the added gamerule</returns>
-    public EntityUid AddGameRule(string ruleId)
+    public EntityUid AddGameRule(string ruleId, bool adminForced = false)
     {
         var ruleEntity = Spawn(ruleId, MapCoordinates.Nullspace);
+
+        if (adminForced)
+            EnsureComp<AdminForcedGameRuleComponent>(ruleEntity);
         _sawmill.Info($"Added game rule {ToPrettyString(ruleEntity)}");
         _adminLogger.Add(LogType.EventStarted, $"Added game rule {ToPrettyString(ruleEntity)}");
         var str = Loc.GetString("station-event-system-run-event", ("eventName", ToPrettyString(ruleEntity)));
@@ -357,10 +360,15 @@ public sealed partial class GameTicker
 
         foreach (var rule in args)
         {
-            if (!_prototypeManager.HasIndex(rule))
+            if (!_prototypeManager.TryIndex(rule, out EntityPrototype? proto))
             {
-                shell.WriteError($"Invalid game rule {rule} was skipped.");
+                shell.WriteError($"Invalid game rule {rule} was skipped (unknown prototype).");
+                continue;
+            }
 
+            if (!proto.HasComponent<GameRuleComponent>())
+            {
+                shell.WriteError($"Invalid game rule {rule} was skipped (entity is not a game rule).");
                 continue;
             }
 
@@ -373,7 +381,7 @@ public sealed partial class GameTicker
             {
                 _adminLogger.Add(LogType.EventStarted, $"Unknown tried to add game rule [{rule}] via command");
             }
-            var ent = AddGameRule(rule);
+            var ent = AddGameRule(rule, adminForced: true);
 
             // Start rule if we're already in the middle of a round
             if(RunLevel == GameRunLevel.InRound)

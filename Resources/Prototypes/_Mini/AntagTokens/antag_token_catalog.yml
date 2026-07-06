@@ -37,7 +37,7 @@
     - id: agent
       nameLocKey: antag-store-role-agent-name
       descriptionLocKey: antag-store-role-agent-description
-      cost: 3
+      cost: 4
       iconPath: /Textures/_Mini/Interface/Antags/traitor.png
       mode: LobbyDeposit
       antagId: Traitor
@@ -71,7 +71,7 @@
       ghostRulesLocKey: ghost-role-information-freeagent-rules
       gameRuleId: ParadoxCloneSpawn
       tagLocKey: antag-token-window-tag-ghost
-      minimumPlayers: 15
+      minimumPlayers: 10
       requiresInRound: true
       minimumTimeFromRoundStart: 1200
       freeMinimumSponsorLevel: 2
@@ -79,7 +79,7 @@
     - id: vox
       nameLocKey: antag-store-role-vox-name
       descriptionLocKey: antag-store-role-vox-description
-      cost: 4
+      cost: 3
       iconPath: /Textures/_Mini/Interface/Antags/vox.png
       mode: GhostRule
       ghostAutoJoinEntityProto: SpawnPointGhostVoxRaider
@@ -100,6 +100,7 @@
       antagId: Devil
       gameRuleId: Devil
       tagLocKey: antag-token-window-tag-queue
+      minimumPlayers: 10
       requiresPreRoundLobby: true
       freeMinimumSponsorLevel: 3
       jobBlacklist: [Chaplain]
@@ -163,10 +164,25 @@
       minimumTimeFromRoundStart: 1800
       freeMinimumSponsorLevel: 2
 
+    - id: slasher
+      nameLocKey: antag-store-role-slasher-name
+      descriptionLocKey: antag-store-role-slasher-description
+      cost: 7
+      iconPath: /Textures/_Mini/Interface/Antags/slasher.png
+      mode: GhostRule
+      ghostAutoJoinEntityProto: SpawnPointGhostSlasherToken
+      ghostRulesLocKey: ghost-role-information-antagonist-rules
+      gameRuleId: TokenSlasherSpawn
+      tagLocKey: antag-token-window-tag-ghost
+      minimumPlayers: 20
+      requiresInRound: true
+      minimumTimeFromRoundStart: 1800
+      freeMinimumSponsorLevel: 4
+
     - id: headrev
       nameLocKey: antag-store-role-headrev-name
       descriptionLocKey: antag-store-role-headrev-description
-      cost: 6
+      cost: 7
       iconPath: /Textures/_Mini/Interface/Antags/rev.png
       mode: LobbyDeposit
       antagId: HeadRev
@@ -176,10 +192,24 @@
       requiresPreRoundLobby: true
       freeMinimumSponsorLevel: 3
 
+    - id: hastur
+      nameLocKey: antag-store-role-hastur-name
+      descriptionLocKey: antag-store-role-hastur-description
+      cost: 7
+      iconPath: /Textures/_Mini/Interface/Antags/hastur.png
+      mode: GhostRule
+      ghostAutoJoinEntityProto: SpawnPointGhostHastur
+      ghostRulesLocKey: ghost-role-information-antagonist-rules
+      gameRuleId: HasturMidround
+      tagLocKey: antag-token-window-tag-ghost
+      minimumPlayers: 20
+      requiresInRound: true
+      minimumTimeFromRoundStart: 2700
+
     - id: initial_infected
       nameLocKey: antag-store-role-initial-infected-name
       descriptionLocKey: antag-store-role-initial-infected-description
-      cost: 6
+      cost: 7
       iconPath: /Textures/_Mini/Interface/Antags/zombie.png
       mode: LobbyDeposit
       antagId: InitialInfected
@@ -192,14 +222,14 @@
     - id: slaughter_demon
       nameLocKey: antag-store-role-slaughter-demon-name
       descriptionLocKey: antag-store-role-slaughter-demon-description
-      cost: 6
+      cost: 8
       iconPath: /Textures/_Mini/Interface/Antags/slaughter_demon.png
       mode: GhostRule
       ghostAutoJoinEntityProto: SpawnPointGhostSlaughterDemon
       ghostRulesLocKey: ghost-role-information-slaughter-demon-rules
       gameRuleId: SlaughterDemonMidround
       tagLocKey: antag-token-window-tag-ghost
-      minimumPlayers: 25
+      minimumPlayers: 20
       requiresInRound: true
       minimumTimeFromRoundStart: 1800
       freeMinimumSponsorLevel: 4
@@ -207,7 +237,7 @@
     - id: cosmic_cult
       nameLocKey: antag-store-role-cosmic-cult-name
       descriptionLocKey: antag-store-role-cosmic-cult-description
-      cost: 6
+      cost: 8
       iconPath: /Textures/_Mini/Interface/Antags/cultist.png
       mode: LobbyDeposit
       antagId: CosmicAntagCultist
@@ -222,7 +252,7 @@
     - id: ratvar_cult
       nameLocKey: antag-store-role-ratvar-cult-name
       descriptionLocKey: antag-store-role-ratvar-cult-description
-      cost: 6
+      cost: 8
       iconPath: /Textures/_Mini/Interface/Antags/ratvar_cult.png
       mode: LobbyDeposit
       antagId: RatvarRighteous
@@ -237,7 +267,7 @@
     - id: blood_cult
       nameLocKey: antag-store-role-blood-cult-name
       descriptionLocKey: antag-store-role-blood-cult-description
-      cost: 6
+      cost: 8
       iconPath: /Textures/_Mini/Interface/Antags/blood_cultist.rsi
       mode: LobbyDeposit
       antagId: BloodCultist
@@ -249,54 +279,10 @@
       freeMinimumSponsorLevel: 3
       jobBlacklist: [Chaplain]
 
-    - id: slasher
-      nameLocKey: antag-store-role-slasher-name
-      descriptionLocKey: antag-store-role-slasher-description
-      cost: 6
-      iconPath: /Textures/_Mini/Interface/Antags/slasher.png
-      mode: GhostRule
-      ghostAutoJoinEntityProto: SpawnPointGhostSlasherToken
-      ghostRulesLocKey: ghost-role-information-antagonist-rules
-      gameRuleId: TokenSlasherSpawn
-      tagLocKey: antag-token-window-tag-ghost
-      minimumPlayers: 30
-      requiresInRound: true
-      minimumTimeFromRoundStart: 1800
-      freeMinimumSponsorLevel: 4
-
-    - id: hastur
-      nameLocKey: antag-store-role-hastur-name
-      descriptionLocKey: antag-store-role-hastur-description
-      cost: 7
-      iconPath: /Textures/_Mini/Interface/Antags/hastur.png
-      mode: GhostRule
-      ghostAutoJoinEntityProto: SpawnPointGhostHastur
-      ghostRulesLocKey: ghost-role-information-antagonist-rules
-      gameRuleId: HasturMidround
-      tagLocKey: antag-token-window-tag-ghost
-      minimumPlayers: 30
-      requiresInRound: true
-      minimumTimeFromRoundStart: 2700
-
-    - id: dragon
-      nameLocKey: antag-store-role-dragon-name
-      descriptionLocKey: antag-store-role-dragon-description
-      cost: 8
-      iconPath: /Textures/_Mini/Interface/Antags/dragon.png
-      mode: GhostRule
-      ghostAutoJoinEntityProto: SpawnPointGhostDragonToken
-      ghostRulesLocKey: ghost-role-information-space-dragon-rules
-      gameRuleId: TokenDragonSpawn
-      tagLocKey: antag-token-window-tag-ghost
-      minimumPlayers: 50
-      requiresInRound: true
-      minimumTimeFromRoundStart: 1800
-      freeMinimumSponsorLevel: 2
-
     - id: heretic
       nameLocKey: antag-store-role-heretic-name
       descriptionLocKey: antag-store-role-heretic-description
-      cost: 8
+      cost: 9
       iconPath: /Textures/_Mini/Interface/Antags/heretic.png
       mode: LobbyDeposit
       antagId: Heretic
@@ -307,35 +293,50 @@
       freeMinimumSponsorLevel: 4
       jobBlacklist: [Chaplain]
 
+    - id: dragon
+      nameLocKey: antag-store-role-dragon-name
+      descriptionLocKey: antag-store-role-dragon-description
+      cost: 10
+      iconPath: /Textures/_Mini/Interface/Antags/dragon.png
+      mode: GhostRule
+      ghostAutoJoinEntityProto: SpawnPointGhostDragonToken
+      ghostRulesLocKey: ghost-role-information-space-dragon-rules
+      gameRuleId: TokenDragonSpawn
+      tagLocKey: antag-token-window-tag-ghost
+      minimumPlayers: 20
+      requiresInRound: true
+      minimumTimeFromRoundStart: 1800
+      freeMinimumSponsorLevel: 2
+
     - id: shadowling
       nameLocKey: antag-store-role-shadowling-name
       descriptionLocKey: antag-store-role-shadowling-description
-      cost: 8
+      cost: 10
       iconPath: /Textures/_Mini/Interface/Antags/shadowling.png
       mode: LobbyDeposit
       antagId: Shadowling
       gameRuleId: Shadowling
       tagLocKey: antag-token-window-tag-queue
-      minimumPlayers: 30
+      minimumPlayers: 25
       requiresPreRoundLobby: true
       freeMinimumSponsorLevel: 4
 
     - id: xenomorph
       nameLocKey: antag-store-role-xenomorph-name
       descriptionLocKey: antag-store-role-xenomorph-description
-      cost: 8
+      cost: 12
       iconPath: /Textures/_Mini/Interface/Antags/xenomorph.png
       mode: LobbyDeposit
       antagId: XenomorphsInfestationRoundstart
       gameRuleId: XenomorphsInfestationRoundstart
       tagLocKey: antag-token-window-tag-queue
-      minimumPlayers: 30
+      minimumPlayers: 20
       requiresPreRoundLobby: true
 
     - id: yao
       nameLocKey: antag-store-role-yao-name
       descriptionLocKey: antag-store-role-yao-description
-      cost: 10
+      cost: 14
       iconPath: /Textures/_Mini/Interface/Antags/nukie.png
       mode: GhostRule
       ghostAutoJoinEntityProto: SpawnPointLoneNukeOperativeToken
@@ -350,7 +351,7 @@
     - id: changeling
       nameLocKey: antag-store-role-changeling-name
       descriptionLocKey: antag-store-role-changeling-description
-      cost: 10
+      cost: 15
       iconPath: /Textures/_Mini/Interface/Antags/changeling.png
       mode: LobbyDeposit
       antagId: Changeling
@@ -364,7 +365,7 @@
     - id: wraith
       nameLocKey: antag-store-role-wraith-name
       descriptionLocKey: antag-store-role-wraith-description
-      cost: 12
+      cost: 14
       iconPath: /Textures/_Mini/Interface/Antags/wraith.png
       mode: GhostRule
       ghostAutoJoinEntityProto: SpawnPointGhostWraith
@@ -376,25 +377,10 @@
       minimumTimeFromRoundStart: 2400
       freeMinimumSponsorLevel: 4
 
-    - id: blob
-      nameLocKey: antag-store-role-blob-name
-      descriptionLocKey: antag-store-role-blob-description
-      cost: 15
-      iconPath: /Textures/_Mini/Interface/Antags/blob.png
-      mode: GhostRule
-      ghostAutoJoinEntityProto: SpawnPointGhostBlobRatToken
-      ghostRulesLocKey: blob-carrier-role-rules
-      gameRuleId: TokenBlobMidround
-      tagLocKey: antag-token-window-tag-ghost
-      minimumPlayers: 30
-      requiresInRound: true
-      minimumTimeFromRoundStart: 2700
-      freeMinimumSponsorLevel: 4
-
     - id: wizard
       nameLocKey: antag-store-role-wizard-name
       descriptionLocKey: antag-store-role-wizard-description
-      cost: 15
+      cost: 18
       iconPath: /Textures/_Mini/Interface/Antags/wizard.png
       mode: GhostRule
       ghostAutoJoinEntityProto: SpawnPointWizardToken
@@ -405,3 +391,18 @@
       requiresInRound: true
       minimumTimeFromRoundStart: 2100
       freeMinimumSponsorLevel: 4
+
+    - id: blob
+      nameLocKey: antag-store-role-blob-name
+      descriptionLocKey: antag-store-role-blob-description
+      cost: 20
+      iconPath: /Textures/_Mini/Interface/Antags/blob.png
+      mode: GhostRule
+      ghostAutoJoinEntityProto: SpawnPointGhostBlobRatToken
+      ghostRulesLocKey: blob-carrier-role-rules
+      gameRuleId: TokenBlobMidround
+      tagLocKey: antag-token-window-tag-ghost
+      minimumPlayers: 30
+      requiresInRound: true
+      minimumTimeFromRoundStart: 2700
+      freeMinimumSponsorLevel: 5
