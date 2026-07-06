@@ -18,6 +18,13 @@ jobs:
   this_aint_right:
     name: Submodule update in pr found
     runs-on: ubuntu-latest
+    # ministation maintains its own RT fork; allow intentional engine bumps on rt/* branches or labelled PRs.
+    if: |
+      !startsWith(github.head_ref, 'rt') &&
+      !contains(join(github.event.pull_request.labels.*.name, ','), 'rt-update') &&
+      !contains(join(github.event.pull_request.labels.*.name, ','), 'submodule-update')
     steps:
       - name: Fail
-        run: exit 1
+        run: |
+          echo "::error::RobustToolbox submodule was changed in this PR. Engine updates should use an rt/* branch or add the rt-update label."
+          exit 1
