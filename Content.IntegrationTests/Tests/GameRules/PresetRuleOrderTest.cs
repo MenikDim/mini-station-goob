@@ -104,8 +104,6 @@ public sealed class PresetRuleOrderTest
 
 public sealed class PresetRuleOrderTestRuleSystem : EntitySystem
 {
-    [Dependency] private readonly GameTicker _gameTicker = default!;
-
     public bool RuleAddedAtStationPostInit;
 
     public override void Initialize()
@@ -119,7 +117,8 @@ public sealed class PresetRuleOrderTestRuleSystem : EntitySystem
     {
         // Mimics RoundstartStationVariationRuleSystem: variation only runs if the rule
         // is already added when the station initializes.
-        if (_gameTicker.IsGameRuleAdded<PresetRuleOrderTestRuleComponent>())
+        // GameTicker is resolved lazily because this system also gets instantiated client-side.
+        if (EntityManager.System<GameTicker>().IsGameRuleAdded<PresetRuleOrderTestRuleComponent>())
             RuleAddedAtStationPostInit = true;
     }
 }
