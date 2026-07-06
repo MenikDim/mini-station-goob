@@ -57,7 +57,7 @@ typan-war-end-announce-typan-elimination = The station war has ended. [color=#FF
 typan-war-end-announce-stalemate = The station war has ended in a stalemate.
 
 typan-war-round-end-header = [color=#F0D890][bold]Station War[/bold][/color]
-typan-war-round-end-initial = Initial roster: NT {$nt}, Typan {$typan}
+typan-war-round-end-initial = Total deployed: NT {$nt}, Typan {$typan}
 typan-war-round-end-final = Survivors: NT {$nt}, Typan {$typan}
 typan-war-round-end-losses = Losses: NT {$ntLoss}%, Typan {$typanLoss}%
 typan-war-round-end-nt-goal = NT station goal: {$goal}

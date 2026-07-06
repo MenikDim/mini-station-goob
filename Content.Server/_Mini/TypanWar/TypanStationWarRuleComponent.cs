@@ -1,4 +1,5 @@
 using Content.Shared._Mini.TypanWar;
+using Robust.Shared.Network;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 using Robust.Shared.Utility;
 using System.Threading;
@@ -88,13 +89,13 @@ public sealed partial class TypanStationWarRuleComponent : Component
     public EntityUid? TypanStation;
 
     [DataField]
-    public int InitialNtAlive;
-
-    [DataField]
-    public int InitialTypanAlive;
-
-    [DataField]
     public TypanWarWinner Winner = TypanWarWinner.None;
+
+    /// <summary>Unique players who spawned on the NT station during this war (includes late join).</summary>
+    public HashSet<NetUserId> NtJoinedUsers = new();
+
+    /// <summary>Unique players who spawned on the Typan station during this war (includes late join).</summary>
+    public HashSet<NetUserId> TypanJoinedUsers = new();
 
     [DataField]
     public bool WarMusicStarted;
