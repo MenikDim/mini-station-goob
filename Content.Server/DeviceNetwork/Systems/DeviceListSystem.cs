@@ -185,6 +185,7 @@ public sealed class DeviceListSystem : SharedDeviceListSystem
             return;
 
         list.Comp.Devices.Remove(device);
+        PruneDeletedEntries(list.Comp);
         Dirty(list);
 
         VerifyDeviceList(list.Owner, list.Comp); // Goobstation - Fix desync of configurator lists
@@ -283,10 +284,16 @@ public sealed class DeviceListSystem : SharedDeviceListSystem
 
         RaiseLocalEvent(uid, new DeviceListUpdateEvent(oldDevices, list));
 
+        PruneDeletedEntries(deviceList);
         Dirty(uid, deviceList);
 
         VerifyDeviceList(uid, deviceList); // Goobstation - Fix desync of configurator lists
 
         return DeviceListUpdateResult.UpdateOk;
+    }
+
+    private void PruneDeletedEntries(DeviceListComponent deviceList)
+    {
+        deviceList.Devices.RemoveWhere(uid => !Exists(uid));
     }
 }

@@ -8,6 +8,7 @@
 
 using System.Linq;
 using Content.Goobstation.Common.Silo;
+using Content.Server._Mini.Networking;
 using Content.Server.Lathe;
 using Content.Server.Station.Components;
 using Content.Shared._Goobstation.Silo;
@@ -15,6 +16,7 @@ using Content.Shared.DeviceLinking;
 using Content.Shared.Lathe;
 using Content.Shared.Materials;
 using Robust.Server.GameStates;
+using Robust.Server.Player;
 using Timer = Robust.Shared.Timing.Timer;
 
 namespace Content.Goobstation.Server.Silo;
@@ -23,6 +25,8 @@ public sealed class SiloSystem : SharedSiloSystem
 {
     [Dependency] private readonly LatheSystem _lathe = default!;
     [Dependency] private readonly PvsOverrideSystem _pvs = default!;
+    [Dependency] private readonly PvsSessionOverrideSystem _pvsSession = default!;
+    [Dependency] private readonly IPlayerManager _player = default!;
 
     public override void Initialize()
     {
@@ -36,12 +40,15 @@ public sealed class SiloSystem : SharedSiloSystem
 
     private void OnStartup(Entity<SiloComponent> ent, ref ComponentStartup args)
     {
-        _pvs.AddGlobalOverride(ent);
+        _pvsSession.RefreshSiloOverrides();
     }
 
     private void OnShutdown(Entity<SiloComponent> ent, ref ComponentShutdown args)
     {
-        _pvs.RemoveGlobalOverride(ent);
+        foreach (var session in _player.Sessions)
+        {
+            _pvs.RemoveSessionOverride(ent, session);
+        }
     }
 
     private void OnMaterialAmountChanged(Entity<SiloComponent> ent, ref MaterialAmountChangedEvent args)

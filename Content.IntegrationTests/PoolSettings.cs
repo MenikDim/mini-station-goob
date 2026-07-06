@@ -165,6 +165,11 @@ public sealed class PoolSettings
     /// </summary>
     public int? ClientSeed { get; set; }
 
+    /// <summary>
+    /// Enable PVS culling for this test pair (default: false for faster/more stable tests).
+    /// </summary>
+    public bool EnableNetPvs { get; init; }
+
     #region Inferred Properties
 
     /// <summary>

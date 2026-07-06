@@ -18,9 +18,10 @@ jobs:
   this_aint_right:
     name: Submodule update in pr found
     runs-on: ubuntu-latest
-    # ministation maintains its own RT fork; allow intentional engine bumps on rt/* branches or labelled PRs.
+    # ministation maintains its own RT fork; allow intentional engine bumps on rt/* or opt/* branches or labelled PRs.
     if: |
       !startsWith(github.head_ref, 'rt') &&
+      !startsWith(github.head_ref, 'opt') &&
       !contains(join(github.event.pull_request.labels.*.name, ','), 'rt-update') &&
       !contains(join(github.event.pull_request.labels.*.name, ','), 'submodule-update')
     steps:

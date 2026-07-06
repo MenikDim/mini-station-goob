@@ -1,0 +1,195 @@
+﻿  Determining projects to restore...
+C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\Robust.Shared.csproj : warning NU1510: PackageReference Microsoft.Win32.Registry will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary. [C:\ss14\mini-station-goob\Content.IntegrationTests\Content.IntegrationTests.csproj]
+C:\ss14\mini-station-goob\RobustToolbox\Robust.Server\Robust.Server.csproj : warning NU1510: PackageReference System.Text.Json will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary. [C:\ss14\mini-station-goob\Content.IntegrationTests\Content.IntegrationTests.csproj]
+C:\ss14\mini-station-goob\Content.Server\Content.Server.csproj : warning NU1608: Detected package version outside of dependency constraint: Microsoft.CodeAnalysis.Workspaces.MSBuild 4.8.0 requires Microsoft.CodeAnalysis.Common (= 4.8.0) but version Microsoft.CodeAnalysis.Common 5.0.0 was resolved. [C:\ss14\mini-station-goob\Content.IntegrationTests\Content.IntegrationTests.csproj]
+C:\ss14\mini-station-goob\RobustToolbox\Robust.Client\Robust.Client.csproj : warning NU1510: PackageReference System.Text.Json will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary. [C:\ss14\mini-station-goob\Content.IntegrationTests\Content.IntegrationTests.csproj]
+C:\ss14\mini-station-goob\Content.Server\Content.Server.csproj : warning NU1608: Detected package version outside of dependency constraint: Microsoft.CodeAnalysis.Workspaces.MSBuild 4.8.0 requires Microsoft.CodeAnalysis.Workspaces.Common (= 4.8.0) but version Microsoft.CodeAnalysis.Workspaces.Common 5.0.0 was resolved. [C:\ss14\mini-station-goob\Content.IntegrationTests\Content.IntegrationTests.csproj]
+C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\Robust.Shared.csproj : warning NU1510: PackageReference System.Reflection.Metadata will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary. [C:\ss14\mini-station-goob\Content.IntegrationTests\Content.IntegrationTests.csproj]
+  All projects are up-to-date for restore.
+C:\ss14\mini-station-goob\RobustToolbox\Robust.Server\Robust.Server.csproj : warning NU1510: PackageReference System.Text.Json will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.
+C:\ss14\mini-station-goob\Content.Server\Content.Server.csproj : warning NU1608: Detected package version outside of dependency constraint: Microsoft.CodeAnalysis.Workspaces.MSBuild 4.8.0 requires Microsoft.CodeAnalysis.Common (= 4.8.0) but version Microsoft.CodeAnalysis.Common 5.0.0 was resolved.
+C:\ss14\mini-station-goob\Content.Server\Content.Server.csproj : warning NU1608: Detected package version outside of dependency constraint: Microsoft.CodeAnalysis.Workspaces.MSBuild 4.8.0 requires Microsoft.CodeAnalysis.Workspaces.Common (= 4.8.0) but version Microsoft.CodeAnalysis.Workspaces.Common 5.0.0 was resolved.
+C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\Robust.Shared.csproj : warning NU1510: PackageReference Microsoft.Win32.Registry will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.
+C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\Robust.Shared.csproj : warning NU1510: PackageReference System.Reflection.Metadata will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.
+C:\ss14\mini-station-goob\RobustToolbox\Robust.Client\Robust.Client.csproj : warning NU1510: PackageReference System.Text.Json will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.
+  Robust.LoaderApi -> C:\ss14\mini-station-goob\RobustToolbox\Robust.LoaderApi\Robust.LoaderApi\bin\Debug\net8.0\Robust.LoaderApi.dll
+  NetSerializer -> C:\ss14\mini-station-goob\RobustToolbox\NetSerializer\NetSerializer\bin\Debug\net8.0\Robust.NetSerializer.dll
+  Robust.Analyzers -> C:\ss14\mini-station-goob\RobustToolbox\Robust.Analyzers\bin\Debug\netstandard2.0\Robust.Analyzers.dll
+  Avalonia.Base -> C:\ss14\mini-station-goob\RobustToolbox\Avalonia.Base\bin\Debug\net10.0\Avalonia.Base.dll
+  XamlX -> C:\ss14\mini-station-goob\RobustToolbox\XamlX\src\XamlX\bin\Debug\netstandard2.0\XamlX.dll
+  Lidgren.Network -> C:\ss14\mini-station-goob\RobustToolbox\Lidgren.Network\bin\Debug\net10.0\SpaceWizards.Lidgren.Network.dll
+  Content.ModuleManager -> C:\ss14\mini-station-goob\Content.ModuleManager\bin\Debug\net10.0\Content.ModuleManager.dll
+  Robust.Serialization.Generator -> C:\ss14\mini-station-goob\RobustToolbox\Robust.Serialization.Generator\bin\Debug\netstandard2.0\Robust.Serialization.Generator.dll
+  Content.Shared.Database -> C:\ss14\mini-station-goob\Content.Shared.Database\bin\Debug\net10.0\Content.Shared.Database.dll
+  XamlX.IL.Cecil -> C:\ss14\mini-station-goob\RobustToolbox\XamlX\src\XamlX.IL.Cecil\bin\Debug\netstandard2.0\XamlX.IL.Cecil.dll
+  Robust.Shared.Maths -> C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared.Maths\bin\Debug\Robust.Shared.Maths.dll
+  Robust.Xaml -> C:\ss14\mini-station-goob\RobustToolbox\Robust.Xaml\bin\Debug\netstandard2.0\Robust.Xaml.dll
+  Robust.Shared.CompNetworkGenerator -> C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared.CompNetworkGenerator\bin\Debug\netstandard2.0\Robust.Shared.CompNetworkGenerator.dll
+  Content.Server.Database -> C:\ss14\mini-station-goob\bin\Content.Server.Database\Content.Server.Database.dll
+  Robust.Shared.Maths.Testing -> C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared.Maths.Testing\bin\Debug\net10.0\Robust.Shared.Maths.Testing.dll
+  Robust.Shared -> C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\bin\Debug\Robust.Shared.dll
+  Robust.Packaging -> C:\ss14\mini-station-goob\RobustToolbox\Robust.Packaging\bin\Debug\net10.0\Robust.Packaging.dll
+  Robust.Shared.Scripting -> C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared.Scripting\bin\Debug\Robust.Shared.Scripting.dll
+  Robust.Shared.Testing -> C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared.Testing\bin\Debug\net10.0\Robust.Shared.Testing.dll
+  Content.Goobstation.Maths -> C:\ss14\mini-station-goob\Content.Goobstation.Maths\bin\Debug\net10.0\Content.Goobstation.Maths.dll
+  Content.Corvax.Interfaces.Shared -> C:\ss14\mini-station-goob\Corvax\Content.Corvax.Interfaces.Shared\bin\Debug\net10.0\Content.Corvax.Interfaces.Shared.dll
+  Content.Packaging -> C:\ss14\mini-station-goob\Content.Packaging\bin\Debug\net10.0\Content.Packaging.dll
+  Robust.Shared.Maths.Tests -> C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared.Maths.Tests\bin\Debug\net10.0\Robust.Shared.Maths.Tests.dll
+  Content.Goobstation.Common -> C:\ss14\mini-station-goob\Content.Goobstation.Common\bin\Debug\Content.Goobstation.Common.dll
+  Content.SponsorImplementations.Shared -> C:\ss14\mini-station-goob\SponsorImplementations\Content.SponsorImplementations.Shared\bin\Debug\net10.0\Content.SponsorImplementations.Shared.dll
+  Robust.Server -> C:\ss14\mini-station-goob\RobustToolbox\bin\Server\Robust.Server.dll
+  Robust.Client.NameGenerator -> C:\ss14\mini-station-goob\RobustToolbox\Robust.Client.NameGenerator\bin\Debug\netstandard2.0\Robust.Client.NameGenerator.dll
+  Content.Corvax.Interfaces.Server -> C:\ss14\mini-station-goob\Corvax\Content.Corvax.Interfaces.Server\bin\Debug\net10.0\Content.Corvax.Interfaces.Server.dll
+  Content.SponsorImplementations.Server -> C:\ss14\mini-station-goob\SponsorImplementations\Content.SponsorImplementations.Server\bin\Debug\net10.0\Content.SponsorImplementations.Server.dll
+  Robust.Server.Testing -> C:\ss14\mini-station-goob\RobustToolbox\Robust.Server.Testing\bin\Debug\net10.0\Robust.Server.Testing.dll
+  Robust.Client.Injectors -> C:\ss14\mini-station-goob\RobustToolbox\Robust.Client.Injectors\bin\Debug\netstandard2.0\Robust.Client.Injectors.dll
+  Robust.Client -> C:\ss14\mini-station-goob\RobustToolbox\bin\Client\Robust.Client.dll
+  Content.SponsorImplementations.Client -> C:\ss14\mini-station-goob\SponsorImplementations\Content.SponsorImplementations.Client\bin\Debug\net10.0\Content.SponsorImplementations.Client.dll
+  Content.Corvax.Interfaces.Client -> C:\ss14\mini-station-goob\Corvax\Content.Corvax.Interfaces.Client\bin\Debug\net10.0\Content.Corvax.Interfaces.Client.dll
+  Content.Shared -> C:\ss14\mini-station-goob\Content.Shared\bin\Debug\Content.Shared.dll
+  Robust.UnitTesting -> C:\ss14\mini-station-goob\RobustToolbox\Robust.UnitTesting\bin\Debug\net10.0\Robust.UnitTesting.dll
+  Content.Goobstation.UIKit -> C:\ss14\mini-station-goob\Content.Goobstation.UIKit\bin\Debug\net10.0\Content.Goobstation.UIKit.dll
+  Content.Goobstation.Shared -> C:\ss14\mini-station-goob\Content.Goobstation.Shared\bin\Debug\Content.Goobstation.Shared.dll
+  Content.Client -> C:\ss14\mini-station-goob\bin\Content.Client\Content.Client.dll
+  Content.Server -> C:\ss14\mini-station-goob\bin\Content.Server\Content.Server.dll
+  Content.Goobstation.Client -> C:\ss14\mini-station-goob\bin\Content.Client\Content.Goobstation.Client.dll
+  Content.Tests -> C:\ss14\mini-station-goob\bin\Content.Tests\Content.Tests.dll
+  Content.Goobstation.Server -> C:\ss14\mini-station-goob\bin\Content.Server\Content.Goobstation.Server.dll
+  Content.IntegrationTests -> C:\ss14\mini-station-goob\bin\Content.IntegrationTests\Content.IntegrationTests.dll
+Test run for C:\ss14\mini-station-goob\bin\Content.IntegrationTests\Content.IntegrationTests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+  Failed SpawnAndMovePvsStressTest [35 s]
+  Error Message:
+   System.InvalidOperationException : Duplicate Subscriptions for comp=Robust.Shared.Player.ActorComponent, event=ComponentStartup
+  Stack Trace:
+     at Robust.Shared.GameObjects.EntityEventBus.EntAddSubscription(CompIdx compType, Type compTypeObj, Type eventType, DirectedEventHandler handler, Type orderType, Type[] before, Type[] after) in C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\GameObjects\EntityEventBus.Directed.cs:line 407
+   at Robust.Shared.GameObjects.EntityEventBus.SubscribeLocalEvent[TComp,TEvent](ComponentEventHandler`2 handler, Type orderType, Type[] before, Type[] after) in C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\GameObjects\EntityEventBus.Directed.cs:line 270
+   at Robust.Shared.GameObjects.EntitySystem.SubscribeLocalEvent[TComp,TEvent](ComponentEventHandler`2 handler, Type[] before, Type[] after) in C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\GameObjects\EntitySystem.Subscriptions.cs:line 131
+   at Content.Server.Station.Systems.StationSystem.Initialize() in C:\ss14\mini-station-goob\Content.Server\Station\Systems\StationSystem.cs:line 165
+   at Robust.Shared.GameObjects.EntitySystemManager.Initialize(Boolean discover) in C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\GameObjects\EntitySystemManager.cs:line 200
+   at Robust.Shared.GameObjects.EntityManager.Startup() in C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\GameObjects\EntityManager.cs:line 235
+   at Robust.Server.GameObjects.ServerEntityManager.Startup() in C:\ss14\mini-station-goob\RobustToolbox\Robust.Server\GameObjects\ServerEntityManager.cs:line 60
+   at Robust.Server.BaseServer.Start(ServerOptions options, Func`1 logHandlerFactory) in C:\ss14\mini-station-goob\RobustToolbox\Robust.Server\BaseServer.cs:line 391
+   at Robust.UnitTesting.RobustIntegrationTest.ServerIntegrationInstance.Init() in C:\ss14\mini-station-goob\RobustToolbox\Robust.UnitTesting\RobustIntegrationTest.cs:line 779
+   at Robust.UnitTesting.RobustIntegrationTest.ServerIntegrationInstance._serverMain() in C:\ss14\mini-station-goob\RobustToolbox\Robust.UnitTesting\RobustIntegrationTest.cs:line 690
+--- End of stack trace from previous location ---
+   at Robust.UnitTesting.RobustIntegrationTest.IntegrationInstance.WaitIdleImplAsync(Boolean throwOnUnhandled, CancellationToken cancellationToken) in C:\ss14\mini-station-goob\RobustToolbox\Robust.UnitTesting\RobustIntegrationTest.cs:line 483
+   at Content.IntegrationTests.PoolManager.GenerateServer(PoolSettings poolSettings, TextWriter testOut) in C:\ss14\mini-station-goob\Content.IntegrationTests\PoolManager.cs:line 164
+   at Content.IntegrationTests.Pair.TestPair.Initialize(PoolSettings settings, TextWriter testOut, List`1 testPrototypes) in C:\ss14\mini-station-goob\Content.IntegrationTests\Pair\TestPair.cs:line 146
+   at Content.IntegrationTests.PoolManager.CreateServerClientPair(PoolSettings poolSettings, TextWriter testOut) in C:\ss14\mini-station-goob\Content.IntegrationTests\PoolManager.cs:line 440
+   at Content.IntegrationTests.PoolManager.GetServerClientPair(PoolSettings poolSettings, ITestContextLike testContext) in C:\ss14\mini-station-goob\Content.IntegrationTests\PoolManager.cs:line 333
+   at Content.IntegrationTests.PoolManager.GetServerClientPair(PoolSettings poolSettings, ITestContextLike testContext) in C:\ss14\mini-station-goob\Content.IntegrationTests\PoolManager.cs:line 348
+   at Content.IntegrationTests.PoolManager.GetServerClient(PoolSettings poolSettings, ITestContextLike testContext) in C:\ss14\mini-station-goob\Content.IntegrationTests\PoolManager.cs:line 270
+   at Content.IntegrationTests.Tests.Networking.PvsStressTest.SpawnAndMovePvsStressTest() in C:\ss14\mini-station-goob\Content.IntegrationTests\Tests\Networking\PvsStressTest.cs:line 22
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.<>c__DisplayClass3_0.<PerformWork>b__0()
+   at NUnit.Framework.Internal.ContextUtils.<>c__DisplayClass1_0`1.<DoIsolated>b__0(Object _)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated(ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated[T](Func`1 func)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.PerformWork()
+1)    at Robust.Shared.GameObjects.EntityEventBus.EntAddSubscription(CompIdx compType, Type compTypeObj, Type eventType, DirectedEventHandler handler, Type orderType, Type[] before, Type[] after) in C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\GameObjects\EntityEventBus.Directed.cs:line 407
+   at Robust.Shared.GameObjects.EntityEventBus.SubscribeLocalEvent[TComp,TEvent](ComponentEventHandler`2 handler, Type orderType, Type[] before, Type[] after) in C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\GameObjects\EntityEventBus.Directed.cs:line 270
+   at Robust.Shared.GameObjects.EntitySystem.SubscribeLocalEvent[TComp,TEvent](ComponentEventHandler`2 handler, Type[] before, Type[] after) in C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\GameObjects\EntitySystem.Subscriptions.cs:line 131
+   at Content.Server.Station.Systems.StationSystem.Initialize() in C:\ss14\mini-station-goob\Content.Server\Station\Systems\StationSystem.cs:line 165
+   at Robust.Shared.GameObjects.EntitySystemManager.Initialize(Boolean discover) in C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\GameObjects\EntitySystemManager.cs:line 200
+   at Robust.Shared.GameObjects.EntityManager.Startup() in C:\ss14\mini-station-goob\RobustToolbox\Robust.Shared\GameObjects\EntityManager.cs:line 235
+   at Robust.Server.GameObjects.ServerEntityManager.Startup() in C:\ss14\mini-station-goob\RobustToolbox\Robust.Server\GameObjects\ServerEntityManager.cs:line 60
+   at Robust.Server.BaseServer.Start(ServerOptions options, Func`1 logHandlerFactory) in C:\ss14\mini-station-goob\RobustToolbox\Robust.Server\BaseServer.cs:line 391
+   at Robust.UnitTesting.RobustIntegrationTest.ServerIntegrationInstance.Init() in C:\ss14\mini-station-goob\RobustToolbox\Robust.UnitTesting\RobustIntegrationTest.cs:line 779
+   at Robust.UnitTesting.RobustIntegrationTest.ServerIntegrationInstance._serverMain() in C:\ss14\mini-station-goob\RobustToolbox\Robust.UnitTesting\RobustIntegrationTest.cs:line 690
+--- End of stack trace from previous location ---
+   at Robust.UnitTesting.RobustIntegrationTest.IntegrationInstance.WaitIdleImplAsync(Boolean throwOnUnhandled, CancellationToken cancellationToken) in C:\ss14\mini-station-goob\RobustToolbox\Robust.UnitTesting\RobustIntegrationTest.cs:line 483
+   at Content.IntegrationTests.PoolManager.GenerateServer(PoolSettings poolSettings, TextWriter testOut) in C:\ss14\mini-station-goob\Content.IntegrationTests\PoolManager.cs:line 164
+   at Content.IntegrationTests.Pair.TestPair.Initialize(PoolSettings settings, TextWriter testOut, List`1 testPrototypes) in C:\ss14\mini-station-goob\Content.IntegrationTests\Pair\TestPair.cs:line 146
+   at Content.IntegrationTests.PoolManager.CreateServerClientPair(PoolSettings poolSettings, TextWriter testOut) in C:\ss14\mini-station-goob\Content.IntegrationTests\PoolManager.cs:line 440
+   at Content.IntegrationTests.PoolManager.GetServerClientPair(PoolSettings poolSettings, ITestContextLike testContext) in C:\ss14\mini-station-goob\Content.IntegrationTests\PoolManager.cs:line 333
+   at Content.IntegrationTests.PoolManager.GetServerClientPair(PoolSettings poolSettings, ITestContextLike testContext) in C:\ss14\mini-station-goob\Content.IntegrationTests\PoolManager.cs:line 348
+   at Content.IntegrationTests.PoolManager.GetServerClient(PoolSettings poolSettings, ITestContextLike testContext) in C:\ss14\mini-station-goob\Content.IntegrationTests\PoolManager.cs:line 270
+   at Content.IntegrationTests.Tests.Networking.PvsStressTest.SpawnAndMovePvsStressTest() in C:\ss14\mini-station-goob\Content.IntegrationTests\Tests\Networking\PvsStressTest.cs:line 22
+   at NUnit.Framework.Internal.TaskAwaitAdapter.GenericAdapter`1.BlockUntilCompleted()
+   at NUnit.Framework.Internal.MessagePumpStrategy.NoMessagePumpStrategy.WaitForCompletion(AwaitAdapter awaiter)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await[TResult](TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.AsyncToSyncAdapter.Await(TestExecutionContext context, Func`1 invoke)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.RunTestMethod(TestExecutionContext context)
+   at NUnit.Framework.Internal.Commands.TestMethodCommand.Execute(TestExecutionContext context)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.<>c__DisplayClass3_0.<PerformWork>b__0()
+   at NUnit.Framework.Internal.ContextUtils.<>c__DisplayClass1_0`1.<DoIsolated>b__0(Object _)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated(ContextCallback callback, Object state)
+   at NUnit.Framework.Internal.ContextUtils.DoIsolated[T](Func`1 func)
+   at NUnit.Framework.Internal.Execution.SimpleWorkItem.PerformWork()
+
+  Standard Output Messages:
+ GetServerClientPair: Called by test Networking.PvsStressTest.SpawnAndMovePvsStressTest
+ GetServerClientPair: Looking in pool for a suitable pair
+ GetServerClientPair: Creating a new pair, no suitable pair found in pool
+ CLIENT: 0.157s [DEBG] root: OS: Microsoft Windows 10.0.29558 X64
+ CLIENT: 0.159s [DEBG] root: .NET Runtime: .NET 10.0.9 win-x64
+ CLIENT: 0.159s [DEBG] root: Server GC: True
+ CLIENT: 0.159s [DEBG] root: Processor: 20x AMD Ryzen AI 9 365 w/ Radeon 880M
+ CLIENT: 0.159s [DEBG] root: Available Memory: 23.12 GiB
+ CLIENT: 0.159s [DEBG] root: Architecture: X64
+ CLIENT: 0.159s [DEBG] root: Robust Version: 270.1.0.0
+ CLIENT: 0.159s [DEBG] root: Compile Options: DEVELOPMENT;TOOLS;DEBUG;CLIENT_SCRIPTING
+ CLIENT: 0.159s [DEBG] root: Intrinsics: X86Aes;Avx;Avx2;Avx512BW;Avx512BW.VL;Avx512CD;Avx512CD.VL;Avx512DQ;Avx512DQ.VL;Avx512F;Avx512F.VL;Avx512Vbmi;Avx512Vbmi.VL;Bmi1;Bmi2;Fma;Lzcnt;Pclmulqdq;Popcnt;Sse;Sse2;Sse3;Ssse3;Sse41;Sse42;X86Base
+ CLIENT: 0.567s [DEBG] serialization: Skipping registering data definition for type Content.Goobstation.Shared.Devil.BaseDevilContractEvent since it is abstract or an interface
+ CLIENT: 0.707s [DEBG] serialization: Skipping registering data definition for type Content.Goobstation.Shared.Blob.BlobChemTypedStorage`1[T] since it is abstract or an interface
+ CLIENT: 0.730s [DEBG] serialization: Skipping registering data definition for type Content.Goobstation.Shared.Blob.BlobTypedStorage`1[T] since it is abstract or an interface
+ CLIENT: 0.887s [DEBG] serialization: Skipping registering data definition for type Content.Shared._CorvaxGoob.Animation.API.AnimationTrackData since it is abstract or an interface
+ CLIENT: 0.889s [DEBG] serialization: Skipping registering data definition for type Content.Shared._CorvaxGoob.Animation.API.KeyFrameData since it is abstract or an interface
+ CLIENT: 0.900s [DEBG] serialization: Skipping registering data definition for type Content.Shared._CorvaxGoob.Events.BaseTargetEvent since it is abstract or an interface
+ CLIENT: 2.863s [INFO] SponsorImplementations: Starting up
+ CLIENT: 3,791s [DEBG] res.preload: Skipping texture preloading due to CVar value.
+ CLIENT: 3,894s [INFO] szr: Serializer Types Hash: 37D50443DDEA9CB01C8F9CCFADDF08F6CA8BCA21C820159B9AC14F97797B4ED7
+ CLIENT: 17,768s [INFO] client: Tickrate changed to: 30 on tick 1
+ CLIENT: 17,795s [INFO] client: Tickrate changed to: 1 on tick 1
+ CLIENT: 17,816s [DEBG] client: Runlevel changed to: Initialize
+ CLIENT: 18,498s [DEBG] root: Switching to state Content.Client.MainMenu.MainScreen
+ CLIENT: 18,678s [DEBG] clyde: Tile atlas took 00:00:00.1683383 to build
+ CLIENT: 18,698s [WARN] cfg: Only the server can change 'net.pvs'.
+ SERVER: 0.103s [INFO] srv: Timescale changed to: 1 on tick 1
+ SERVER: 0.103s [INFO] srv: Name: MyServer
+ SERVER: 0.103s [INFO] srv: TickRate: 30(33.33ms)
+ SERVER: 0.103s [INFO] srv: Max players: 256
+ SERVER: 0.149s [INFO] SponsorImplementations: Starting up
+ SERVER: 0.241s [INFO] szr: Serializer Types Hash: 37D50443DDEA9CB01C8F9CCFADDF08F6CA8BCA21C820159B9AC14F97797B4ED7
+ SERVER: 0.276s [INFO] configpreset: Loaded config preset: "/ConfigPresets/Build/debug.toml"
+ SERVER: 1,475s [WARN] db.ef: The migration operation 'PRAGMA foreign_keys = 0;
+ ' from migration 'AdminLogs' cannot be executed in a transaction. If the app is terminated or an unrecoverable error occurs while this operation is being executed then the migration will be left in a partially applied state and would need to be reverted manually before it can be applied again. Create a separate migration that contains just this operation.
+ SERVER: 1,630s [WARN] db.ef: The migration operation 'PRAGMA foreign_keys = 0;
+ ' from migration 'Cleanup' cannot be executed in a transaction. If the app is terminated or an unrecoverable error occurs while this operation is being executed then the migration will be left in a partially applied state and would need to be reverted manually before it can be applied again. Create a separate migration that contains just this operation.
+ SERVER: 1,679s [WARN] db.ef: The migration operation 'PRAGMA foreign_keys = 0;
+ ' from migration 'ServerNameFts' cannot be executed in a transaction. If the app is terminated or an unrecoverable error occurs while this operation is being executed then the migration will be left in a partially applied state and would need to be reverted manually before it can be applied again. Create a separate migration that contains just this operation.
+ SERVER: 1,722s [WARN] db.ef: The migration operation 'PRAGMA foreign_keys = 0;
+ ' from migration 'MarkingsJsonb' cannot be executed in a transaction. If the app is terminated or an unrecoverable error occurs while this operation is being executed then the migration will be left in a partially applied state and would need to be reverted manually before it can be applied again. Create a separate migration that contains just this operation.
+ SERVER: 1,795s [WARN] db.ef: An operation of type 'UpdateDataOperation' will be attempted while a rebuild of table 'admin_notes' is pending. The database may not be in an expected state. Review the SQL generated by this migration to help diagnose any failures. Consider moving these operations to a subsequent migration.
+ SERVER: 1,801s [WARN] db.ef: The migration operation 'PRAGMA foreign_keys = 0;
+ ' from migration 'AdminNotesImprovement' cannot be executed in a transaction. If the app is terminated or an unrecoverable error occurs while this operation is being executed then the migration will be left in a partially applied state and would need to be reverted manually before it can be applied again. Create a separate migration that contains just this operation.
+ SERVER: 1,844s [WARN] db.ef: The migration operation 'PRAGMA foreign_keys = 0;
+ ' from migration 'AdminNotesImprovementsForeignKeys' cannot be executed in a transaction. If the app is terminated or an unrecoverable error occurs while this operation is being executed then the migration will be left in a partially applied state and would need to be reverted manually before it can be applied again. Create a separate migration that contains just this operation.
+ SERVER: 1,895s [WARN] db.ef: The migration operation 'PRAGMA foreign_keys = 0;
+ ' from migration 'ConnectionLogServer' cannot be executed in a transaction. If the app is terminated or an unrecoverable error occurs while this operation is being executed then the migration will be left in a partially applied state and would need to be reverted manually before it can be applied again. Create a separate migration that contains just this operation.
+ SERVER: 1,918s [WARN] db.ef: The migration operation 'PRAGMA foreign_keys = 0;
+ ' from migration 'AdminLogPk' cannot be executed in a transaction. If the app is terminated or an unrecoverable error occurs while this operation is being executed then the migration will be left in a partially applied state and would need to be reverted manually before it can be applied again. Create a separate migration that contains just this operation.
+ SERVER: 1,954s [WARN] db.ef: The migration operation 'PRAGMA foreign_keys = 0;
+ ' from migration 'ClothingRemoval' cannot be executed in a transaction. If the app is terminated or an unrecoverable error occurs while this operation is being executed then the migration will be left in a partially applied state and would need to be reverted manually before it can be applied again. Create a separate migration that contains just this operation.
+ SERVER: 1,973s [WARN] db.ef: The migration operation 'PRAGMA foreign_keys = 0;
+ ' from migration 'AdminMessageDismiss' cannot be executed in a transaction. If the app is terminated or an unrecoverable error occurs while this operation is being executed then the migration will be left in a partially applied state and would need to be reverted manually before it can be applied again. Create a separate migration that contains just this operation.
+ SERVER: 2,406s [WARN] db.ef: The migration operation 'PRAGMA foreign_keys = 0;
+ ' from migration 'BanRefactor' cannot be executed in a transaction. If the app is terminated or an unrecoverable error occurs while this operation is being executed then the migration will be left in a partially applied state and would need to be reverted manually before it can be applied again. Create a separate migration that contains just this operation.
+ SERVER: 14,028s [WARN] system.sponsor: [Sponsors] PostgreSQL is not configured, skipping sponsor sync.
+ SERVER: 14,648s [INFO] autocleaning: AutoCleaning enabled set to: True
+
+
+
+Failed!  - Failed:     1, Passed:     0, Skipped:     0, Total:     1, Duration: 35 s - Content.IntegrationTests.dll (net10.0)

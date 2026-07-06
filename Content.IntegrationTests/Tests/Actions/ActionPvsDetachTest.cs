@@ -71,7 +71,7 @@ public sealed class ActionPvsDetachTest
     [Test]
     public async Task TestActionDetach()
     {
-        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true });
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, EnableNetPvs = true });
         var (server, client) = pair;
         var sys = server.System<SharedActionsSystem>();
         var cSys = client.System<SharedActionsSystem>();
@@ -79,8 +79,12 @@ public sealed class ActionPvsDetachTest
         // Spawn mob that has some actions
         EntityUid ent = default;
         var map = await pair.CreateTestMap();
-        await server.WaitPost(() => ent = server.EntMan.SpawnAtPosition("MobHuman", map.GridCoords));
-        await pair.RunTicksSync(5);
+        await server.WaitPost(() =>
+        {
+            ent = server.EntMan.SpawnAtPosition("MobHuman", map.GridCoords);
+            server.PlayerMan.SetAttachedEntity(pair.Player, ent, true);
+        });
+        await pair.RunTicksSync(30);
         var cEnt = pair.ToClientUid(ent);
 
         // Verify that both the client & server agree on the number of actions

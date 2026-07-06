@@ -151,6 +151,18 @@ public abstract class SharedNavMapSystem : EntitySystem
 
     #region: Event handling
 
+    private Dictionary<NetEntity, NavMapBeacon> FilterBeacons(Dictionary<NetEntity, NavMapBeacon> beacons)
+    {
+        var filtered = new Dictionary<NetEntity, NavMapBeacon>(beacons.Count);
+        foreach (var (nuid, beacon) in beacons)
+        {
+            if (TryGetEntity(nuid, out _))
+                filtered[nuid] = beacon;
+        }
+
+        return filtered;
+    }
+
     private void OnGetState(EntityUid uid, NavMapComponent component, ref ComponentGetState args)
     {
         Dictionary<Vector2i, int[]> chunks;
@@ -165,7 +177,7 @@ public abstract class SharedNavMapSystem : EntitySystem
                 chunks.Add(origin, chunk.TileData);
             }
 
-            args.State = new NavMapState(chunks, component.Beacons, component.RegionProperties);
+            args.State = new NavMapState(chunks, FilterBeacons(component.Beacons), component.RegionProperties);
             return;
         }
 
@@ -178,7 +190,7 @@ public abstract class SharedNavMapSystem : EntitySystem
             chunks.Add(origin, chunk.TileData);
         }
 
-        args.State = new NavMapDeltaState(chunks, component.Beacons, component.RegionProperties, new(component.Chunks.Keys));
+        args.State = new NavMapDeltaState(chunks, FilterBeacons(component.Beacons), component.RegionProperties, new(component.Chunks.Keys));
     }
 
     private void OnConfigurableExamined(Entity<ConfigurableNavMapBeaconComponent> ent, ref ExaminedEvent args)

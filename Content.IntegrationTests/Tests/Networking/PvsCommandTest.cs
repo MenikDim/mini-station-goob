@@ -18,14 +18,18 @@ public sealed class PvsCommandTest
     [Test]
     public async Task TestPvsCommands()
     {
-        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, DummyTicker = false });
+        await using var pair = await PoolManager.GetServerClient(new PoolSettings { Connected = true, EnableNetPvs = true });
         var (server, client) = pair;
-        await pair.RunTicksSync(5);
+        var map = await pair.CreateTestMap();
 
-        // Spawn a complex entity.
+        // Spawn a complex entity near the player so PVS replicates it.
         EntityUid entity = default;
-        await server.WaitPost(() => entity = server.EntMan.Spawn(TestEnt));
-        await pair.RunTicksSync(5);
+        await server.WaitPost(() =>
+        {
+            entity = server.EntMan.SpawnAtPosition(TestEnt, map.GridCoords);
+            server.PlayerMan.SetAttachedEntity(pair.Player, entity, true);
+        });
+        await pair.RunTicksSync(30);
 
         // Check that the client has a variety pf entities.
         Assert.That(client.EntMan.EntityCount, Is.GreaterThan(0));

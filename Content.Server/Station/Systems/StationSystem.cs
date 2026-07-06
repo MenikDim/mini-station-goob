@@ -100,6 +100,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using System.Linq;
+using Content.Server._Mini.Networking;
 using Content.Server.Chat.Systems;
 using Content.Server.GameTicking;
 using Content.Server.Station.Components;
@@ -107,10 +108,10 @@ using Content.Server.Station.Events;
 using Content.Shared.Station;
 using Content.Shared.Station.Components;
 using JetBrains.Annotations;
-using Robust.Server.GameStates;
 using Robust.Server.Player;
 using Robust.Shared.Collections;
 using Robust.Shared.Enums;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Player;
@@ -131,7 +132,7 @@ public sealed partial class StationSystem : SharedStationSystem
     [Dependency] private readonly ChatSystem _chatSystem = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly MetaDataSystem _metaData = default!;
-    [Dependency] private readonly PvsOverrideSystem _pvsOverride = default!;
+    [Dependency] private readonly PvsSessionOverrideSystem _pvsSession = default!;
 
     private ISawmill _sawmill = default!;
 
@@ -213,7 +214,7 @@ public sealed partial class StationSystem : SharedStationSystem
         var metaData = MetaData(uid);
         RaiseLocalEvent(new StationInitializedEvent(uid));
         _sawmill.Info($"Set up station {metaData.EntityName} ({uid}).");
-        _pvsOverride.AddGlobalOverride(uid);
+        _pvsSession.RefreshAllPlayers();
     }
 
     private void OnStationDeleted(EntityUid uid, StationDataComponent component, ComponentShutdown args)

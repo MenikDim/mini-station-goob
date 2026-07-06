@@ -11,6 +11,7 @@
 
 using System.Linq;
 using Content.Goobstation.Maths.FixedPoint;
+using Content.Server._Mini.Networking;
 using Content.Shared.Points;
 using JetBrains.Annotations;
 using Robust.Server.GameStates;
@@ -25,6 +26,7 @@ public sealed class PointSystem : SharedPointSystem
 {
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly PvsOverrideSystem _pvsOverride = default!;
+    [Dependency] private readonly PvsSessionOverrideSystem _pvsSession = default!;
 
     /// <inheritdoc/>
     public override void Initialize()
@@ -32,11 +34,20 @@ public sealed class PointSystem : SharedPointSystem
         base.Initialize();
 
         SubscribeLocalEvent<PointManagerComponent, ComponentStartup>(OnStartup);
+        SubscribeLocalEvent<PointManagerComponent, ComponentShutdown>(OnShutdown);
     }
 
     private void OnStartup(EntityUid uid, PointManagerComponent component, ComponentStartup args)
     {
-        _pvsOverride.AddGlobalOverride(uid);
+        _pvsSession.RefreshPointManagerOverrides();
+    }
+
+    private void OnShutdown(EntityUid uid, PointManagerComponent component, ComponentShutdown args)
+    {
+        foreach (var session in _player.Sessions)
+        {
+            _pvsOverride.RemoveSessionOverride(uid, session);
+        }
     }
 
     /// <summary>

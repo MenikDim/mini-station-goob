@@ -1,3 +1,4 @@
+using Content.Shared.GameTicking.Components;
 using Content.Goobstation.Common.Mind;
 using Content.Goobstation.Common.Mobs;
 using Content.Goobstation.Server.MisandryBox.Mind;
@@ -757,6 +758,15 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
 
     private void OnPlayerStatusChanged(object? sender, SessionStatusEventArgs args)
     {
+        if (args.NewStatus == SessionStatus.InGame)
+        {
+            var query = EntityQueryEnumerator<ThunderdomeRuleComponent, ActiveGameRuleComponent>();
+            while (query.MoveNext(out var ent, out var rule, out _))
+            {
+                RefreshLeaderboardOverrides((ent, rule));
+            }
+        }
+
         if (args.NewStatus != SessionStatus.Disconnected)
             return;
 
@@ -1396,11 +1406,8 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             {
                 rule.CachedLeaderboards = leaderboards.ToList();
 
-                // Make leaderboards visible to all clients (including ghosts far away)
-                foreach (var (lbUid, _) in leaderboards)
-                {
-                    _pvsOverride.AddGlobalOverride(lbUid);
-                }
+                // Make leaderboards visible to thunderdome participants and spectators
+                RefreshLeaderboardOverrides((rule.Owner, rule));
             }
         }
 
@@ -1520,9 +1527,39 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         foreach (var (lbUid, leaderboard) in leaderboards)
         {
             leaderboard.RuleEntity = ent;
-            // Make leaderboards visible to all clients (including ghosts far away)
-            _pvsOverride.AddGlobalOverride(lbUid);
         }
+
+        RefreshLeaderboardOverrides(ent);
+    }
+
+    private void RefreshLeaderboardOverrides(Entity<ThunderdomeRuleComponent> rule)
+    {
+        if (rule.Comp.CachedLeaderboards.Count == 0)
+            return;
+
+        var arenaMap = rule.Comp.ArenaMap;
+
+        foreach (var (lbUid, _) in rule.Comp.CachedLeaderboards)
+        {
+            foreach (var session in _playerManager.Sessions)
+            {
+                if (ShouldReceiveThunderdomeLeaderboard(session, arenaMap))
+                    _pvsOverride.AddSessionOverride(lbUid, session);
+                else
+                    _pvsOverride.RemoveSessionOverride(lbUid, session);
+            }
+        }
+    }
+
+    private bool ShouldReceiveThunderdomeLeaderboard(ICommonSession session, MapId? arenaMap)
+    {
+        if (session.Status != SessionStatus.InGame || session.AttachedEntity is not { } player)
+            return false;
+
+        if (HasComp<ThunderdomePlayerComponent>(player) || HasComp<GhostComponent>(player))
+            return true;
+
+        return arenaMap != null && Transform(player).MapID == arenaMap;
     }
 
     private void OnThunderdomePlayerDamaged(Entity<ThunderdomePlayerComponent> ent, ref DamageChangedEvent args)
