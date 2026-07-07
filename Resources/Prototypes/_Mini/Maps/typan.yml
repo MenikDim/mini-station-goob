@@ -21,7 +21,7 @@
             TypanMedic: [ 2, 2 ]
             TypanResearchDirector: [ 1, 1 ]
             TypanScience: [ 2, 2 ]
-            TypanPatrol: [ 2, 2 ]
+            TypanPatrol: [ 4, 4 ]
             TypanBorg: [ 2, 2 ]
             TypanCommander: [ 1, 1 ]
         - type: StationCargoShuttle
