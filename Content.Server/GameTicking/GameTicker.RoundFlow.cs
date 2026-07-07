@@ -184,6 +184,10 @@ namespace Content.Server.GameTicking
             if (_mapManager.MapExists(DefaultMap))
                 return;
 
+            // Preset rules must be added before the maps load: stations post-init during map load
+            // and systems like roundstart station variation only run if their rule is already added.
+            AddGamePresetRules();
+
             var maps = new List<GameMapPrototype>();
 
             // the map might have been force-set by something
@@ -500,9 +504,9 @@ namespace Content.Server.GameTicking
             // applies to players who didn't ready up
             UpdateInfoText();
 
-            // Preset may change after map preload (e.g. forcepreset) — always refresh rules.
-            ClearGameRules();
-            AddGamePresetRules();
+            // Preset may change after map preload (e.g. forcepreset) — swap in the new
+            // preset's rules if so. Rules queued by other means (e.g. addgamerule) survive.
+            RefreshGamePresetRules();
             StartGamePresetRules();
 
             RoundLengthMetric.Set(0);
@@ -883,6 +887,7 @@ namespace Content.Server.GameTicking
             // Clear up any game rules.
             ClearGameRules();
             CurrentPreset = null;
+            _addedPresetRules.Clear();
 
             _allPreviousGameRules.Clear();
 

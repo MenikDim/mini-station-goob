@@ -166,7 +166,7 @@ public sealed class DailyQuestSystem : EntitySystem
     }
 
     /// <summary>
-    /// Rolls daily quests forward when the Moscow calendar date changes. Returns true if assignments were refreshed.
+    /// Rolls weekly quests forward when the Moscow calendar week changes. Returns true if assignments were refreshed.
     /// </summary>
     private bool TryRefreshDailyQuestsIfNeeded(ICommonSession session, PlayerDailyQuestState state)
     {
@@ -179,7 +179,7 @@ public sealed class DailyQuestSystem : EntitySystem
 
         var previousDate = state.QuestDate;
         EnsureDailyAssignments(session, state);
-        Log.Info($"Daily quests refreshed for {session.Name}: {previousDate:yyyy-MM-dd} -> {today:yyyy-MM-dd}");
+        Log.Info($"Weekly quests refreshed for {session.Name}: {previousDate:yyyy-MM-dd} -> {today:yyyy-MM-dd}");
         return true;
     }
 
@@ -1244,20 +1244,22 @@ public sealed class DailyQuestSystem : EntitySystem
     }
 
     /// <summary>
-    /// Current calendar date in Moscow (MSK), used as the quest day key in the database.
+    /// Start of the current quest week (Monday, MSK), used as the quest period key in the database.
     /// </summary>
     private static DateTime GetCurrentQuestDate()
     {
-        return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, MoscowTimeZone).Date;
+        var moscowDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, MoscowTimeZone).Date;
+        var daysFromMonday = ((int) moscowDate.DayOfWeek + 6) % 7;
+        return moscowDate.AddDays(-daysFromMonday);
     }
 
     /// <summary>
-    /// Next quest reset instant (midnight MSK) expressed in UTC for client countdown.
+    /// Next quest reset instant (Monday 00:00 MSK) expressed in UTC for client countdown.
     /// </summary>
     private static DateTime GetNextQuestResetUtc(DateTime questDate)
     {
-        var nextMoscowMidnight = DateTime.SpecifyKind(questDate.Date.AddDays(1), DateTimeKind.Unspecified);
-        return TimeZoneInfo.ConvertTimeToUtc(nextMoscowMidnight, MoscowTimeZone);
+        var nextWeekStart = DateTime.SpecifyKind(questDate.Date.AddDays(7), DateTimeKind.Unspecified);
+        return TimeZoneInfo.ConvertTimeToUtc(nextWeekStart, MoscowTimeZone);
     }
 
     private void DeduplicateSlots(PlayerDailyQuestState state)

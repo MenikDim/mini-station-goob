@@ -20,11 +20,16 @@ public sealed class TypanWarFriendlyFireSystem : EntitySystem
         SubscribeLocalEvent<TypanWarFriendlyFireComponent, AmmoShotUserEvent>(OnAmmoShot);
     }
 
-    public void SetupCombatant(EntityUid uid, TypanWarSide side, bool enabled = true)
+    public void SetFaction(EntityUid uid, TypanWarSide side)
     {
         var faction = EnsureComp<TypanWarFactionComponent>(uid);
         faction.Side = side;
         Dirty(uid, faction);
+    }
+
+    public void SetupCombatant(EntityUid uid, TypanWarSide side, bool enabled = true)
+    {
+        SetFaction(uid, side);
 
         var ff = EnsureComp<TypanWarFriendlyFireComponent>(uid);
         ff.Enabled = enabled;

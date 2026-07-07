@@ -10,3 +10,21 @@
   icon:
     sprite: /Textures/_Mini/Interface/Misc/ratvar_cult_icons.rsi
     state: Cultist
+
+- type: factionIcon
+  id: TypanWarNtFaction
+  priority: 0
+  locationPreference: Left
+  hideOnStealth: false
+  icon:
+    sprite: /Textures/Interface/Misc/job_icons.rsi
+    state: Nanotrasen
+
+- type: factionIcon
+  id: TypanWarTypanFaction
+  priority: 0
+  locationPreference: Left
+  hideOnStealth: false
+  icon:
+    sprite: /Textures/Interface/Misc/job_icons.rsi
+    state: Syndicate

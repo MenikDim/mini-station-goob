@@ -53,19 +53,19 @@ namespace Content.IntegrationTests.Tests.GameRules
                 sGameTicker.StartRound();
             });
 
-            await server.WaitPost(() => sGameTicker.ClearGameRules());
-
-            Assert.That(server.EntMan.Count<ActiveGameRuleComponent>(), Is.Zero);
+            // StartRound clears manually added rules. Goobstation auto-starts JobObjectiveRule.
+            Assert.That(server.EntMan.Count<GameRuleComponent>(), Is.EqualTo(1));
+            Assert.That(server.EntMan.Count<ActiveGameRuleComponent>(), Is.EqualTo(1));
 
             await server.WaitPost(() =>
             {
                 sGameTicker.StartGameRule("MaxTimeRestart", out var ruleEntity);
                 Assert.That(entityManager.TryGetComponent<MaxTimeRestartRuleComponent>(ruleEntity, out maxTime));
-                maxTime!.RoundMaxTime = TimeSpan.FromSeconds(3);
-                maxTimeRestart.RestartTimer(maxTime);
+                maxTime.RoundMaxTime = TimeSpan.FromSeconds(3);
             });
 
-            Assert.That(server.EntMan.Count<ActiveGameRuleComponent>(), Is.EqualTo(1));
+            Assert.That(server.EntMan.Count<GameRuleComponent>(), Is.EqualTo(2));
+            Assert.That(server.EntMan.Count<ActiveGameRuleComponent>(), Is.EqualTo(2));
 
             await server.WaitAssertion(() =>
             {

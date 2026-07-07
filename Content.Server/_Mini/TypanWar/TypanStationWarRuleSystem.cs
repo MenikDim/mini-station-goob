@@ -156,13 +156,19 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
                 RecordFactionJoin(component, args.Player.UserId, jobId);
         }
 
-        if (!IsWarActive)
+        if (!TryGetRunningWarRule(out var warComponent)
+            || warComponent.Phase is not (TypanWarPhase.Pending or TypanWarPhase.Active))
             return;
 
         if (!_mind.TryGetMind(args.Mob, out var combatMindId, out var combatMind))
             return;
 
-        if (TryGetWarSide((combatMindId, combatMind), out var side) && !IsSilicon(args.Mob))
+        if (!TryGetWarSide((combatMindId, combatMind), out var side))
+            return;
+
+        _friendlyFire.SetFaction(args.Mob, side);
+
+        if (warComponent.Phase == TypanWarPhase.Active && !IsSilicon(args.Mob))
             _friendlyFire.SetupCombatant(args.Mob, side);
     }
 
@@ -246,6 +252,7 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
 
         IsModeActive = true;
         SeedJoinedRoster(component);
+        SetupWarFactionMarkers();
         BroadcastStatus(component);
     }
 
@@ -715,7 +722,7 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
         _metaData.SetEntityDescription(objective.Value, text, MetaData(objective.Value));
     }
 
-    private void SetupWarCombatants()
+    private void SetupWarFactionMarkers()
     {
         var minds = EntityQueryEnumerator<MindComponent>();
         while (minds.MoveNext(out var mindId, out var mind))
@@ -723,17 +730,25 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
             if (!IsMindAlive(mind) || mind.CurrentEntity is not { } mob)
                 continue;
 
-            if (!TryGetWarSide((mindId, mind), out var side) || IsSilicon(mob))
+            if (!TryGetWarSide((mindId, mind), out var side))
                 continue;
 
-            _friendlyFire.SetupCombatant(mob, side);
+            _friendlyFire.SetFaction(mob, side);
+
+            if (IsWarActive && !IsSilicon(mob))
+                _friendlyFire.SetupCombatant(mob, side);
         }
+    }
+
+    private void SetupWarCombatants()
+    {
+        SetupWarFactionMarkers();
     }
 
     private void ClearWarCombatants()
     {
-        var query = EntityQueryEnumerator<TypanWarFriendlyFireComponent, TransformComponent>();
-        while (query.MoveNext(out var uid, out _, out _))
+        var query = EntityQueryEnumerator<TypanWarFactionComponent>();
+        while (query.MoveNext(out var uid, out _))
             _friendlyFire.RemoveCombatant(uid);
     }
 
@@ -936,10 +951,14 @@ public sealed class TypanStationWarRuleSystem : GameRuleSystem<TypanStationWarRu
 
     private void OnGameRuleAdded(ref GameRuleAddedEvent args)
     {
-        if (!IsTypanWarBlocking())
+        // Only block midround additions — roundstart rules are added in the lobby before war goes active.
+        if (GameTicker.RunLevel != GameRunLevel.InRound || !IsTypanWarBlocking())
             return;
 
         if (HasComp<TypanStationWarRuleComponent>(args.RuleEntity))
+            return;
+
+        if (HasComp<AdminForcedGameRuleComponent>(args.RuleEntity))
             return;
 
         if (!TryComp<GameRuleComponent>(args.RuleEntity, out var rule))

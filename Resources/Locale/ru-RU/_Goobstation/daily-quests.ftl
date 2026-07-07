@@ -1,16 +1,16 @@
 # SPDX-FileCopyrightText: 2026 Casha
 
-daily-quest-section-title = Ежедневные квесты
-daily-quest-section-summary = Ежедневные квесты ({$done}/{$total} получено)
-daily-quest-empty = Сегодня квесты ещё не назначены. Зайдите в игру, чтобы получить задания.
+daily-quest-section-title = Еженедельные квесты
+daily-quest-section-summary = Еженедельные квесты ({$done}/{$total} получено)
+daily-quest-empty = На эту неделю квесты ещё не назначены. Зайдите в игру, чтобы получить задания.
 daily-quest-role-hint = Роль: {$role}
 daily-quest-progress = {$current} / {$target}
 daily-quest-status-active = В процессе
 daily-quest-status-complete = Выполнено — награда начислена!
 daily-quest-status-claimed = Получено +{$amount} монет
-daily-quest-status-next-quest = Новый квест через {$time}
-daily-quest-status-claimed-timer = {$status} Новый квест через {$time}
-daily-quest-status-complete-timer = {$status} Новый квест через {$time}
+daily-quest-status-next-quest = Новые квесты через {$time}
+daily-quest-status-claimed-timer = {$status} Новые квесты через {$time}
+daily-quest-status-complete-timer = {$status} Новые квесты через {$time}
 daily-quest-claim = Забрать награду
 daily-quest-claim-success = Квест выполнен! Получено монет: {$amount}.
 daily-quest-claim-empty = Награда по квесту не начислена.
@@ -19,9 +19,9 @@ daily-quest-replace-pending = Замена задания...
 daily-quest-replace-denied = Сейчас этот квест нельзя заменить.
 daily-quest-replace-denied-loading = Данные квестов ещё загружаются. Попробуйте через несколько секунд.
 daily-quest-replace-denied-progress = Заменить можно только задание без прогресса.
-daily-quest-replace-denied-used = Замену заданий можно использовать только один раз в день.
-daily-quest-replace-used-today = Замена заданий на сегодня уже использована.
-daily-quest-replace-empty-pool = Сегодня больше нет доступных квестов для замены.
+daily-quest-replace-denied-used = Замену заданий можно использовать только один раз в неделю.
+daily-quest-replace-used-today = Замена заданий на эту неделю уже использована.
+daily-quest-replace-empty-pool = На этой неделе больше нет доступных квестов для замены.
 daily-quest-replace-success = Задание заменено.
 
 daily-quest-rarity-rare = Редкий
