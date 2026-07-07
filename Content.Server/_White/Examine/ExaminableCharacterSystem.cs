@@ -119,12 +119,12 @@ public sealed class ExaminableCharacterSystem : EntitySystem
         FormattedMessage message = new();
         message.PushTag(new MarkupNode("examineborder", null, null)); // border
         message.PushNewline();
-        message.AddText($"[color=DarkGray][font size=11]{name}[/font][/color]");
+        message.AddMarkupOrThrow($"[color=DarkGray][font size=11]{name}[/font][/color]");
         message.PushNewline();
         AddLine(message);
         foreach (var line in logLines)
         {
-            message.AddText(line);
+            message.AddMarkupOrThrow(line);
             message.PushNewline();
         }
         AddLine(message);
@@ -156,11 +156,11 @@ public sealed class ExaminableCharacterSystem : EntitySystem
             {
                 TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
                 var item = Loc.GetString("examine-present-tex", ("name", textInfo.ToTitleCase(metaData.EntityName)), ("id", GetNetEntity(uid).Id), ("size", 14));
-                message.AddText($"[color=DarkGray][font size=11]{item}[/font][/color]");
+                message.AddMarkupOrThrow($"[color=DarkGray][font size=11]{item}[/font][/color]");
                 message.PushNewline();
             }
             AddLine(message);
-            message.AddText($"[font size=10]{args.Message}[/font]");
+            message.AddMarkupOrThrow($"[font size=10]{args.Message}[/font]");
             message.PushNewline();
             AddLine(message);
             message.Pop();

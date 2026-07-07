@@ -103,3 +103,12 @@ guide-entry-sop-janitor = Janitor
 guide-entry-sop-librarian = Librarian
 guide-entry-sop-mime = Mime
 guide-entry-sop-reporter = Reporter
+
+guide-entry-bingle = Bingle
+guide-entry-devil = Devil
+guide-entry-devil-clauses = Agreement Clauses
+guide-entry-slasher = Slasher
+guide-entry-corporate-agents = Corporate Agent
+guide-entry-revealing-conditions = Revealing Antagonists
+guide-entry-xenobiology = Xenobiology
+guide-entry-slaughter-demon = Slaughter Demon

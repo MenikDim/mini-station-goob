@@ -3,7 +3,7 @@
   parent: BaseGameRule
   components:
   - type: GameRule
-    minPlayers: 0
+    minPlayers: 20
     chaosScore: 900
   - type: Tag
     tags:
@@ -28,7 +28,7 @@
   - typan-station-war
   name: game-presets-typan-station-war
   showInVote: true
-  minPlayers: 0
+  minPlayers: 20
   description: game-presets-typan-station-war-description
   rules:
   - TypanStationWar
