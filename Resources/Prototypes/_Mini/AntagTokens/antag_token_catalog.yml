@@ -238,7 +238,7 @@
       nameLocKey: antag-store-role-blood-cult-name
       descriptionLocKey: antag-store-role-blood-cult-description
       cost: 6
-      iconPath: /Textures/_Mini/Interface/Antags/blood_cultist.rsi
+      iconPath: /Textures/_Mini/Interface/Antags/blood_cultist.png
       mode: LobbyDeposit
       antagId: BloodCultist
       gameRuleId: BloodCult
